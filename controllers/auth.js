@@ -29,7 +29,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       email,
       age,
-      role: 'user',
+      role: 'patient',
     });
 
     // Gửi email
@@ -110,7 +110,7 @@ const loginFacebook = async (req, res) => {
         userName: fullName,
         email,
         faceAppId: id,
-        role: 'user',
+        role: 'patient',
       });
     } else if (!user.faceAppId) {
       // Cập nhật faceAppId nếu user đã tồn tại nhưng chưa có
