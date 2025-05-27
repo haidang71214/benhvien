@@ -4,8 +4,8 @@ const { Schema } = mongoose;
 
 export const ROLE_ENUM = ['patient', 'admin', 'doctor', 'nurse', 'receptionist', 'accounting'];
 export const STATUS_ENUM = ['NotUsed', 'InUse', 'UnderMaintenance', 'Broken', 'Removed'];
-
-
+export const DOCTOR_HEHE = ['internal_medicine', 'pediatrics', 'dermatology', 'dentistry', 'ENT', 'ophthalmology', 'cardiology', 'neurology']
+export const ROOM_ENUM = ['booked', 'checkedIn', 'inProgress', 'completed', 'cancelled']
 const userSchema = new Schema({
   userName: {
     type: String,
@@ -48,7 +48,19 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  // những thuộc tính t bỏ dưới dòng này là những thuộc tính của doctor mới có
+  specialty:{
+    type:[String], // à, 1 bác sĩ có thể có nhiều chuyên ngành nên cái này mình để mảng thì hợp lí hơn
+    enum:DOCTOR_HEHE
+  },
+  licenseNumber:{
+    type:String // mã duy nhất của 1 bác sĩ được cấp phép
+  },
+  bio:{// mô tả
+    type:String
+  }
 }, { timestamps: true });
+
 // quản lí thiết bị phòng khám mỗi thiết bị phòng khám thì sẽ có
 //  nhiều cái size tương ứng với những chức năng đó, số lượng,status: tình trạng thiết bị, dụng cụ phòng khám
 const equipmentSchema = new Schema({
@@ -92,10 +104,148 @@ const equipmentDetailSchema = new Schema({
   }
   // muốn chuyển thành đang dùng thì cần có điều kiện gì ? xin từ kho, bác sĩ xin, admin duyệt
 })
+const paymentSchema = new Schema({
+    tranSactionNo:String,
+    amount:Number,
+    payMethod:{
+      enum:['VNPay,cash'], // trả tiền mặt hoặc vnpay
+      type:String,
+      require:false,
+      default:'VNPay'
+    },
+    response_code:String,
+    payment_date: Date,
+    vnp_PayDate: Date,
+    vnp_TransactionStatus: String,
+    patientId:{
+      type:Types.ObjectId,
+      ref:'User',
+      required:true
+    }
+})
+// lịch hẹn
+const appointmentSchema = new Schema({
+    doctorId:{type:Types.ObjectId,
+      ref:'User',
+      required:true
+    },
+    patientId:{
+      type:Types.ObjectId,
+      ref:'User',
+      required:true
+    },
+    cinicRoomId:{
+      type:Types.ObjectId,
+      ref:'cinicRoom',
+      required:true
+    },
+    appointmentTime:Date,
+    status:{
+      type:String,
+      enum:ROOM_ENUM,
+      default:'booked'
+    }
+})
+const cinicRoomSchema = new Schema({
+  name:String, // phòng thì thường cố định nên thường không có tạo phòng
+              // nhma giả định đi
+  allowedSpecialized:{
+    type:[String],
+    enum:DOCTOR_HEHE
+  },
+  function:String // chức năng của 
+})
+const doctorSchedualSchema = new Schema({
+  doctorId:{
+    type:Types.ObjectId,
+    ref:'User',
+    required:false
+  },
+  dayOfWeek: {
+    type: String,
+    enum: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    required: true
+  },  
+  slot:{
+    type:String,
+    enum:['morning,afternoon'],
+    required:true
+  },
+  //startTime thì dựa vào cái morning hay afternoon
+  startTime:{
+    type:Date,
+    require:true
+  }
+})
 
 
-
+const appointments = mongoose.model('appointments',appointmentSchema)
+const payments = mongoose.model('payments',paymentSchema)
 const equipmentDetails = mongoose.model('equipmentDetails',equipmentDetailSchema)
 const equipments = mongoose.model('equipments',equipmentSchema)
 const users = mongoose.model('users', userSchema);
-export { users,equipments,equipmentDetails };
+export { users,equipments,equipmentDetails,payments,appointments };
+
+// ADMIN
+// Quyền truy cập: TẤT CẢ module – toàn quyền hệ thống
+
+// Chức năng	Hành động được phép
+// Quản lý người dùng	Thêm/sửa/xóa tất cả người dùng (bác sĩ, lễ tân, kế toán…)
+// Quản lý chuyên khoa	Quản lý danh sách chuyên khoa
+// Quản lý bác sĩ	Gán chuyên khoa, cập nhật lịch làm việc
+// Lịch làm việc	Quản lý lịch toàn bộ bác sĩ
+// Vật tư y tế	Theo dõi, cập nhật kho, tạo giao dịch nhập - xuất
+// Hồ sơ bệnh án	Truy cập mọi hồ sơ
+// Thanh toán	Xem/tổng hợp hóa đơn
+// Báo cáo	Truy xuất toàn bộ thống kê
+// Cấu hình hệ thống	Phân quyền, cấu hình nhắc lịch,
+
+// DOCTOR (Bác sĩ)
+// Quyền truy cập: Giới hạn trong khuôn khổ chuyên môn cá nhân
+
+// Chức năng	Hành động được phép
+// Lịch khám	Xem lịch cá nhân
+// Bệnh nhân	Xem danh sách bệnh nhân đã đăng ký khám với mình
+// Hồ sơ bệnh án	Tạo & cập nhật chẩn đoán, đơn thuốc, cận lâm sàng
+// Kê toa thuốc	Kê đơn, xem tồn kho cơ bản (để kê hợp lý)
+// Cận lâm sàng	Gửi yêu cầu, xem kết quả
+// Phản hồi	Xem đánh giá bệnh nhân về mình nhớ làm bảng phản hồi
+
+// RECEPTIONIST (Lễ tân)
+// Quyền truy cập: Quản lý lịch hẹn và tiếp đón bệnh nhân
+
+// Chức năng	Hành động được phép
+// Bệnh nhân	Thêm bệnh nhân mới
+// Lịch hẹn	Đặt lịch, xác nhận, hủy, chuyển lịch
+// Danh sách khám	Kiểm tra lịch từng bác sĩ trong ngày
+// Thanh toán	Hỗ trợ tạo hóa đơn
+// Gửi nhắc lịch	SMS, Zalo, hoặc email
+
+// ACCOUNTANT (Kế toán)
+// Quyền truy cập: Tài chính – hóa đơn – thống kê
+
+// Chức năng	Hành động được phép
+// Hóa đơn	Tạo, cập nhật, xuất hóa đơn
+// Thanh toán	Kiểm tra tình trạng thanh toán
+// Báo cáo doanh thu	Thống kê theo ngày/tháng/bác sĩ
+
+// NURSE (Điều dưỡng)
+// Quyền truy cập: Hỗ trợ bác sĩ – xử lý cận lâm sàng – cấp phát thuốc
+
+// Chức năng	Hành động được phép
+// Xem lịch khám	Chuẩn bị trước ca khám
+// Cận lâm sàng	Nhận chỉ định – nhập kết quả
+// Kho thuốc	Cấp phát thuốc – trừ kho
+// Giao tiếp bệnh nhân	Giải thích hướng dẫn dùng thuốc, theo dõi sau khám
+
+
+// PATIENT (Bệnh nhân)
+// Quyền truy cập: Tài khoản cá nhân, lịch sử khá
+// Chức năng	Hành động được phép
+// Đặt lịch khám	hiện tại mình block cái này, vì lịch khám bác sĩ có thể không chủ động được
+// Xem lịch khám	
+// Xem đơn thuốc	
+// Xem kết quả xét nghiệm	File đính kèm -> pdf 
+// Thanh toán	Trực tiếp hoặc quét mã
+// Gửi phản hồi	Đánh giá bác sĩ, góp ý dịch vụ
+// Nhận nhắc nhở	Lịch tái khám, thuốc
