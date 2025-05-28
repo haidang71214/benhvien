@@ -5,12 +5,12 @@ import { uploadCloud } from '../config/uploadCloud.js';
 
 
 const authRouter = express.Router();
-authRouter.post('/register',register);
-authRouter.post('/login',login);
-authRouter.post('/loginFace',loginFacebook);
-authRouter.post('/extendToken',extendToken);
-authRouter.post('/forgotPassword',forgotPassword);
-authRouter.post('/resetPassword',resetPassword);
-authRouter.post('/logout',logout);
-authRouter.post('/updateMyself',middlewareTokenAsyncKey,uploadCloud.single('img'),updateMyself);
+authRouter.post('/register',register); // đăng kí
+authRouter.post('/login',login); // đăng nhập
+authRouter.post('/loginFace',loginFacebook); // loginfb
+authRouter.post('/extendToken',extendToken); // extendToken
+authRouter.post('/forgotPassword',forgotPassword); // forgotpass
+authRouter.post('/resetPassword',resetPassword); // resetPass after forgot
+authRouter.post('/logout',logout); // logout
+authRouter.post('/updateMyself',middlewareTokenAsyncKey,uploadCloud.single('img'),updateMyself); // update myself
 export default authRouter; 

@@ -66,7 +66,7 @@ const updateUser = async (req, res) => {
        return res.status(404).json({ message: 'Người dùng không tồn tại.' });
      }
  
-   
+   // hơi sai 1 tí =)) 
      const updateData = {};
      if (userName) updateData.userName = userName;
      if (password) updateData.password = bcrypt.hashSync(password, 10);
@@ -82,31 +82,31 @@ const updateUser = async (req, res) => {
    }
  };
  
-// này làm rồi
-// const updateSelf = async (req, res) => {
-//    try {
-//       const userId = req.user.id; 
-//       const { userName, password } = req.body;
-//       const file = req.file;
-//       const findUser = await users.findById(userId);
-//       if (!findUser) {
-//          return res.status(404).json({ message: "Người dùng không tồn tại." });
-//       }
-//       const updatedUser = await users.findByIdAndUpdate(
-//          userId,
-//          {
-//             userName: userName || findUser.userName, 
-//             password: password ? bcrypt.hashSync(password, 10) : findUser.password,
-//             avartar: file ? file.path : findUser.avartar, 
-//          },
-//          { new: true } // trả về user mới
-//       );
-//       return res.status(200).json({ message: "Cập nhật thành công", user: updatedUser });
-//    } catch (error) {
-//       console.error("Lỗi khi cập nhật thông tin:", error);
-//       return res.status(500).json({ message: "Có lỗi xảy ra." });
-//    }
-// };
+
+const updateSelf = async (req, res) => {
+   try {
+      const userId = req.user.id; 
+      const { userName, password } = req.body;
+      const file = req.file;
+      const findUser = await users.findById(userId);
+      if (!findUser) {
+         return res.status(404).json({ message: "Người dùng không tồn tại." });
+      }
+      const updatedUser = await users.findByIdAndUpdate(
+         userId,
+         {
+            userName: userName || findUser.userName, 
+            password: password ? bcrypt.hashSync(password, 10) : findUser.password,
+            avartar: file ? file.path : findUser.avartar, 
+         },
+         { new: true } // trả về user mới
+      );
+      return res.status(200).json({ message: "Cập nhật thành công", user: updatedUser });
+   } catch (error) {
+      console.error("Lỗi khi cập nhật thông tin:", error);
+      return res.status(500).json({ message: "Có lỗi xảy ra." });
+   }
+};
 
 
 // xoá theo id của user đó

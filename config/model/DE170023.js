@@ -1,4 +1,4 @@
-import mongoose, { Types } from 'mongoose';
+import mongoose, { mongo, Types } from 'mongoose';
 const { Schema } = mongoose;
 
 
@@ -104,6 +104,7 @@ const equipmentDetailSchema = new Schema({
   }
   // muốn chuyển thành đang dùng thì cần có điều kiện gì ? xin từ kho, bác sĩ xin, admin duyệt
 })
+
 const paymentSchema = new Schema({
     tranSactionNo:String,
     amount:Number,
@@ -134,6 +135,7 @@ const appointmentSchema = new Schema({
       ref:'User',
       required:true
     },
+    
     cinicRoomId:{
       type:Types.ObjectId,
       ref:'cinicRoom',
@@ -146,7 +148,7 @@ const appointmentSchema = new Schema({
       default:'booked'
     }
 })
-const cinicRoomSchema = new Schema({
+const clinicRoomSchema = new Schema({
   name:String, // phòng thì thường cố định nên thường không có tạo phòng
               // nhma giả định đi
   allowedSpecialized:{
@@ -177,24 +179,113 @@ const doctorSchedualSchema = new Schema({
     require:true
   }
 })
+// hồ sơ bệnh án
+const medicalRecordSchema = new Schema({
+  // lịch khám
+  appointmentId: { 
+    type: Types.ObjectId,
+    ref: 'Appointment',
+    required: true,
+  },
+  patientId: {
+    type: Types.ObjectId,
+    ref: 'User', // user có role là patient
+    required: true,
+  },
+  doctorId: {
+    type: Types.ObjectId,
+    ref: 'User', // user có role là doctor
+    required: true,
+  }, 
+  // triệu chứng
+  symptoms: {
+    type: String,
+    required: true,
+  },
+  // chuẩn đoán
+  diagnosis: {
+    type: String,
+    required: true,
+  },
+  // kết luận
+  conclusion: {
+    type: String,
+  },
+  prescriptions: [{
+    type: Types.ObjectId,
+    ref: 'Prescription',
+  }],
+  notes: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+  }
+}, { timestamps: true });
+// thuốc
+const medicineSchema = new Schema({
+  type:{
+    type:String,
+    enum:[] // viên nén,siro
+  },
+  description:{
+    type:String
+  }, // mô tả công dụng thuốc,
+  quantities:Number, // tổng số lượng
+  warning:String // cảnh báo, cấm chỉ định 
+})
+// làm đơn thuốc? bệnh nhân có thể có nhiều đơn thuốc không?
+const prescriptionSchema = new Schema({
+  patientId:{
+    type:Types.ObjectId,
+    ref:'User'
+  },
+  doctorId:{
+    type:Types.ObjectId,
+    ref:'User'
+  },
+  dateIssuse:Date, // ngày tạo đơn thuốc
+  note:String // chỉ định tái khám
+})
+// từng loại thuốc sẽ có những chỉ định uống khác nhau
+const presctiptionDetailSchema = new Schema({
+  medicineId:{
+    type:Types.ObjectId,
+    ref:'Medicine'
+  },
+  dosage:Number, // số lượng
+  frequently:String, // mấy lần / ngày / tuần, nhắc uống thuốc
+  duration:String // uống bao lâu ?
+})
 
 
+
+//
+const presctiptionDetails = mongoose.model('presctiptionDetails',presctiptionDetailSchema)
+const prescriptions = mongoose.model('prescriptions',prescriptionSchema)
+const medicines = mongoose.model('medicines',medicineSchema)
+const MedicalRecords = mongoose.model('MedicalRecords', medicalRecordSchema);
+const doctorScheduals = mongoose.model('doctorScheduals',doctorSchedualSchema)
+const clinicRooms = mongoose.model('clinicRooms',clinicRoomSchema)
 const appointments = mongoose.model('appointments',appointmentSchema)
 const payments = mongoose.model('payments',paymentSchema)
 const equipmentDetails = mongoose.model('equipmentDetails',equipmentDetailSchema)
 const equipments = mongoose.model('equipments',equipmentSchema)
 const users = mongoose.model('users', userSchema);
-export { users,equipments,equipmentDetails,payments,appointments };
+export { users,equipments,equipmentDetails,payments,appointments,clinicRooms,doctorScheduals,MedicalRecords,medicines,prescriptions,presctiptionDetails };
 
 // ADMIN
 // Quyền truy cập: TẤT CẢ module – toàn quyền hệ thống
-
 // Chức năng	Hành động được phép
-// Quản lý người dùng	Thêm/sửa/xóa tất cả người dùng (bác sĩ, lễ tân, kế toán…)
+// Quản lý người dùng	Thêm/sửa/xóa tất cả người dùng (bác sĩ, lễ tân, kế toán…)// oce
 // Quản lý chuyên khoa	Quản lý danh sách chuyên khoa
-// Quản lý bác sĩ	Gán chuyên khoa, cập nhật lịch làm việc
+// Quản lý bác sĩ	Gán chuyên khoa, cập nhật lịch làm việc 
 // Lịch làm việc	Quản lý lịch toàn bộ bác sĩ
-// Vật tư y tế	Theo dõi, cập nhật kho, tạo giao dịch nhập - xuất
+// Vật tư y tế	Theo dõi, cập nhật kho, tạo giao dịch nhập - xuất sẽ làm
 // Hồ sơ bệnh án	Truy cập mọi hồ sơ
 // Thanh toán	Xem/tổng hợp hóa đơn
 // Báo cáo	Truy xuất toàn bộ thống kê
