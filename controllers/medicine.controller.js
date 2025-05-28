@@ -1,6 +1,6 @@
 
 import medicines from "../config/model/medicines.js";
-import { checkAdmin } from "./admin.controller.js";
+import { checkAdmin, checkDoctor } from "./admin.controller.js";
 
 // xem thuốc tồn kho, thì cái role nào cũng xem được,trừ cái patients
 // admin quản lí thuốc
@@ -111,7 +111,7 @@ const searchMedicines = async (req, res) => {
      const { type, description, quantities, warning, name } = req.body;
      const userId = req.user.id;
  
-     if (!checkAdmin(userId)) {
+     if (!checkAdmin(userId) || !checkDoctor(userId)) {
        return res.status(403).json({ message: "Không phải admin thì không update được" });
      }
      
