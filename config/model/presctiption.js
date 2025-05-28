@@ -2,7 +2,6 @@ import mongoose, { mongo, Types } from 'mongoose';
 const { Schema } = mongoose;
 
 
-// làm đơn thuốc? bệnh nhân có thể có nhiều đơn thuốc không?
 const presctiptionDetailSchema = new Schema({
   medicineId:{
     type:Types.ObjectId,

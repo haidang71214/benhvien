@@ -1,5 +1,6 @@
 import { users } from "../config/model/DE170023.js";
 import bcrypt from "bcrypt";
+import medicines from "../config/model/medicines.js";
 // hàm để check admin
 export const checkAdmin = async (userId) => {
    try {
@@ -7,18 +8,73 @@ export const checkAdmin = async (userId) => {
      if (!user) {
        throw new Error("Người dùng không tồn tại.");
      }
-     return user.role === 'admin';
+     if(user.role === 'admin'){
+      return true
+     }
+     else{
+      return false
+     }
    } catch (error) {
      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
      return false;
    }
  };
-
+export const checkDoctor = async(req,res)=>{
+   try {
+      const user = await users.findById(userId);
+      if (!user) {
+        throw new Error("Người dùng không tồn tại.");
+      }
+      if(user.role === 'doctor'){
+       return true
+      }
+      else{
+       return false
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
+      return false;
+    }
+}
+export const checkPatients = async(req,res)=>{
+   try {
+      const user = await users.findById(userId);
+      if (!user) {
+        throw new Error("Người dùng không tồn tại.");
+      }
+      if(user.role === 'patient'){
+       return true
+      }
+      else{
+       return false
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
+      return false;
+    }
+}
+export const checkReceptionist = async(req,res) =>{
+   try {
+      const user = await users.findById(userId);
+      if (!user) {
+        throw new Error("Người dùng không tồn tại.");
+      }
+      if(user.role === 'receptionist'){
+       return true
+      }
+      else{
+       return false
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
+      return false;
+    }
+}
 // copy cái này làm register cũng được
 const createUser = async (req, res) => {
    try {
       const {id} = req.user
-      if(checkAdmin(id) === 'admin'){
+      if(checkAdmin(id)){
          const { userName, password, role, email } = req.body;
 
          // Kiểm tra email hợp lệ bằng Regex
@@ -153,7 +209,7 @@ const getDetailUser = async(req,res) =>{
    const {id} = req.params;
    const userId = req.user.id
    try {
-      if(checkAdmin(userId) === 'amin'){
+      if(checkAdmin(userId)){
          const data = await users.findById(id);
          res.status(200).json({data})
       }else{
@@ -173,11 +229,17 @@ const detailSelf = async(req,res) =>{
       res.status(500).json({message:error})
    }
 }
+// nhớ làm controller cho đoạn này
+
+
+// quản lí vật tư
+
 export {
    createUser,
    updateUser,
    deleteUser,
    getAlluser,
    getDetailUser,
-   detailSelf
+   detailSelf,
+   //
 }

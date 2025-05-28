@@ -1,16 +1,23 @@
 import mongoose, { mongo, Types } from 'mongoose';
 const { Schema } = mongoose;
-
+export const MEDICINE_ENUM = ['tablet', 'syrup', 'capsule', 'ointment']// vien nen, siro, vien nang, thuoc mo
 // thuốc
 const medicineSchema = new Schema({
+   name:{type:String,
+   required:true
+},
   type:{
     type:String,
-    enum:[] // viên nén,siro
+    enum: MEDICINE_ENUM,
   },
   description:{
-    type:String
+    type:String,
+    required:true
   }, // mô tả công dụng thuốc,
-  quantities:Number, // tổng số lượng
+  quantities:{
+   type:Number,
+   required:true
+  }, // tổng số lượng
   warning:String // cảnh báo, cấm chỉ định 
 })
 

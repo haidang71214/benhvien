@@ -1,6 +1,7 @@
 import mongoose, { mongo, Types } from 'mongoose';
 const { Schema } = mongoose;
 
+// lich
 const appointmentSchema = new Schema({
     doctorId:{type:Types.ObjectId,
       ref:'User',
