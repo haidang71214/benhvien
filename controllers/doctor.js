@@ -1,6 +1,6 @@
 // làm cho doctor
 
-import { appointments, doctorScheduals } from "../config/model/DE170023";
+import { appointments, doctorScheduals } from "../config/model/user";
 
 // lấy lịch khám chưa làm được
 // xem lịch khám cá nhân làm tạm
