@@ -40,7 +40,7 @@ const equipmentDetailSchema = new Schema({
   status: {
     type: String,
     enum: STATUS_ENUM,
-    default: 'NotUsed', // mặc định là chưa dùng đến
+    default: 'InUse', // mặc định là dùng đến
     required: true
   }
   // muốn chuyển thành đang dùng thì cần có điều kiện gì ? xin từ kho, bác sĩ xin, admin duyệt

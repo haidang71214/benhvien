@@ -11,11 +11,6 @@ const appointmentSchema = new Schema({
       ref:'User',
       required:true
     },
-//     cinicRoomId:{
-//       type:Types.ObjectId,
-//       ref:'cinicRoom',
-//       required:false
-//     },
     appointmentTime:Date,
 })
 const appointments = mongoose.model('appointments',appointmentSchema)

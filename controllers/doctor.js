@@ -1,23 +1,13 @@
 // làm cho doctor
 
-import { appointments, doctorScheduals } from "../config/model/user";
+import appointments from "../config/model/apointmentSchema";
 
-// lấy lịch khám chưa làm được
-// xem lịch khám cá nhân làm tạm
-const detailMySchedual = async(req,res) =>{
-   try {
-      const {id} = req.user;
-      const data = await doctorScheduals.find({
-         doctorId:id
-      }).populate('')
-      return res.status(200).json({data})
-   } catch (error) {
-      throw new Error(error);
-   }
-}
+
+
 // lấy lịch khám của bác sĩ đó với bệnh nhân nào ? 
 const getAppointment = async(req,res) =>{
    try {
+      
       const {id} = req.user;
       const data = appointments.find({
          doctorId:id
