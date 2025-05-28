@@ -13,6 +13,8 @@ const appointmentSchema = new Schema({
       required:true
     },
     appointmentTime:Date,
+  // lí do cập nhật lịch ?
+    reason:String
 })
 const appointments = mongoose.model('appointments',appointmentSchema)
 export default appointments

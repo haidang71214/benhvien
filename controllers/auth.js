@@ -1,7 +1,7 @@
 import { createRefTokenAsyncKey, createTokenAsyncKey } from '../config/jwt.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import {users} from '../config/model/DE170023.js';
+import { users } from '../config/model/user.js';
 
 
 // Đăng ký
@@ -32,18 +32,6 @@ const register = async (req, res) => {
       role: 'patient',
     });
 
-    // Gửi email
-    const mailOption = {
-      from: "dangpnhde170023@fpt.edu.vn",
-      to: email,
-      subject: `Reset Token : ${randomCode}`,
-      text: "best regart",
-   };
-    transporter.sendMail(mailOption, (err, info) => {
-      if (err) {
-        console.error('Error sending email:', err);
-      }
-    });
 
     res.status(201).json({ message: 'Đăng ký thành công', user: newUser });
   } catch (error) {

@@ -38,7 +38,7 @@ const medicalRecordSchema = new Schema({
     ref: 'Prescription',
   }],
   notes: {
-    type: String,
+    type: String, // note mấy cái lịch hẹn tái chỉ định khám hay nhắc nhớ thân thiện
   },
   createdAt: {
     type: Date,

@@ -1,6 +1,6 @@
-import medicines from "../config/model/medicines";
-import medicines from "../config/model/medicines";
-import { checkAdmin } from "./admin.controller";
+
+import medicines from "../config/model/medicines.js";
+import { checkAdmin } from "./admin.controller.js";
 
 // xem thuốc tồn kho, thì cái role nào cũng xem được,trừ cái patients
 // admin quản lí thuốc

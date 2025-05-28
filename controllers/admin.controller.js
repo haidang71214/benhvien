@@ -1,6 +1,6 @@
-import { users } from "../config/model/DE170023.js";
+
 import bcrypt from "bcrypt";
-import medicines from "../config/model/medicines.js";
+import { users } from "../config/model/user.js";
 // hàm để check admin
 export const checkAdmin = async (userId) => {
    try {

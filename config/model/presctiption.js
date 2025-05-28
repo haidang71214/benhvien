@@ -1,32 +1,27 @@
-import mongoose, { mongo, Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 const { Schema } = mongoose;
 
-
-const presctiptionDetailSchema = new Schema({
-  medicineId:{
-    type:Types.ObjectId,
-    ref:'Medicine'
-  },
-  dosage:Number, // số lượng
-  frequently:String, // mấy lần / ngày / tuần, nhắc uống thuốc
-  duration:String // uống bao lâu ?
-})
-// làm đơn thuốc? bệnh nhân có thể có nhiều đơn thuốc không?
+// Chi tiết của từng đơn thuốc
 const prescriptionSchema = new Schema({
-  patientId:{
-    type:Types.ObjectId,
-    ref:'User'
+  medicineId: {
+    type: Types.ObjectId,
+    ref: 'Medicine',
+    required: true,
   },
-  doctorId:{
-    type:Types.ObjectId,
-    ref:'User'
+  dosage: {
+    type: Number,
+    required: true,
   },
-  dateIssuse:Date, // ngày tạo đơn thuốc
-  note:String // chỉ định tái khám
-})
-// từng loại thuốc sẽ có những chỉ định uống khác nhau
+  frequently: {
+    type: String,
+    required: true,
+  },
+  duration: {
+    type: String,
+    required: true,
+  }
+});
 
+const Prescription = mongoose.model('Prescription', prescriptionSchema);
 
-const presctiptionDetails = mongoose.model('presctiptionDetails',presctiptionDetailSchema)
-const prescriptions = mongoose.model('prescriptions',prescriptionSchema)
-export  {presctiptionDetails,prescriptions}
+export { Prescription };

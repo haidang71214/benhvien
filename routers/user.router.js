@@ -1,6 +1,6 @@
 import express from 'express';
 import { middlewareTokenAsyncKey } from '../config/jwt.js';
-import { createUser, deleteUser, detailSelf, getAlluser, getDetailUser, updateUser } from '../controllers/user.controller.js';
+import { createUser, deleteUser, detailSelf, getAlluser, getDetailUser, updateUser } from '../controllers/admin.controller.js';
 import { uploadCloud } from '../config/uploadCloud.js';
 
 
