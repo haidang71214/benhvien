@@ -30,7 +30,7 @@ const createAppointment = async(req,res) =>{
       const userId = req.user.id;
       const {id} = req.params
       const {appointmentTime} = req.body
-   if(!checkDoctor(userId)){
+   if(! await checkDoctor(userId)){
       return res.status(404).json({message:'Không phải bacs sĩ'})
    }
    else{
@@ -59,7 +59,7 @@ const updateAppointment = async(req,res) =>{
       const {id} = req.params;
       const userId = req.user.id
    const{appointmentHehe,reason} = req.body
-   if(!checkDoctor(userId) || !checkAdmin(userId) ){
+   if(! await checkDoctor(userId) && ! await checkAdmin(userId) ){
       return res.status(404).json({message :"Không phải bác si sĩ hoặc admin không cập nhật được"})
    };
    const findAppointment = appointments.findById(id);
@@ -101,7 +101,7 @@ const deleteAppointment = async(req,res) =>{
       const userId = req.user.id
       const {id} = req.params;
       const {reason} = req.body
-   if(!checkAdmin(userId) || !checkDoctor(userId)){
+   if(! await checkAdmin(userId) && ! await checkDoctor(userId)){
       return res.status(404).json({message:'Không có quyền cập nhật'})
    }
    const findAppointment = await appointments.findById(id);
@@ -139,7 +139,7 @@ const getMedicalRecordPatients = async (req, res) => {
      const { id } = req.params;       // id bệnh nhân
      const userId = req.user.id;      // id người gọi API
      // Kiểm tra quyền
-     if (userId !== id && !checkAdmin(userId) && !checkDoctor(userId)) {
+     if (!await checkAdmin(userId) && !await checkDoctor(userId)) {
        return res.status(403).json({ message: "Bạn không có quyền xem hồ sơ này" });
      }
      // Tìm tất cả hồ sơ bệnh án của bệnh nhân, populate đơn thuốc
@@ -162,7 +162,7 @@ const getMedicalRecordPatients = async (req, res) => {
 const doctorGetMedicalRecord = async(req,res) =>{
    try {
       const userId = req.user.id
-      if (userId !== id && !checkAdmin(userId) && !checkDoctor(userId)) {
+      if (! await checkAdmin(userId) && !await checkDoctor(userId)) {
          return res.status(403).json({ message: "Bạn không có quyền xem hồ sơ này" });
     }
    const data = await MedicalRecords.find({doctorId:userId})
@@ -175,7 +175,7 @@ const doctorGetMedicalRecord = async(req,res) =>{
 const createPrescription = async (req, res) => {
    try {
      const userId = req.user.id;
-     if (!checkAdmin(userId) || !checkDoctor(userId)) {
+     if (!await checkAdmin(userId) && !await checkDoctor(userId)) {
        return res.status(403).json({ message: "Bạn không có quyền tạo đơn thuốc" });
      }
      const { medicineId, dosage, frequently, duration } = req.body;
@@ -203,7 +203,7 @@ const createPrescription = async (req, res) => {
 const createMedicalRecord = async(req,res) => {
  try {
    const userId = req.user.id
-   if (userId !== id && !checkAdmin(userId) && !checkDoctor(userId)) {
+   if ( !await checkAdmin(userId) && ! await checkDoctor(userId)) {
       return res.status(403).json({ message: "Bạn không có quyền tạo hồ sơ này" });
  }
  // tạo  đơn thuốc trước, xong tạo sau, xong gán cái id của đơn thuốc vô 

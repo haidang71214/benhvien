@@ -1,6 +1,6 @@
 
 import medicines from "../config/model/medicines.js";
-import { checkAdmin, checkDoctor } from "./admin.controller.js";
+import { checkAdmin, checkDoctor, checkPatients } from "./admin.controller.js";
 
 // xem thuốc tồn kho, thì cái role nào cũng xem được,trừ cái patients
 // admin quản lí thuốc
@@ -8,9 +8,12 @@ const createMedicine = async(req,res) =>{
    const userId = req.user.id
    const {type,description,quantities,warning,name} = req.body
    try {
-      if(!checkAdmin(userId)){
-         return res.status(404).json({message:"Không có quyền"})
-      }
+    const isAdmin = await checkAdmin(userId);
+    const isDoctor = await checkDoctor(userId);
+    if (!isAdmin && !isDoctor) {
+      return res.status(403).json({ message: "Không có quyền" });
+    }
+    
 // tạo thuốc mới, nếu thuốc đã có trong list của bệnh viện thì tiến hành update, cập nhật thêm
          if (!type || typeof type !== 'string' || type.trim() === '') {
             return res.status(400).json({ message: "type không được để trống" });
@@ -46,7 +49,8 @@ const createMedicine = async(req,res) =>{
 const getAllMedicine = async (req, res) => {
    const userId = req.user.id;
    try {
-     if (checkPatients(userId)) {
+    const isPatient = await checkPatients(userId)
+     if (isPatient) {
        return res.status(403).json({ message: 'Bệnh nhân không có quyền truy cập vào kho thuốc' });
      }
  
@@ -111,7 +115,7 @@ const searchMedicines = async (req, res) => {
      const { type, description, quantities, warning, name } = req.body;
      const userId = req.user.id;
  
-     if (!checkAdmin(userId) || !checkDoctor(userId)) {
+     if (!await checkAdmin(userId)) {
        return res.status(403).json({ message: "Không phải admin thì không update được" });
      }
      
@@ -139,7 +143,7 @@ const deleteMedicine = async(req,res) =>{
   try {
    const userId = req.user.id;
    const {id} = req.params;
-   if(!checkAdmin(userId)){
+   if(!await checkAdmin(userId)){
       return res.status(404).json({message:"Không phải admin thì không xóa được"})
    }
    const findMedicine = await medicines.findById(id);

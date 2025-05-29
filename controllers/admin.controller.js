@@ -11,31 +11,24 @@ export const checkAdmin = async (userId) => {
      if(user.role === 'admin'){
       return true
      }
-     else{
-      return false
-     }
    } catch (error) {
      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
      return false;
    }
  };
-export const checkDoctor = async(req,res)=>{
+ export const checkDoctor = async (userId) => {
    try {
-      const user = await users.findById(userId);
-      if (!user) {
-        throw new Error("Người dùng không tồn tại.");
-      }
-      if(user.role === 'doctor'){
-       return true
-      }
-      else{
-       return false
-      }
-    } catch (error) {
-      console.error("Lỗi khi kiểm tra quyền admin:", error.message);
-      return false;
-    }
-}
+     const user = await users.findById(userId);
+     if (!user) {
+       throw new Error("Người dùng không tồn tại.");
+     }
+     return user.role === 'doctor';
+   } catch (error) {
+     console.error("Lỗi khi kiểm tra quyền doctor:", error.message);
+     return false;
+   }
+ };
+ 
 export const checkPatients = async(req,res)=>{
    try {
       const user = await users.findById(userId);
