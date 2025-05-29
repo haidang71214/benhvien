@@ -1,7 +1,7 @@
 import mongoose, { mongo, Types } from 'mongoose';
 const { Schema } = mongoose;
 
-// lich
+// tạo lịch khám hiện tại => tạo cái hồ sơ => tạo thuốc
 const appointmentSchema = new Schema({
     doctorId:{type:Types.ObjectId,
       ref:'User',

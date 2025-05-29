@@ -198,6 +198,7 @@ const getAlluser = async(req,res) => {
    }
 }
 
+// lấy chi tiết của người dùng, dùng cái này lấy chi tiết của thằng bác sĩ cũng được
 const getDetailUser = async(req,res) =>{
    const {id} = req.params;
    const userId = req.user.id
@@ -222,9 +223,28 @@ const detailSelf = async(req,res) =>{
       res.status(500).json({message:error})
    }
 }
-// nhớ làm controller cho đoạn này
 
-
+// search bệnh nhân cho admin và bác sĩ
+const searchDoctors = async (req, res) => {
+   try {
+     // Lấy query tìm kiếm (userName hoặc email)
+     const { q } = req.query;
+     if (!q || q.trim() === "") {
+       return res.status(400).json({ message: "Vui lòng nhập từ khóa tìm kiếm" });
+     }
+     // Tìm bác sĩ theo userName hoặc email gần đúng (case-insensitive)
+     const regex = new RegExp(q.trim(), "i");
+     const doctors = await users.find({
+       role: "doctor",
+       $or: [{ userName: regex }, { email: regex }]
+     });
+ 
+     return res.status(200).json({ data: doctors });
+   } catch (error) {
+     console.error("Lỗi khi tìm kiếm bác sĩ:", error);
+     return res.status(500).json({ message: "Lỗi server" });
+   }
+ };
 // quản lí vật tư
 
 export {
@@ -234,5 +254,6 @@ export {
    getAlluser,
    getDetailUser,
    detailSelf,
+   searchDoctors
    //
 }

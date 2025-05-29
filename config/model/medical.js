@@ -33,6 +33,7 @@ const medicalRecordSchema = new Schema({
   conclusion: {
     type: String,
   },
+  // lấy tất cả đơn thuốc
   prescriptions: [{
     type: Types.ObjectId,
     ref: 'Prescription',

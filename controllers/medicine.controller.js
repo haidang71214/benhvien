@@ -90,24 +90,27 @@ const getAllMedicine = async (req, res) => {
 // /medicines/search?type=tablet
 // Tìm theo cả tên và loạ
 // /medicines/search?name=para&type=tablet
-const searchMedicines = async (req, res) => {
-   try {
-     const { name, type } = req.query;
-     const filter = {};
-     if (name) {
-       filter.name = { $regex: new RegExp(name, 'i') };
-     }
-     if (type) {
-       filter.type = type;
-     }
- 
-     const medicines = await medicines.find(filter); 
-     return res.status(200).json({ data: medicines });
-   } catch (error) {
-     console.error(error);
-     return res.status(500).json({ message: 'Lỗi server' });
-   }
- };
+
+  const searchMedicines = async (req, res) => {
+    try {
+      const { name, type } = req.query;
+      const filter = {};
+  
+      if (name) {
+        filter.name = { $regex: new RegExp(name, 'i') }; 
+      }
+      if (type) {
+        filter.type = type;
+      }
+  
+      const data = await medicinesModel.find(filter);
+      return res.status(200).json({ data });
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm thuốc:', error);
+      return res.status(500).json({ message: 'Lỗi server' });
+    }
+  };
+
  // lấy id của cái medicine 
  const updateMedicine = async (req, res) => {
    try {
@@ -158,5 +161,10 @@ const deleteMedicine = async(req,res) =>{
    throw new Error(error )
   } 
 }
+// lấy chi tiết của cái thuốc đó
 
-export {searchMedicines,getAllMedicine,createMedicine,updateMedicine,deleteMedicine}
+export {searchMedicines,
+  getAllMedicine,
+  createMedicine,
+  updateMedicine,
+  deleteMedicine}
