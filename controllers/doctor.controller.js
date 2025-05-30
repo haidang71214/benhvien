@@ -33,18 +33,25 @@ const createAppointment = async(req,res) =>{
    try {
       const userId = req.user.id;
       const {id} = req.params
-      const {appointmentTime} = req.body
-   if(! await checkDoctor(userId)){
-      return res.status(404).json({message:'Không phải bacs sĩ'})
-   }
+      const {appointmentTime,doctorId: doctorIdFromBody} = req.body
+    const isAdmin = await checkAdmin(userId);
+     const isDoctor = await checkDoctor(userId);
+ 
+     if (!isAdmin && !isDoctor) {
+       return res.status(403).json({ message: 'Không có quyền tạo lịch' });
+     }
+     const doctorId = isAdmin ? doctorIdFromBody : (isDoctor ? userId : null);
+     if (!doctorId) {
+       return res.status(400).json({ message: 'doctorId không hợp lệ' });
+     }
    else{
-      const checkUser = await users.findOne(id);
+      const checkUser = await users.findById(id);
       if(!checkUser){
          return res.status(409).json({message:'User không tồn tại'})
       }
-      const data = await appointments.findOne({
-         doctorId:userId,
-         patientId:id,
+      const data = await appointments.create({
+         doctorId:mongoose.Types.ObjectId(doctorId),
+         patientId:mongoose.Types.ObjectId(id),
          appointmentTime
       })
       return res.status(200).json({data})
@@ -63,10 +70,19 @@ const updateAppointment = async(req,res) =>{
       // admin với thằng doctor được cập nhật
       const {id} = req.params;
       const userId = req.user.id
-   const{appointmentHehe,reason} = req.body
-   if(! await checkDoctor(userId) && ! await checkAdmin(userId) ){
-      return res.status(404).json({message :"Không phải bác si sĩ hoặc admin không cập nhật được"})
-   };
+   const{appointmentHehe,reason,doctorId: doctorIdFromBody} = req.body
+   //
+   const isAdmin = await checkAdmin(userId);
+     const isDoctor = await checkDoctor(userId);
+ 
+     if (!isAdmin && !isDoctor) {
+       return res.status(403).json({ message: 'Không có quyền tạo lịch' });
+     }
+     const doctorId = isAdmin ? doctorIdFromBody : (isDoctor ? userId : null);
+     if (!doctorId) {
+       return res.status(400).json({ message: 'doctorId không hợp lệ' });
+     }
+     //
    const findAppointment = appointments.findById(id);
    if(!findAppointment){
       return res.status(409).json({message:'Hong tìm thấy cái lịch khám'})
@@ -133,61 +149,6 @@ const deleteAppointment = async(req,res) =>{
       throw new Error(error )
    }
 }
-// tạo cái hồ sơ theo lịch khám đã tạo sẵn
-const createMedicaRedordByAppointment = async(req,res)=>{
-   try {
-      const{ symptoms, diagnosis, conclusion, notes,prescriptions} = req.body;
-      // params lấy của cái appointment
-      const {id} = req.params;
-      const userId = req.user.id
-      if (!await checkAdmin(userId) && !await checkDoctor(userId)) {
-         return res.status(403).json({ message: "Bạn không có quyền tạo cái này" });
-       }
-      // lấy id của chính cái bệnh nhân trong cái lịch khám đó
-      const getIdPatients  = await appointments.findById(id)
-   
-      // 2. Tạo đơn thuốc
-     let prescriptionIds = [];
-     if (Array.isArray(prescriptions) && prescriptions.length > 0) {
-       const createdPrescriptions = await Promise.all(prescriptions.map(async (p) => {
-         for (const item of p) {
-           const med = await medicines.findById(item.medicineId);
-           if (!med || med.quantities < item.dosage) {
-             throw new Error(`Thuốc ${item.medicineId} không đủ tồn kho hoặc không tồn tại`);
-           }
-         }
-         const prescription = new Prescription({
-           medicineId: mongoose.Types.ObjectId(p.medicineId),
-           dosage: p.dosage,
-           frequently: p.frequently,
-           duration: p.duration
-         });
-         return await prescription.save();
-       }));
- 
-       prescriptionIds = createdPrescriptions.map(p => p._id);
-     }
- 
-     // 3. Tạo hồ sơ bệnh án và gán prescriptions vào
-     const medicalRecord = new MedicalRecords({
-       appointmentId: mongoose.Types.ObjectId(id),
-      //  bệnh nhân
-       patientId: mongoose.Types.ObjectId(getIdPatients.patientId),
-       // người tạo
-       doctorId: mongoose.Types.ObjectId(userId),
-       symptoms,
-       diagnosis,
-       conclusion: conclusion || '',
-       notes: notes || '',
-       prescriptions: prescriptionIds
-     });
-     await medicalRecord.save();
-      
-   } catch (error) {
-      throw new Error(error);
-      
-   }
-}
 
 // Hồ sơ bệnh án	Tạo & cập nhật chẩn đoán, đơn thuốc, cận lâm sàng
 // hồ sơ bệnh án lấy hồ sơ bệnh án của bệnh nhân đó, tạo mới hồ sơ bệnh án
@@ -218,89 +179,35 @@ const getMedicalRecordPatients = async (req, res) => {
    }
  };
 // doctor lấy hết hồ sơ bệnh án của bệnh nhân của mình, cái này để hỗ trợ cái trên làm cái list á, vì bệnh nhân nhiều lắm
-const doctorGetMedicalRecord = async(req,res) =>{
-   try {
-      const userId = req.user.id
-      if (! await checkAdmin(userId) && !await checkDoctor(userId)) {
-         return res.status(403).json({ message: "Bạn không có quyền xem hồ sơ này" });
-    }
-   const data = await MedicalRecords.find({doctorId:userId})
-   return res.status(200).json({ data });
-   } catch (error) {
-      throw new Error(error)
-   }
-}
-// tạo lịch khám ở thời gian hiện tại
-const createAppointmentAndRecord = async (req, res) => {
+const doctorGetMedicalRecord = async (req, res) => {
    try {
      const userId = req.user.id;
-     // tạo bệnh nhân trước -> lấy id của bệnh nhân đó theo params
-      const patientId = req.params.id
-     const { doctorId, reason, symptoms, diagnosis, conclusion, notes, prescriptions } = req.body;
+     const { doctorId: doctorIdFromBody } = req.body;
  
-     // Kiểm tra quyền: bác sĩ hoặc admin mới được tạo hồ sơ và lịch khám
-     if (userId !== doctorId && !checkAdmin(userId) && !checkDoctor(userId)) {
-       return res.status(403).json({ message: "Bạn không có quyền thực hiện thao tác này" });
-     }
-
-     // 1. Tạo lịch khám với thời gian hiện tại, ở đây
-     // không cần điền cái reason, vì cái reason mình sẽ làm ở "tạo lịch khám tương lai"
-     // cái tạo lịch khám ở hiện tại là để lấy record thôi, sau có thống kê các thứ thì mình dùng
-     const newAppointment = new appointments({
-       doctorId: mongoose.Types.ObjectId(doctorId),
-       patientId: mongoose.Types.ObjectId(patientId),
-       appointmentTime: new Date(),
-       reason: reason || ''
-     });
-     await newAppointment.save();
+     const isAdmin = await checkAdmin(userId);
+     const isDoctor = await checkDoctor(userId);
  
-     // 2. Tạo đơn thuốc (nếu có)
-     let prescriptionIds = [];
-     if (Array.isArray(prescriptions) && prescriptions.length > 0) {
-       const createdPrescriptions = await Promise.all(prescriptions.map(async (p) => {
-         for (const item of p) {
-           const med = await medicines.findById(item.medicineId);
-           if (!med || med.quantities < item.dosage) {
-             throw new Error(`Thuốc ${item.medicineId} không đủ tồn kho hoặc không tồn tại`);
-           }
-         }
- 
-         const prescription = new Prescription({
-           medicineId: mongoose.Types.ObjectId(p.medicineId),
-           dosage: p.dosage,
-           frequently: p.frequently,
-           duration: p.duration
-         });
-         return await prescription.save();
-       }));
- 
-       prescriptionIds = createdPrescriptions.map(p => p._id);
+     if (!isAdmin && !isDoctor) {
+       return res.status(403).json({ message: "Bạn không có quyền xem hồ sơ này" });
      }
  
-     // 3. Tạo hồ sơ bệnh án và gán prescriptions vào
-     const medicalRecord = new MedicalRecords({
-       appointmentId: newAppointment._id,
-       patientId: mongoose.Types.ObjectId(patientId),
-       doctorId: mongoose.Types.ObjectId(doctorId),
-       symptoms,
-       diagnosis,
-       conclusion: conclusion || '',
-       notes: notes || '',
-       prescriptions: prescriptionIds
-     });
-     await medicalRecord.save();
+     // Lấy doctorId tùy role
+     const doctorId = isAdmin ? doctorIdFromBody : (isDoctor ? userId : null);
  
-     res.status(201).json({
-       message: "Tạo lịch khám, hồ sơ bệnh án và đơn thuốc thành công",
-       appointment: newAppointment,
-       medicalRecord,
-       prescriptions: prescriptionIds
-     });
+     if (!doctorId) {
+       return res.status(400).json({ message: "doctorId không hợp lệ" });
+     }
+ 
+     const data = await MedicalRecords.find({ doctorId: doctorId });
+ 
+     return res.status(200).json({ data });
    } catch (error) {
      console.error(error);
-     return  res.status(500).json({ message: error.message || "Lỗi server" });
+     return res.status(500).json({ message: "Lỗi server" });
    }
  };
+ 
+
 // update cái hồ sơ dựa trên lịch khám, thường là thay đổi thuốc, thay đổi hồ sơ
 // search bệnh nhân 
 const searchPatients = async(req,res) =>{
@@ -320,14 +227,98 @@ const searchPatients = async(req,res) =>{
       throw new Error(error);
    }
 }
+// khi bệnh nhân tới khám thì làm gì ? thì tạo 1 cái appointment mới, với date là hiện tại -> lấy id của appointment đó, tạo thông tin của từng viên/ml thuốc gán thành mảng tạm -> xong bỏ vô hồ sơ
+const createNowAppoinment = async(req,res)=>{
+   try {
+      // chỉ có doctor mới tạo được cái này
+      const userId = req.user.id
+      // lấy id của thằng user mới tạo 
+      const {id} = req.params
+      const checkUser = await users.findById(id);
+      if(!await checkDoctor(userId)){
+         return res.status(409).json({message:'Không có quyền tạo lịch '})
+      }
+      if(!checkUser){
+         return res.status(409).json({message:'User không tồn tại'})
+      }
+      const data = await appointments.create({
+         doctorId:mongoose.Types.ObjectId(userId),
+         patientId:mongoose.Types.ObjectId(id),
+         appointmentTime: new Date()
+      });
+      return res.status(200).json({data})
+   } catch (error) {
+      throw new Error(error)
+   }
+} // đây, khi tạo xong thì mình lấy cái id của cái đằng trên gán tạm vô cái biến tạm trong fe, tạo từng cái cách uống cho từng loại thuốc
+const createPrescription = async(req,res)=>{
+   try {
+      const userId = req.user.id;
+      // lấy id của medicine, của từng cái loại thuốc ấy
+      const {id} = req.params
+      // lấy id của medicine -> mấy viên 1 lần: dosage, frequently mấy lần 1 ngày, duy trì mấy ngày duration: -> tổng lượng thuốc cho mỗi cái đơn nhỏ
+      const {dosage,frequently,duration} = req.body
+      
+      if(!await checkDoctor(userId)){
+         return res.status(409).json({message:'Không có quyền tạo lịch '})
+      }
+      // check cái medicine check xem có còn không ? và trừ khi update xong
+      const tongTungMedicineTrongDon = dosage*frequently*duration;
+      const findQuantititesMedicine = await medicines.findById(id)
+      if(tongTungMedicineTrongDon > findQuantititesMedicine.quantities ){
+         return res.status(409).json({message:"Loại thuốc này không còn có đủ trong kho"})
+      }
+      const createPrescription = await Prescription.create({
+         dosage,
+         frequently,
+         duration
+      })
+      return res.status(200).json({createPrescription}) 
+   } catch (error) {
+      throw new Error(error);
+   }
+}
+// tạo hồ sơ mới, nhét cái mảng lưu những id của thằng prescription vô, với cái id của thằng apponitment ở trên vô đây
+const createMedicalRecord = async (req, res) => {
+   try {
+     const { appointmentId, patientId, doctorId: doctorIdFromBody, symptoms, diagnosis, prescriptions, notes } = req.body;
+     const userId = req.user.id;
+     const isAdmin = await checkAdmin(userId);
+     const isDoctor = await checkDoctor(userId);
+ 
+     if (!isAdmin && !isDoctor) {
+       return res.status(403).json({ message: 'Không có quyền tạo lịch' });
+     }
+     const doctorId = isAdmin ? doctorIdFromBody : (isDoctor ? userId : null);
+     if (!doctorId) {
+       return res.status(400).json({ message: 'doctorId không hợp lệ' });
+     }
+     const newMedicalRecord = await MedicalRecords.create({
+       appointmentId,
+       patientId,
+       doctorId,
+       symptoms,
+       diagnosis,
+       prescriptions,
+       notes,
+     });
+     return res.status(200).json({ newMedicalRecord });
+   } catch (error) {
+     console.error(error);
+     return res.status(500).json({ message: 'Lỗi server' });
+   }
+ };
+ 
+
 
 export {getAppointment,
-   createAppointment,
+   createAppointment,  // tạo lịch khám ngẫu nhiên, t biết tạo như này thừa nhma t ngứa tay :v
    updateAppointment,
    deleteAppointment,
    getMedicalRecordPatients,
    doctorGetMedicalRecord,
-   createAppointmentAndRecord,
-   createMedicaRedordByAppointment,
-   searchPatients
+   searchPatients,
+   createNowAppoinment,
+   createPrescription,
+   createMedicalRecord
 }

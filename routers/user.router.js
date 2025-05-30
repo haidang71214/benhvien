@@ -1,6 +1,6 @@
 import express from 'express';
 import { middlewareTokenAsyncKey } from '../config/jwt.js';
-import { createUser, deleteUser, detailSelf, getAlluser, getDetailUser, updateUser } from '../controllers/admin.controller.js';
+import { createUser, deleteUser, detailSelf, getAlluser, getDetailUser, searchDoctors, updateUser } from '../controllers/admin.controller.js';
 import { uploadCloud } from '../config/uploadCloud.js';
 
 
@@ -12,4 +12,5 @@ userRouter.get('/getAllUser',middlewareTokenAsyncKey,getAlluser) // get all
 // cần check admin
 userRouter.get('/getDetailUser/:id',middlewareTokenAsyncKey,getDetailUser) // get detail user by id
 userRouter.get('/getDetailMySelf',middlewareTokenAsyncKey,detailSelf) // get my information
+userRouter.get('/search',searchDoctors)// searchDoctor
 export default userRouter; 

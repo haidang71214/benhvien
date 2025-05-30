@@ -1,5 +1,6 @@
 
 import medicines from "../config/model/medicines.js";
+import { users } from "../config/model/user.js";
 import { checkAdmin, checkDoctor, checkPatients } from "./admin.controller.js";
 
 // xem thuốc tồn kho, thì cái role nào cũng xem được,trừ cái patients
@@ -152,19 +153,42 @@ const deleteMedicine = async(req,res) =>{
    const findMedicine = await medicines.findById(id);
    if(!findMedicine){
       return res.status(400).json({
-         message:"Hong tìm thấy thuốc cần xóa"
+         message:"Hong tìm thấy thuốc"
       })
    }
-   await medicines.findByIdAndDelete(id);
-   return res.status(200).json({message:"xóa thành công"})
+   await medicines.findByIdAndUpdate(id,{
+    quantities:0
+   })
+   return res.status(200).json({message:"update thành công"})
   } catch (error) {
    throw new Error(error )
   } 
 }
-// lấy chi tiết của cái thuốc đó
+// lấy chi tiết của cái thuốc đó, lấy cho cả cái đơn, ai là người dùng ?.. 
+const getDetailMedicine = async(req,res) =>{
+  try {
+// check tồn tại, check authen
+  const userId= req.user.id;
+  const {id} = req.params;
+  if(!await checkAdmin(userId) && ! await checkDoctor(userId)){
+    return res.status(404).json({message:"Không phải admin hoặc bác sĩ thì không xem chi tiết của cái thuốc này được"})
+  };
+  const data = await medicines.findById(id)
+  if(!data){
+    return res.status(409).json({message:'Không có loại thuốc phù hợp'})
+  }
+  return res.status(200).json({data})
+  } catch (error) {
+      throw new Error(error);
+  }
+}
+// giờ ae làm cái curd vật tư y tế của admin nè, với làm mấy 
+
 
 export {searchMedicines,
   getAllMedicine,
   createMedicine,
   updateMedicine,
-  deleteMedicine}
+  deleteMedicine,
+  getDetailMedicine
+}

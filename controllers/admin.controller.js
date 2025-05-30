@@ -203,11 +203,11 @@ const getDetailUser = async(req,res) =>{
    const {id} = req.params;
    const userId = req.user.id
    try {
-      if(checkAdmin(userId)){
+      if(checkAdmin(userId) ){
          const data = await users.findById(id);
          res.status(200).json({data})
       }else{
-         res.status(400).json("đéo có quyền")
+         res.status(400).json("không có quyền")
       }
    } catch (error) {
       res.status(500).json({message:error})
