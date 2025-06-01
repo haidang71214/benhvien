@@ -22,7 +22,7 @@ const MyProfile = () => {
       age: user?.age || "",
       password: "",
     });
-    setPreview(user?.image || user?.avatarUrl || "");
+    setPreview(user?.image || user?.avatarUrl || "/default-avatar.png");
   }, [user]);
 
   const handleChange = (e) => {
@@ -31,8 +31,10 @@ const MyProfile = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -57,68 +59,94 @@ const MyProfile = () => {
           withCredentials: true,
         }
       );
-      setMsg("Cập nhật thành công!");
+
+      setMsg("Profile updated successfully!");
       setUser(res.data.user);
-      setPreview(
-        res.data.user.image || res.data.user.avatarUrl || "/default-avatar.png"
-      );
+      setPreview(res.data.user.image || res.data.user.avatarUrl || "/default-avatar.png");
+
       const storedUser = JSON.parse(localStorage.getItem("user")) || {};
       storedUser.image = res.data.user.image || res.data.user.avatarUrl;
       localStorage.setItem("user", JSON.stringify(storedUser));
     } catch (err) {
-      setMsg(err.response?.data?.message || "Lỗi cập nhật");
+      setMsg(err.response?.data?.message || "Update failed. Please try again.");
     }
     setLoading(false);
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-8 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Thông tin cá nhân</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
+      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">My Profile</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col items-center">
           <img
             src={preview || "/default-avatar.png"}
-            alt="avatar"
-            className="w-24 h-24 rounded-full object-cover mb-2"
+            alt="Profile"
+            className="w-16 h-16 rounded-full object-cover mb-3 border"
           />
-          <input type="file" accept="image/*" onChange={handleImageChange} />
+          <label className="cursor-pointer bg-blue-50 text-blue-700 px-4 py-2 rounded-md border border-blue-300 hover:bg-blue-100 transition">
+            Change Avatar
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </label>
         </div>
-        <label>
-          Tên người dùng:
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
           <input
             type="text"
             name="userName"
             value={form.userName}
             onChange={handleChange}
-            className="border rounded px-2 py-1 w-full"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
-        </label>
-        <label>
-          Tuổi:
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
           <input
             type="number"
             name="age"
             value={form.age}
             onChange={handleChange}
-            className="border rounded px-2 py-1 w-full"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </label>
+        </div>
+
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className={`w-full py-2 px-4 rounded-lg text-black font-medium ${
+            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          } transition`}
           disabled={loading}
         >
-          {loading ? "Đang cập nhật..." : "Cập nhật"}
+          {loading ? "Updating..." : "Update Profile"}
         </button>
-        {msg && <div className="text-center text-red-500">{msg}</div>}
+
+        {msg && (
+          <div
+            className={`text-center text-sm mt-2 ${
+              msg.includes("success") ? "text-green-600" : "text-red-500"
+            }`}
+          >
+            {msg}
+          </div>
+        )}
       </form>
-            <button
+
+      <div className="text-center mt-6">
+        <button
           type="button"
-          className="text-blue-500 underline mt-2"
+          className="text-blue-600 hover:underline text-sm"
           onClick={() => navigate("/change-password")}
         >
-          Đổi mật khẩu
+          Change Password
         </button>
+      </div>
     </div>
   );
 };
