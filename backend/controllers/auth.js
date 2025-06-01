@@ -45,39 +45,42 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 const register = async (req, res) => {
   try {
     const { userName, password, email, age } = req.body;
+
+    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ" });
     }
 
-    const existingUser = await users.findOne({
-      $or: [{ email }, { userName }],
-    });
+    // Check if user already exists
+    const existingUser = await users.findOne({ $or: [{ email }, { userName }] });
     if (existingUser) {
       return res.status(400).json({
-        message:
-          existingUser.email === email
-            ? "Email đã tồn tại"
-            : "Tên người dùng đã tồn tại",
+        message: existingUser.email === email ? "Email đã tồn tại" : "Tên người dùng đã tồn tại",
       });
     }
 
+    // Create user
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const otpCode = crypto.randomBytes(3).toString("hex"); // e.g. '1a2b3c'
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // valid for 10 minutes
-
     const newUser = await users.create({
       userName,
       password: hashedPassword,
       email,
       age,
       role: "patient",
-      otpCode,
-      otpExpires,
-      isVerified: false,
     });
 
-    // Send OTP to user's email
+    res.status(201).json({ message: "Đăng ký thành công", user: newUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+const sendOtpEmail = async (req, res) => {
+  try {
+    const { email, userName, otpCode } = req.body;
+
     const mailOption = {
       from: process.env.MAIL_USER,
       to: email,
@@ -85,40 +88,11 @@ const register = async (req, res) => {
       text: `Xin chào ${userName}, mã xác thực của bạn là: ${otpCode}`,
     };
 
-    transporter.sendMail(mailOption);
-
-    res.status(201).json({
-      message: "Đăng ký thành công, kiểm tra email để xác thực",
-      email,
-    });
+    await transporter.sendMail(mailOption);
+    res.status(200).json({ message: "OTP đã được gửi đến email của bạn" });
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
-  }
-};
-
-const verifyEmail = async (req, res) => {
-  try {
-    const { email, otpCode } = req.body;
-    const user = await users.findOne({ email });
-
-    if (!user) return res.status(404).json({ message: "Email không tồn tại" });
-    if (user.isVerified)
-      return res.status(400).json({ message: "Email đã được xác thực" });
-
-    if (user.otpCode !== otpCode || new Date() > user.otpExpires) {
-      return res
-        .status(400)
-        .json({ message: "Mã OTP không đúng hoặc đã hết hạn" });
-    }
-
-    user.isVerified = true;
-    user.otpCode = null;
-    user.otpExpires = null;
-    await user.save();
-
-    res.status(200).json({ message: "Xác thực email thành công" });
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Lỗi gửi email", error: error.message });
   }
 };
 
@@ -489,5 +463,5 @@ export {
   register,
   logout,
   updateMyself,
-  verifyEmail,
+  sendOtpEmail,
 };

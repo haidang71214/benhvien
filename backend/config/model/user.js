@@ -64,12 +64,6 @@ const userSchema = new Schema(
       default:
         "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png",
     },
-    otpCode: String,
-    otpExpires: Date,
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
     faceAppId: {
       type: String,
       default: null,

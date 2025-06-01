@@ -1,5 +1,5 @@
 import express from 'express';
-import { extendToken, forgotPassword, login, loginFacebook, logout, register, verifyEmail, resetPassword, updateMyself } from '../controllers/auth.js';
+import { extendToken, forgotPassword, login, loginFacebook, logout, register, sendOtpEmail, resetPassword, updateMyself } from '../controllers/auth.js';
 import { middlewareTokenAsyncKey } from '../config/jwt.js';
 import { uploadCloud } from '../config/uploadCloud.js';
 import passport from 'passport';
@@ -7,7 +7,7 @@ import { createTokenAsyncKey } from '../config/jwt.js';
 
 const authRouter = express.Router();
 authRouter.post('/register',register); // đăng kí
-authRouter.post('/verifyEmail',verifyEmail); // verify email
+authRouter.post('/sendOtpEmail',sendOtpEmail); // verify email
 authRouter.post('/login',login); // đăng nhập
 authRouter.post('/loginFace',loginFacebook); // loginfb
 authRouter.post('/extendToken',extendToken); // extendToken
