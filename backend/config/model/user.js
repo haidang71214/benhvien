@@ -38,8 +38,8 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
     },
-    age: {
-      type: Number,
+    dob: {
+      type: String, // Store as string (e.g., "1990-01-01")
       default: null,
     },
     role: {
