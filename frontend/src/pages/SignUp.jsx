@@ -8,7 +8,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
-  const [form, setForm] = useState({ userName: "", email: "", password: "", age: "" });
+  const [form, setForm] = useState({ userName: "", email: "", password: "", dob: "" });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -80,10 +80,8 @@ const Signup = () => {
         "Password must be at least 8 characters long and include one capital letter and one special character";
     }
 
-    if (!form.age) {
-      newErrors.age = "Age is required";
-    } else if (!/^\d+$/.test(form.age)) {
-      newErrors.age = "Age must be a number";
+    if (!form.dob) {
+      newErrors.dob = "Date of birth is required";
     }
 
     return newErrors;
@@ -338,33 +336,33 @@ const Signup = () => {
             </div>
 
             <div>
-              <label htmlFor="age" className="block text-sm font-medium text-gray-700">
-                Age
+              <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
+                Date of Birth
               </label>
               <input
-                id="age"
-                name="age"
-                type="text"
-                placeholder="Enter your age"
-                value={form.age}
+                id="dob"
+                name="dob"
+                type="date"
+                placeholder="Enter your date of birth"
+                value={form.dob}
                 onChange={handleChange}
                 required
-                aria-describedby={errors.age ? "age-error" : undefined}
+                aria-describedby={errors.dob ? "dob-error" : undefined}
                 className={`mt-1 block w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400
                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
                   transition-all duration-200
-                  ${errors.age ? "border-red-500" : "border-gray-300"}`}
+                  ${errors.dob ? "border-red-500" : "border-gray-300"}`}
               />
               <AnimatePresence>
-                {errors.age && (
+                {errors.dob && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    id="age-error"
+                    id="dob-error"
                     className="mt-2 text-sm text-red-600"
                   >
-                    {errors.age}
+                    {errors.dob}
                   </motion.p>
                 )}
               </AnimatePresence>

@@ -93,7 +93,7 @@ const VerifyEmail = () => {
         {success && <div className="text-green-500 text-center">{success}</div>}
         <button
           type="submit"
-          className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+          className="bg-indigo-600 text-black py-2 rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
         >
           Xác Thực
         </button>

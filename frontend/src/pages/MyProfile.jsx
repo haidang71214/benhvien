@@ -8,7 +8,7 @@ const MyProfile = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     userName: user?.userName || "",
-    age: user?.age || "",
+    dob: user?.dob || "",
     password: "",
   });
   const [image, setImage] = useState(null);
@@ -19,7 +19,7 @@ const MyProfile = () => {
   useEffect(() => {
     setForm({
       userName: user?.userName || "",
-      age: user?.age || "",
+      dob: user?.dob || "",
       password: "",
     });
     setPreview(user?.image || user?.avatarUrl || "/default-avatar.png");
@@ -44,7 +44,7 @@ const MyProfile = () => {
     try {
       const formData = new FormData();
       formData.append("userName", form.userName);
-      formData.append("age", form.age);
+      formData.append("dob", form.dob);
       if (form.password) formData.append("password", form.password);
       if (image) formData.append("img", image);
 
@@ -107,13 +107,14 @@ const MyProfile = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
           <input
-            type="number"
-            name="age"
-            value={form.age}
+            type="date"
+            name="dob"
+            value={form.dob}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
         </div>
 

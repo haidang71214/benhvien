@@ -44,7 +44,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const register = async (req, res) => {
   try {
-    const { userName, password, email, age } = req.body;
+    const { userName, password, email, dob } = req.body;
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,7 +66,7 @@ const register = async (req, res) => {
       userName,
       password: hashedPassword,
       email,
-      age,
+      dob,
       role: "patient",
     });
 
@@ -143,7 +143,7 @@ const login = async (req, res) => {
         userName: user.userName,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        age: user.age,
+        dob: user.dob,
       },
     });
   } catch (error) {
@@ -375,7 +375,7 @@ const updateMyself = async (req, res) => {
   try {
     const userId = req.user.id;
     const { oldPassword, newPassword } = req.body;
-    const { userName, password, age } = req.body;
+    const { userName, password, dob } = req.body;
     const file = req.file;
 
     // Tìm user
@@ -385,7 +385,7 @@ const updateMyself = async (req, res) => {
     }
 
     if (userName) user.userName = userName;
-    if (age) user.age = age;
+    if (dob) user.dob = dob;
     if (file) user.avatarUrl = file.path;
 
     if (oldPassword && newPassword) {
