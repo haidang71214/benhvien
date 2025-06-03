@@ -52,7 +52,8 @@ const register = async (req, res) => {
     await transporter.sendMail(mailOption);
 
     res.status(201).json({
-      message: "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.",
+      message:
+        "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.",
       email,
     });
   } catch (error) {
@@ -83,6 +84,46 @@ const verifyEmail = async (req, res) => {
 
     res.status(200).json({ message: "Xác thực email thành công" });
   } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+//gửi lại otp
+const resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await users.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Email không tồn tại" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Email đã được xác thực" });
+    }
+
+    const newOtpCode = crypto.randomBytes(3).toString("hex");
+    const newOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.otpCode = newOtpCode;
+    user.otpExpires = newOtpExpires;
+    await user.save();
+
+    const mailOption = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: "Gửi lại mã xác thực email",
+      text: `Xin chào ${user.userName}, mã xác thực mới của bạn là: ${newOtpCode}. Mã này sẽ hết hạn sau 10 phút.`,
+    };
+
+    await transporter.sendMail(mailOption);
+
+    res.status(200).json({
+      message: "Đã gửi lại mã xác thực đến email của bạn",
+      email,
+    });
+  } catch (error) {
+    console.error("Lỗi khi gửi lại mã OTP:", error);
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
@@ -304,7 +345,9 @@ const logout = async (req, res) => {
     // Lấy refreshToken từ cookie
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(400).json({ message: "Không tìm thấy refreshToken trong cookie" });
+      return res
+        .status(400)
+        .json({ message: "Không tìm thấy refreshToken trong cookie" });
     }
 
     // Tìm user theo refreshToken
@@ -378,7 +421,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await users.findById(id);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -394,6 +437,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("Google profile:", profile);
         let user = await users.findOne({ googleId: profile.id });
         if (!user) {
           user = await users.findOne({ email: profile.emails[0].value });
@@ -407,7 +451,7 @@ passport.use(
               email: profile.emails[0].value,
               password: randomPassword,
               role: "patient",
-              isVerified: true, // Automatically verify new users
+              isVerified: true,
               avatarUrl: profile.photos ? profile.photos[0].value : null,
             });
           }
@@ -415,6 +459,7 @@ passport.use(
         }
         return done(null, user);
       } catch (error) {
+        console.error("Error in Google Strategy:", error); // Log lỗi để debug
         return done(error, null);
       }
     }
@@ -431,4 +476,5 @@ export {
   logout,
   updateMyself,
   verifyEmail,
+  resendOtp,
 };

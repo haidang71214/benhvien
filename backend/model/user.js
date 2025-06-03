@@ -1,4 +1,4 @@
-import mongoose, { mongo, Types } from "mongoose";
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export const ROLE_ENUM = ["patient", "admin", "doctor", "receptionist"];

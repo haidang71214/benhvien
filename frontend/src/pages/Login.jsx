@@ -3,6 +3,7 @@ import { AuthForm } from "@/components/AuthForm";
 import { useAuth } from "@/context/AuthContext";
 import { axiosInstance } from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -27,10 +28,11 @@ export default function Login() {
     try {
       const response = await axiosInstance.post("/auth/login", formData);
       const data = response.data;
-      login(data.user, data.token);
+      login(data.user, data.accessToken);
+      toast.success('Đăng nhập thành công !!!')
       navigate("/");
     } catch (err) {
-      setError("Invalid credentials or something went wrong.", err.message);
+      toast.error(err.response.data.message || 'Đăng nhập thất bại !!!');
     }
 
     setLoading(false);

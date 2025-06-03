@@ -1,4 +1,5 @@
 import { assets } from "../assets/assets";
+
 const About = () => {
   return (
     <div>

@@ -5,7 +5,7 @@ import TopDoctors from '../components/TopDoctors'
 
 const Home = () => {
   return (
-    <div>
+    <div >
       <Header />
       <SpecialityMenu />
       <TopDoctors />

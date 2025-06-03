@@ -9,6 +9,7 @@ import {
   verifyEmail,
   resetPassword,
   updateMyself,
+  resendOtp,
 } from "../controllers/auth.controller.js";
 import { middlewareTokenAsyncKey } from "../config/jwt.js";
 import { uploadCloud } from "../config/uploadCloud.js";
@@ -18,6 +19,7 @@ import { createTokenAsyncKey } from "../config/jwt.js";
 const authRouter = express.Router();
 authRouter.post("/register", register); // đăng kí
 authRouter.post("/verifyEmail", verifyEmail); // verify email
+authRouter.post("/resendOTP", resendOtp);
 authRouter.post("/login", login); // đăng nhập
 authRouter.post("/loginFace", loginFacebook); // loginfb
 authRouter.post("/extendToken", extendToken); // extendToken
@@ -37,7 +39,7 @@ authRouter.get(
 
 authRouter.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
+  passport.authenticate("google", { failureRedirect: "/auth/login" }),
   async (req, res) => {
     const token = await createTokenAsyncKey({
       id: req.user._id,
@@ -46,6 +48,7 @@ authRouter.get(
       avatarUrl: req.user.avatarUrl,
       email: req.user.email,
     });
+    console.log("Google callback user:", req.user);
     res.redirect(
       `http://localhost:5173/login-success?token=${token}&id=${
         req.user._id

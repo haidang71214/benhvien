@@ -39,7 +39,7 @@ const App = () => {
         <Route path="/appointment/:docId" element={<Appointment />} />
       </Routes>
       <Footer />
-      <Toaster />
+      <Toaster position="top-right"/>
     </div>
   );
 };
