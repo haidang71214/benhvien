@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"; // Thêm useEffect
+import { useState, useEffect } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom"; // Thêm useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { axiosInstance } from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 
@@ -15,11 +15,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const location = useLocation(); // Lấy query params từ URL
-
+  const location = useLocation();
   const { email, password, confirmPassword, userName } = formData;
 
-  // Xử lý redirect sau khi đăng nhập Google thành công
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const token = urlParams.get("token");
@@ -30,7 +28,7 @@ export default function Register() {
         const parsedUser = JSON.parse(user);
         login(parsedUser, token);
         toast.success("Đăng nhập bằng Google thành công!");
-        navigate("/"); // Redirect về trang chủ hoặc trang mong muốn
+        navigate("/");
       } catch (err) {
         toast.error("Lỗi khi xử lý đăng nhập Google", err.message);
       }

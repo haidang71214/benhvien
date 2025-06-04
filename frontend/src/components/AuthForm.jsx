@@ -51,15 +51,15 @@ export function AuthForm({
   }, [error]);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)} {...props}>
+    <div className={cn("flex flex-col gap-4 mt-20", className)} {...props}>
       <Card className="rounded-xl shadow-lg border border-gray-100">
-        <CardHeader className="space-y-3 text-center">
+        <CardHeader className="space-y-3 text-center pt-6">
           <CardTitle className="text-3xl font-extrabold text-gray-800">
             {currentConfig.title}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="flex flex-col pt-8 pb-8">
+          <form onSubmit={onSubmit} className="flex flex-col pb-8">
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 {!isLogin && (
@@ -86,10 +86,7 @@ export function AuthForm({
                   </div>
                 )}
                 <div className="grid gap-2 pb-4">
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-medium text-gray-700"
-                  >
+                  <Label className="text-sm font-medium text-gray-700">
                     Email Address
                   </Label>
                   <Input
@@ -140,10 +137,7 @@ export function AuthForm({
 
               {!isLogin && (
                 <div className="grid gap-2 pb-4">
-                  <Label
-                    htmlFor="confirmPassword"
-                    className="text-sm font-medium text-gray-700"
-                  >
+                  <Label className="text-sm font-medium text-gray-700">
                     Confirm Password
                   </Label>
                   <Input
