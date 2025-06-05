@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAppointment, createMedicalRecord, createNowAppoinment, createPrescription, deleteAppointment, doctorGetMedicalRecord, getMedicalRecordPatients, searchPatients, updateAppointment } from '../controllers/doctor.controller.js';
+import { createAppointment, createMedicalRecord, createNowAppoinment, createPrescription, deleteAppointment, doctorGetMedicalRecord, getAndFilterDoctor, getMedicalRecordPatients, searchPatients, updateAppointment } from '../controllers/doctor.controller.js';
 import { middlewareTokenAsyncKey } from '../config/jwt.js';
 
 const doctorRouter = express.Router();
@@ -24,5 +24,9 @@ doctorRouter.post('/createNowAppoinment/:id',middlewareTokenAsyncKey,createNowAp
 // dễ cho việc t viết code quản lí thuốc trong khi hơn, chỗ này khi hiểu thì gọi t
 doctorRouter.post('/createPresCription/:id',middlewareTokenAsyncKey,createPrescription)
 // tạo mới hồ sơ bệnh án -> sẽ lấy lịch hẹn và mảng id của thuốc nhét vào đây
-doctorRouter.post('/createmedicalrecord',middlewareTokenAsyncKey,createMedicalRecord)
+doctorRouter.post('/createmedicalrecord',middlewareTokenAsyncKey,createMedicalRecord);
+// admin tạo lịch khám cho thằng doctor, chỗ này bên fe check phải trước 2 ngày và không được dưới ngày hiện tại
+doctorRouter.post('/createApoinment')
+// filter doctor
+doctorRouter.get('/filterDoctor',getAndFilterDoctor)
 export default doctorRouter; 
