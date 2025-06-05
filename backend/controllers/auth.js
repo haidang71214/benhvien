@@ -418,41 +418,41 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:8080/api/v1/auth/auth/google/callback",
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await users.findOne({ googleId: profile.id });
-        if (!user) {
-          user = await users.findOne({ email: profile.emails[0].value });
-          if (user) {
-            user.googleId = profile.id;
-          } else {
-            const randomPassword = crypto.randomBytes(16).toString("hex");
-            user = new users({
-              googleId: profile.id,
-              userName: profile.displayName,
-              email: profile.emails[0].value,
-              password: randomPassword,
-              role: "patient",
-              isVerified: true, // Automatically verify new users
-              avatarUrl: profile.photos ? profile.photos[0].value : null,
-            });
-          }
-          await user.save();
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
-      }
-    }
-  )
-);
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.GOOGLE_CLIENT_ID,
+//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//       callbackURL: "http://localhost:8080/api/v1/auth/auth/google/callback",
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       try {
+//         let user = await users.findOne({ googleId: profile.id });
+//         if (!user) {
+//           user = await users.findOne({ email: profile.emails[0].value });
+//           if (user) {
+//             user.googleId = profile.id;
+//           } else {
+//             const randomPassword = crypto.randomBytes(16).toString("hex");
+//             user = new users({
+//               googleId: profile.id,
+//               userName: profile.displayName,
+//               email: profile.emails[0].value,
+//               password: randomPassword,
+//               role: "patient",
+//               isVerified: true, // Automatically verify new users
+//               avatarUrl: profile.photos ? profile.photos[0].value : null,
+//             });
+//           }
+//           await user.save();
+//         }
+//         return done(null, user);
+//       } catch (error) {
+//         return done(error, null);
+//       }
+//     }
+//   )
+// );
 
 export {
   login,

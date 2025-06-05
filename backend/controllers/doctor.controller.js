@@ -10,7 +10,6 @@ import { checkAdmin, checkDoctor } from "./admin.controller.js";
 // tạo lịch khám, tạo đơn thuốc, kiểm tra thuốc trong kho
 // tạo hồ sơ bệnh án, cập nhật hồ so bệnh án, xem hồ sơ bệnh án
 // cập nhật cái trạng thái của thằng dụng cụ y tế, hỏng hay loại bỏ, hay đang vệ sinh
-
 // xem tất cả lịch khám trong ngày. hôm nay khám cho ai ?
 const getAppointment = async(req,res) =>{
    try {
@@ -27,38 +26,59 @@ const getAppointment = async(req,res) =>{
 // check điều kiện xem bệnh nhân có trong db chưa ? nếu mà có rồi thì lấy id nhét vô kiếm
 // không có thì tạo bệnh nhân mới xong nhét id vô, 
 // chỗ này sẽ có 1 cái là tìm kiếm bệnh nhân hoặc các bác sĩ á
-const createAppointment = async(req,res) =>{
-// tạo lịch khám ở tương lai
+const createAppointment = async (req, res) => {
    try {
-      const userId = req.user.id;
-      const {id} = req.params
-      const {appointmentTime,doctorId: doctorIdFromBody} = req.body
-    const isAdmin = await checkAdmin(userId);
+      // ý tưởng sẽ là ném 1 cái list user xong đó admin click vô tạo lịch khám mới 
+     const userId = req.user.id;
+     const { id } = req.params; // patientId
+     const { appointmentTime, doctorId: doctorIdFromBody } = req.body;
+ 
+     const isAdmin = await checkAdmin(userId);
      const isDoctor = await checkDoctor(userId);
  
      if (!isAdmin && !isDoctor) {
        return res.status(403).json({ message: 'Không có quyền tạo lịch' });
      }
+ 
      const doctorId = isAdmin ? doctorIdFromBody : (isDoctor ? userId : null);
      if (!doctorId) {
        return res.status(400).json({ message: 'doctorId không hợp lệ' });
      }
-   else{
-      const checkUser = await users.findById(id);
-      if(!checkUser){
-         return res.status(409).json({message:'User không tồn tại'})
-      }
-      const data = await appointments.create({
-         doctorId:mongoose.Types.ObjectId(doctorId),
-         patientId:mongoose.Types.ObjectId(id),
-         appointmentTime
-      })
-      return res.status(200).json({data})
-   }
+ 
+     // Kiểm tra user có tồn tại không
+     const checkUser = await users.findById(id);
+     if (!checkUser) {
+       return res.status(409).json({ message: 'User không tồn tại' });
+     }
+ 
+     // Kiểm tra appointmentTime hợp lệ: phải cách ít nhất 2 ngày và không ở quá khứ
+     const now = new Date();
+     const appointmentDate = new Date(appointmentTime);
+     const diffInMilliseconds = appointmentDate.getTime() - now.getTime();
+     const diffInDays = diffInMilliseconds / (1000 * 60 * 60 * 24);
+ 
+     if (diffInDays < 2) {
+       return res.status(400).json({
+         message: 'Lịch khám phải được đặt trước ít nhất 2 ngày và không được là ngày quá khứ.'
+       });
+     }
+ 
+     // Tạo lịch khám
+     const data = await appointments.create({
+       doctorId: mongoose.Types.ObjectId(doctorId),
+       patientId: mongoose.Types.ObjectId(id),
+       appointmentTime
+     });
+ 
+     return res.status(200).json({ data });
+ 
    } catch (error) {
-      throw new Error(error)
+     console.error(error);
+     return res.status(500).json({ message: 'Lỗi server' });
    }
-}
+ };
+
+ 
 // sửa cái lịch của thằng doctor
 // lấy cái lịch cần sửa -> sửa xong thì thông báo cho thằng patients
 // sửa lịch khám của chính thằng doctor với bệnh nhân đó, lấy id cái lịch khám đó nhét vô
@@ -308,7 +328,40 @@ const createMedicalRecord = async (req, res) => {
    }
  };
  
-
+ const getAndFilterDoctor = async (req, res) => {
+   try {
+     const { specialty } = req.query;
+     const query = { role: "doctor" };
+ 
+     if (specialty) {
+       const specialties = specialty.split(",").map((s) => s.trim());
+       query.specialty = { $in: specialties };
+     }
+ 
+     const doctors = await users.find(query)
+       .select("userName email specialty licenseNumber bio avatarUrl")
+       .lean();
+ 
+     if (!doctors || doctors.length === 0) {
+       return res.status(404).json({
+         success: false,
+         message: "No doctors found matching the criteria",
+       });
+     }
+ 
+     return res.status(200).json({
+       success: true,
+       data: doctors,
+     });
+   } catch (error) {
+     console.error("Error in getAndFilterDoctor:", error);
+     return res.status(500).json({
+       success: false,
+       message: "Server error",
+       error: error.message,
+     });
+   }
+ };
 
 export {getAppointment,
    createAppointment,  // tạo lịch khám ngẫu nhiên, t biết tạo như này thừa nhma t ngứa tay :v
@@ -319,5 +372,6 @@ export {getAppointment,
    searchPatients,
    createNowAppoinment,
    createPrescription,
-   createMedicalRecord
+   createMedicalRecord,
+   getAndFilterDoctor
 }

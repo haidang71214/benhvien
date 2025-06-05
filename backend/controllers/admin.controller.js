@@ -29,7 +29,7 @@ export const checkAdmin = async (userId) => {
    }
  };
  
-export const checkPatients = async(req,res)=>{
+export const checkPatients = async(userId)=>{
    try {
       const user = await users.findById(userId);
       if (!user) {
@@ -46,7 +46,7 @@ export const checkPatients = async(req,res)=>{
       return false;
     }
 }
-export const checkReceptionist = async(req,res) =>{
+export const checkReceptionist = async(userId) =>{
    try {
       const user = await users.findById(userId);
       if (!user) {
