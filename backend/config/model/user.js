@@ -13,13 +13,17 @@ export const DOCTOR_HEHE = [
   "cardiology",
   "neurology",
 ];
-export const ROOM_ENUM = [
-  "booked",
-  "checkedIn",
-  "inProgress",
-  "completed",
-  "cancelled",
-];
+export const DOCTOR_SPECIALTIES_ENUM = {
+  internal_medicine: "Nội khoa",
+  pediatrics: "Nhi khoa",
+  dermatology: "Da liễu",
+  dentistry: "Nha khoa",
+  ENT: "Tai Mũi Họng",
+  ophthalmology: "Nhãn khoa",
+  cardiology: "Tim mạch",
+  neurology: "Thần kinh",
+};
+
 const userSchema = new Schema(
   {
     userName: {
