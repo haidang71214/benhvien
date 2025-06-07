@@ -1,4 +1,4 @@
-import mongoose, { mongo, Types } from "mongoose";
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export const ROLE_ENUM = ["patient", "admin", "doctor", "receptionist"];
@@ -13,17 +13,13 @@ export const DOCTOR_HEHE = [
   "cardiology",
   "neurology",
 ];
-export const DOCTOR_SPECIALTIES_ENUM = {
-  internal_medicine: "Nội khoa",
-  pediatrics: "Nhi khoa",
-  dermatology: "Da liễu",
-  dentistry: "Nha khoa",
-  ENT: "Tai Mũi Họng",
-  ophthalmology: "Nhãn khoa",
-  cardiology: "Tim mạch",
-  neurology: "Thần kinh",
-};
-
+export const ROOM_ENUM = [
+  "booked",
+  "checkedIn",
+  "inProgress",
+  "completed",
+  "cancelled",
+];
 const userSchema = new Schema(
   {
     userName: {
@@ -42,8 +38,8 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
     },
-    dob: {
-      type: String, // Store as string (e.g., "1990-01-01")
+    age: {
+      type: Number,
       default: null,
     },
     role: {
@@ -67,6 +63,12 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png",
+    },
+    otpCode: String,
+    otpExpires: Date,
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     faceAppId: {
       type: String,

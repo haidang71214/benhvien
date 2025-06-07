@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @import "tailwindcss";
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
@@ -1134,3 +1135,8 @@ video {
     line-height: 1.25;
   }
 }
+=======
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+>>>>>>> fe-demo
