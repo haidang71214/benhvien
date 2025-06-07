@@ -5,7 +5,11 @@ import TopDoctors from '../components/TopDoctors'
 
 const Home = () => {
   return (
+<<<<<<< HEAD
     <div>
+=======
+    <div >
+>>>>>>> fe-demo
       <Header />
       <SpecialityMenu />
       <TopDoctors />

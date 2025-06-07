@@ -1,17 +1,23 @@
-import { createContext } from "react";
-import { doctors } from "../assets/assets";
+import { createContext, useState, useContext } from "react";
 
-export const AppContext = createContext()
+export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
-    const value = {
-        doctors
-    }
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    )
-}
+  const [doctors, setDoctors] = useState([]); // State động cho doctors
+  const currencySymbol = "$";
 
-export default AppContextProvider
+  const value = {
+    doctors,
+    setDoctors,
+    currencySymbol,
+  };
+
+  return (
+    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+  );
+};
+
+// Hook để sử dụng context
+export const useAppContext = () => useContext(AppContext);
+
+export default AppContextProvider;
