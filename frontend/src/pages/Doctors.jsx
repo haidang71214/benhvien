@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-import React from 'react'
-
-const Doctors = () => {
-  return (
-    <div>Doctors</div>
-  )
-}
-
-export default Doctors
-=======
-=======
->>>>>>> fe-hung
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
@@ -42,7 +28,6 @@ const Doctors = () => {
     setError(null);
     try {
       const response = await axiosInstance.get("/doctor/filterDoctor");
-      console.log("API Response:", response);
       if (response.data.success) {
         setDoctors(response.data.data);
       } else {
@@ -52,7 +37,6 @@ const Doctors = () => {
     } catch (error) {
       setError("Error fetching doctors. Please try again.");
       toast.error("Error fetching doctors. Please try again.");
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -117,9 +101,10 @@ const Doctors = () => {
                   src={item.avatarUrl}
                   alt={item.userName}
                   className="w-full bg-blue-50"
-                  onError={(e) =>
-                    (e.target.src = "https://via.placeholder.com/150")
-                  }
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://via.placeholder.com/150";
+                  }}
                 />
                 <div className="p-4">
                   <div className="flex items-center gap-2 text-sm text-green-500 mb-2">
@@ -145,7 +130,3 @@ const Doctors = () => {
 };
 
 export default Doctors;
-<<<<<<< HEAD
->>>>>>> fe-demo
-=======
->>>>>>> fe-hung
