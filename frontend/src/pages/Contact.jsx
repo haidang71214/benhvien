@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React from 'react'
 
 const Contact = () => {
@@ -9,6 +10,8 @@ const Contact = () => {
 
 export default Contact
 =======
+=======
+>>>>>>> fe-hung
 import { assets } from "@/assets/data/doctors";
 
 const Contact = () => {
@@ -46,4 +49,7 @@ const Contact = () => {
 };
 
 export default Contact;
+<<<<<<< HEAD
 >>>>>>> fe-demo
+=======
+>>>>>>> fe-hung

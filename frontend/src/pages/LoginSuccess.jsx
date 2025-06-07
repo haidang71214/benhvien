@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import { useAuth } from "../context/AuthContext";
-=======
 import { useAuth } from "@/context/AuthContext";
->>>>>>> fe-demo
 
 const LoginSuccess = () => {
   const navigate = useNavigate();

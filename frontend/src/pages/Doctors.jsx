@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React from 'react'
 
 const Doctors = () => {
@@ -9,6 +10,8 @@ const Doctors = () => {
 
 export default Doctors
 =======
+=======
+>>>>>>> fe-hung
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
@@ -142,4 +145,7 @@ const Doctors = () => {
 };
 
 export default Doctors;
+<<<<<<< HEAD
 >>>>>>> fe-demo
+=======
+>>>>>>> fe-hung
