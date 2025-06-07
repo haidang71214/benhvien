@@ -1,14 +1,28 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
+import {axiosInstance} from '../utils/axiosInstance'
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (!savedUser || savedUser === "undefined") return null;
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.error("Lỗi parse user từ localStorage:", error);
+      return null;
+    }
   });
+
   const [accessToken, setAccessToken] = useState(() => {
-    return localStorage.getItem("accessToken") || null;
+    try {
+      const token = localStorage.getItem("accessToken");
+      return token && token !== "undefined" ? token : null;
+    } catch (error) {
+      console.error("Lỗi parse token từ localStorage:", error);
+      return null;
+    }
   });
 
   const login = (userData, token) => {
@@ -18,22 +32,28 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("accessToken", token);
   };
 
-  const logout = () => {
-    setUser(null);
-    setAccessToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    window.location.href = "/";
+  const logout = async () => {
+    try {
+      await axiosInstance.post('http://localhost:8080/api/v1/auth/logout')
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+    } finally {
+      setUser(null);
+      setAccessToken(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+    }
   };
 
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, isAuthenticated, accessToken }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, logout, isAuthenticated, accessToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook
 export const useAuth = () => useContext(AuthContext);
