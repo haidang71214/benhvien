@@ -97,6 +97,8 @@ console.log(apiPrefix);
 
 app.use(rootRouter);
 
+app.use("/api/v1/auth", authRouter);
+
 /**
  * Handle errors.
  */
@@ -107,8 +109,6 @@ app.use((err, _req, res, _next) => {
     stack: err?.message,
   });
 });
-
-app.use("/api/v1/auth", authRouter);
 
 /**
  * Create HTTP server.

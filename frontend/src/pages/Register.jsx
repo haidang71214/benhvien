@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { AuthForm } from "@/components/AuthForm";
+import AuthForm from "@/components/AuthForm";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance } from "@/utils/axiosInstance";
 import toast from "react-hot-toast";
 
 export default function Register() {

@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { assets, doctors } from "../assets/data/doctors";
-import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const AppointmentBooking = () => {
   const { docId } = useParams();
-  const [docInfo, setDocInfo] = useState(null); // Sửa lỗi useState ở đây
+  const [docInfo, setDocInfo] = useState(null);
   const [docSlots, setDocSlots] = useState([]);
-  const { authUser } = useAuth();
   const [slotIndex, setSlotIndex] = useState(-1);
   const [slotTime, setSlotTime] = useState("");
   const [isBooking, setIsBooking] = useState(false);
@@ -28,7 +26,7 @@ const AppointmentBooking = () => {
     const fetchDocInfo = () => {
       const info = doctors.find((item) => item._id === docId);
       setDocInfo(info);
-      setDocSlots(info?.slots || []); // Giả sử slots nằm trong docInfo
+      setDocSlots(info?.slots || []);
     };
     fetchDocInfo();
   }, [docId]);
@@ -72,7 +70,6 @@ const AppointmentBooking = () => {
   }
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Doctor Info Card */}
       <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-10">
         <div className="bg-gradient-to-r h-32"></div>
         <div className="relative px-6 md:px-10 pb-10 -mt-20">
@@ -130,12 +127,11 @@ const AppointmentBooking = () => {
         </div>
       </div>
 
-      {/* Booking Section */}
       <div className="bg-white rounded-2xl shadow-md p-6">
         <h3 className="text-xl font-bold mb-4 text-gray-700">🗓️ Choose Date</h3>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {docSlots.map((item, index) => {
-            const date = new Date(item[0]?.dateTime); // Ensure date is Date object
+            const date = new Date(item[0]?.dateTime);
             return (
               <div
                 key={index}
