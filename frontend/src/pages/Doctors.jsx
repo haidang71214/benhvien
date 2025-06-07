@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppContext } from "../context/AppContext"; // Sử dụng hook
 import { axiosInstance } from "../utils/axiosInstance";
@@ -43,8 +44,23 @@ const Doctors = () => {
       setLoading(false);
     }
   }, [setDoctors]); // Chỉ phụ thuộc vào setDoctors
+  }, [setDoctors]); // Chỉ phụ thuộc vào setDoctors
 
   useEffect(() => {
+    fetchDoctors();
+  }, [fetchDoctors]);
+
+  // Cập nhật filteredDoctors dựa trên selectedSpecialty
+  const filteredDoctors = selectedSpecialty
+    ? doctors.filter((doc) => doc.specialty.includes(selectedSpecialty))
+    : doctors;
+
+  // Xử lý khi click vào nút chuyên khoa
+  const handleSpecialtyClick = (value) => {
+    const newSpecialty = selectedSpecialty === value ? "" : value; // Bỏ chọn nếu click lại
+    setSelectedSpecialty(newSpecialty);
+    navigate(newSpecialty ? `/doctors/${newSpecialty}` : "/doctors"); // Cập nhật URL
+  };
     fetchDoctors();
   }, [fetchDoctors]);
 
@@ -65,6 +81,17 @@ const Doctors = () => {
       <p className="text-gray-600">Browse through the doctors specialist</p>
       <div className="flex flex-col sm:flex-row items-start gap-5 mt-5">
         <div className="flex flex-col gap-4 text-sm text-gray-600">
+          {SPECIALTIES.map(({ display, value }) => (
+            <p
+              key={value}
+              onClick={() => handleSpecialtyClick(value)}
+              className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
+                selectedSpecialty === value ? "bg-indigo-100 text-black" : ""
+              }`}
+            >
+              {display}
+            </p>
+          ))}
           {SPECIALTIES.map(({ display, value }) => (
             <p
               key={value}
@@ -121,6 +148,10 @@ const Doctors = () => {
                   </p>
                 </div>
               </div>
+            ))
+          ) : (
+            <p className="text-gray-600">No doctors found</p>
+          )}
             ))
           ) : (
             <p className="text-gray-600">No doctors found</p>
