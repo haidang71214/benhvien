@@ -246,6 +246,42 @@ const searchDoctors = async (req, res) => {
    }
  };
 // quản lí vật tư
+// thay đổi role thành doctor, đồng thời set cái dữ liệu cho thằng doctor đó
+const changeRoleUserToDoctor = async (req, res) => {
+  try {
+    const admin_id = req.user.id;
+    const isAdmin = await checkAdmin(admin_id);
+    if (!isAdmin) {
+      return res.status(403).json({ message: "Không có quyền" });
+    }
+
+    const { id } = req.params;
+    const { specialty, licenseNumber, bio } = req.body;
+
+    // Kiểm tra xem user cần đổi role có tồn tại không
+    const targetUser = await users.findById(id);
+    if (!targetUser) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    // Cập nhật role + thông tin bác sĩ
+    const updatedUser = await users.findByIdAndUpdate(
+      id,
+      {
+        role: 'doctor',
+        specialty,
+        licenseNumber,
+        bio,
+      },
+      { new: true } // Trả về document đã được cập nhật
+    );
+
+    return res.status(200).json({ data: updatedUser });
+  } catch (error) {
+    console.error("Lỗi:", error);
+    return res.status(500).json({ message: "Đã xảy ra lỗi server" });
+  }
+};
 
 export {
    createUser,
@@ -254,6 +290,7 @@ export {
    getAlluser,
    getDetailUser,
    detailSelf,
-   searchDoctors
+   searchDoctors,
+   changeRoleUserToDoctor
    //
 }
