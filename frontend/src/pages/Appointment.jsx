@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import React from 'react'
-
-const Appointment = () => {
-  return (
-    <div>Appointment</div>
-  )
-}
-
-export default Appointment
-=======
 import { useState, useEffect } from "react";
 import { assets, doctors } from "../assets/data/doctors";
 import { toast } from "react-hot-toast";
@@ -209,4 +198,3 @@ const AppointmentBooking = () => {
 };
 
 export default AppointmentBooking;
->>>>>>> fe-demo
