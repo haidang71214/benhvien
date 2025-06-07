@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppContext } from "../context/AppContext"; // Sử dụng hook
+import { useAppContext } from "../context/AppContext";
 import { axiosInstance } from "../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 
@@ -17,63 +16,46 @@ const SPECIALTIES = [
 ];
 
 const Doctors = () => {
-  const { speciality: urlSpeciality } = useParams(); // Lấy speciality từ URL
-  const { doctors, setDoctors } = useAppContext(); // Lấy doctors và setDoctors từ context
+  const { speciality: urlSpeciality } = useParams();
+  const { doctors, setDoctors } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedSpecialty, setSelectedSpecialty] = useState(
-    urlSpeciality || ""
-  ); // State cho chuyên khoa được chọn
+  const [selectedSpecialty, setSelectedSpecialty] = useState(urlSpeciality || "");
   const navigate = useNavigate();
 
   const fetchDoctors = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get("/doctor/filterDoctor"); // Lấy toàn bộ danh sách
+      const response = await axiosInstance.get("/doctor/filterDoctor");
       console.log("API Response:", response);
       if (response.data.success) {
-        setDoctors(response.data.data); // Cập nhật context với dữ liệu từ API
+        setDoctors(response.data.data);
       } else {
         setError(response.data.message || "Failed to fetch doctors");
+        toast.error(response.data.message || "Failed to fetch doctors");
       }
     } catch (error) {
       setError("Error fetching doctors. Please try again.");
+      toast.error("Error fetching doctors. Please try again.");
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [setDoctors]); // Chỉ phụ thuộc vào setDoctors
-  }, [setDoctors]); // Chỉ phụ thuộc vào setDoctors
+  }, [setDoctors]);
 
   useEffect(() => {
     fetchDoctors();
   }, [fetchDoctors]);
 
-  // Cập nhật filteredDoctors dựa trên selectedSpecialty
   const filteredDoctors = selectedSpecialty
     ? doctors.filter((doc) => doc.specialty.includes(selectedSpecialty))
     : doctors;
 
-  // Xử lý khi click vào nút chuyên khoa
   const handleSpecialtyClick = (value) => {
-    const newSpecialty = selectedSpecialty === value ? "" : value; // Bỏ chọn nếu click lại
+    const newSpecialty = selectedSpecialty === value ? "" : value;
     setSelectedSpecialty(newSpecialty);
-    navigate(newSpecialty ? `/doctors/${newSpecialty}` : "/doctors"); // Cập nhật URL
-  };
-    fetchDoctors();
-  }, [fetchDoctors]);
-
-  // Cập nhật filteredDoctors dựa trên selectedSpecialty
-  const filteredDoctors = selectedSpecialty
-    ? doctors.filter((doc) => doc.specialty.includes(selectedSpecialty))
-    : doctors;
-
-  // Xử lý khi click vào nút chuyên khoa
-  const handleSpecialtyClick = (value) => {
-    const newSpecialty = selectedSpecialty === value ? "" : value; // Bỏ chọn nếu click lại
-    setSelectedSpecialty(newSpecialty);
-    navigate(newSpecialty ? `/doctors/${newSpecialty}` : "/doctors"); // Cập nhật URL
+    navigate(newSpecialty ? `/doctors/${newSpecialty}` : "/doctors");
   };
 
   return (
@@ -92,18 +74,8 @@ const Doctors = () => {
               {display}
             </p>
           ))}
-          {SPECIALTIES.map(({ display, value }) => (
-            <p
-              key={value}
-              onClick={() => handleSpecialtyClick(value)}
-              className={`w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${
-                selectedSpecialty === value ? "bg-indigo-100 text-black" : ""
-              }`}
-            >
-              {display}
-            </p>
-          ))}
         </div>
+
         <div className="w-full grid grid-cols-auto gap-4 gap-y-6 min-h-[400px]">
           {loading ? (
             <p className="text-gray-600">Loading...</p>
@@ -148,10 +120,6 @@ const Doctors = () => {
                   </p>
                 </div>
               </div>
-            ))
-          ) : (
-            <p className="text-gray-600">No doctors found</p>
-          )}
             ))
           ) : (
             <p className="text-gray-600">No doctors found</p>
