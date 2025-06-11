@@ -1,4 +1,5 @@
-import { assets } from "../assets/data/doctors";
+import { assets } from "@/assets/data/doctors";
+
 const About = () => {
   return (
     <div>

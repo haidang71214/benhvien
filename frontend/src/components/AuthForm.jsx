@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, LogIn, UserPlus } from "lucide-react";
 import { GoogleIcon } from "@/components/google-icon";
 
-export function AuthForm({
+export default function AuthForm({
   className,
   formData,
   onChange,

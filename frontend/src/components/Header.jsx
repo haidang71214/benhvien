@@ -1,6 +1,8 @@
-import { assets } from "../assets/data/doctors";
+import { assets } from "@/assets/data/doctors";
+import { Link } from "react-router-dom";
 
 const Header = () => {
+
   return (
     <div className="flex flex-col md:flex-row flex-wrap bg-primary rounded-lg px-6 md:px-10 lg:px-20 relative">
       {/* Left side */}
@@ -16,17 +18,18 @@ const Header = () => {
           />
           <div className="w-full max-w-md">
             <p className="text-white text-sm">
-              Simple browser application to book appointments with doctors. Schedule your appointment with ease and convenience.
+              Simple browser application to book appointments with doctors.
+              Schedule your appointment with ease and convenience.
             </p>
           </div>
         </div>
-        <a
-          href="#speciality"
+        <Link
+          to={"/doctors"}
           className="flex items-center gap-2 bg-white text-gray-600 px-8 py-3 rounded-full hover:scale-105 font-medium hover:bg-gray-100 transition-all mt-4"
         >
           Book Appointment
           <img src={assets.arrow_icon} alt="arrow" className="w-4 h-4" />
-        </a>
+        </Link>
       </div>
 
       {/* Right side */}

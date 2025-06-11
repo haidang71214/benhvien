@@ -1,5 +1,6 @@
 
-import medicines from "../model/medicines.js";
+import medicines from "../model/medical.js";
+import { users } from "../model/user.js";
 import { checkAdmin, checkDoctor, checkPatients } from "./admin.controller.js";
 
 // xem thuốc tồn kho, thì cái role nào cũng xem được,trừ cái patients
