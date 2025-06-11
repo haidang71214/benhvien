@@ -18,13 +18,13 @@ const DoctorsPagination = ({ currentPage, totalPage, onPageChange }) => {
               <PaginationPrevious
                 onClick={() => onPageChange(currentPage - 1)}
                 className={`cursor-pointer rounded-xl transition-all duration-300 ${
-                  currentPage === 1 
-                    ? "pointer-events-none opacity-50" 
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
                     : "hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
                 }`}
               />
             </PaginationItem>
-            
+
             {[...Array(totalPage)].map((_, i) => {
               const page = i + 1;
               if (
@@ -52,17 +52,19 @@ const DoctorsPagination = ({ currentPage, totalPage, onPageChange }) => {
                 (page === currentPage - 2 && currentPage > 3) ||
                 (page === currentPage + 2 && currentPage < totalPage - 2)
               ) {
-                return <PaginationEllipsis key={page} className="text-gray-400" />;
+                return (
+                  <PaginationEllipsis key={page} className="text-gray-400" />
+                );
               }
               return null;
             })}
-            
+
             <PaginationItem>
               <PaginationNext
                 onClick={() => onPageChange(currentPage + 1)}
                 className={`cursor-pointer rounded-xl transition-all duration-300 ${
-                  currentPage === totalPage 
-                    ? "pointer-events-none opacity-50" 
+                  currentPage === totalPage
+                    ? "pointer-events-none opacity-50"
                     : "hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:shadow-md"
                 }`}
               />

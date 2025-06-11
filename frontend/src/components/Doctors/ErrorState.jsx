@@ -5,7 +5,9 @@ const ErrorState = ({ error, onRetry }) => {
         <div className="w-20 h-20 bg-gradient-to-r from-red-100 to-pink-100 rounded-full flex items-center justify-center mb-6">
           <span className="text-3xl">⚠️</span>
         </div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Oops! Something went wrong</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">
+          Oops! Something went wrong
+        </h3>
         <p className="text-red-500 mb-6 text-lg">{error}</p>
         <button
           onClick={onRetry}

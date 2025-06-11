@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const DoctorCard = ({ doctor }) => {
   const renderStars = (rating) => (
     <div className="flex items-center gap-1">

@@ -1,4 +1,3 @@
-// hooks/useDoctors.js
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../utils/axiosInstance.ts";
@@ -9,7 +8,9 @@ export const useDoctors = () => {
   const { speciality: urlSpeciality } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedSpecialty, setSelectedSpecialty] = useState(urlSpeciality || "");
+  const [selectedSpecialty, setSelectedSpecialty] = useState(
+    urlSpeciality || ""
+  );
   const [doctors, setDoctors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const doctorsPerPage = 10;
@@ -17,29 +18,58 @@ export const useDoctors = () => {
   const fetchDoctors = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const staticDoctorsTransformed = staticDoctors.map((doc) =>
-        transformDoctorData(doc, "static")
-      );
+      const staticDoctorsTransformed = staticDoctors
+        .map((doc) => {
+          try {
+            const transformed = transformDoctorData(doc, "static");
+            return transformed;
+          } catch (transformError) {
+            return null;
+          }
+        })
+        .filter(Boolean);
+      setDoctors(staticDoctorsTransformed); 
+      setLoading(false);
 
-      const { data: mongoDoctorsData } = await axiosInstance.get(
-        "/admin/getAllDoctors"
-      );
-      const mongoDoctors = mongoDoctorsData.map((doc) =>
-        transformDoctorData(doc, "mongodb")
-      );
-
-      const combinedDoctors = [
-        ...staticDoctorsTransformed,
-        ...mongoDoctors,
-      ].filter(
-        (doc, index, self) => index === self.findIndex((d) => d._id === doc._id)
-      );
-
-      setDoctors(combinedDoctors);
+      try {
+        const { data: mongoDoctorsData } = await axiosInstance.get(
+          "/admin/getAllDoctors"
+        );
+        console.log("✅ Mongo doctors data:", mongoDoctorsData);
+        const mongoDoctors = mongoDoctorsData
+          .map((doc) => {
+            try {
+              return transformDoctorData(doc, "mongodb");
+            } catch (transformError) {
+              return null;
+            }
+          })
+          .filter(Boolean);
+        const combinedDoctors = [
+          ...staticDoctorsTransformed,
+          ...mongoDoctors,
+        ].filter(
+          (doc, index, self) =>
+            index === self.findIndex((d) => d._id === doc._id)
+        );
+        setDoctors(combinedDoctors);
+      } catch (mongoError) {
+        if (staticDoctorsTransformed.length === 0) {
+          setError("Unable to load doctors list");
+        }
+      }
     } catch (err) {
-      console.error("Lỗi khi tải danh sách bác sĩ:", err);
-      setError("Không thể tải danh sách bác sĩ");
+      setError("Unable to load doctors list");
+      try {
+        const staticDoctorsTransformed = staticDoctors.map((doc) =>
+          transformDoctorData(doc, "static")
+        );
+        setDoctors(staticDoctorsTransformed);
+      } catch (fallbackError) {
+        setDoctors([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -53,8 +83,19 @@ export const useDoctors = () => {
     setCurrentPage(1);
   }, [selectedSpecialty]);
 
+  useEffect(() => {
+    setSelectedSpecialty(urlSpeciality || "");
+  }, [urlSpeciality]);
+
   const filteredDoctors = selectedSpecialty
-    ? doctors.filter((doc) => doc.specialty.includes(selectedSpecialty))
+    ? doctors.filter((doc) => {
+        const docSpecialty = (
+          doc.specialty ||
+          doc.speciality ||
+          ""
+        ).toLowerCase();
+        return docSpecialty.includes(selectedSpecialty.toLowerCase());
+      })
     : doctors;
 
   const totalPage = Math.ceil(filteredDoctors.length / doctorsPerPage);

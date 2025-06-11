@@ -5,12 +5,13 @@ const EmptyState = ({ selectedSpecialty, onSpecialtyClick }) => {
         <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
           <span className="text-4xl">👨‍⚕️</span>
         </div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">No Doctors Found</h3>
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">
+          No Doctors Found
+        </h3>
         <p className="text-gray-600 text-lg mb-6">
-          {selectedSpecialty 
-            ? `We couldn't find any ${selectedSpecialty} specialists at the moment` 
-            : "No doctors are currently available"
-          }
+          {selectedSpecialty
+            ? `We couldn't find any ${selectedSpecialty} specialists at the moment`
+            : "No doctors are currently available"}
         </p>
         {selectedSpecialty && (
           <button

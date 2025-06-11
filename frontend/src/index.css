@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Outfit:wght@100..900&display=swap');
+*{
+  font-family: Outfit;
+}
+::-webkit-scrollbar{
+  display: none;
+}
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
