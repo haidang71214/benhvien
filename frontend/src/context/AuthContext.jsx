@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import {axiosInstance} from '../utils/axiosInstance'
+import { axiosInstance } from "../utils/axiosInstance";
 
 const AuthContext = createContext();
 
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axiosInstance.post('http://localhost:8080/api/v1/auth/logout')
+      await axiosInstance.post("http://localhost:8080/api/v1/auth/logout");
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
     } finally {

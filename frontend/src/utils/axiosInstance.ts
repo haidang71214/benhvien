@@ -1,13 +1,17 @@
 import axios from "axios";
 
 export const BASE_URL = "http://localhost:8080";
-// cấu hình mang tiếng là nâng cao, nhma mình sẽ tận dụng cái nâng cao này cho nó lỏ lỏ xíu
+
 export const axiosInstance = axios.create({
   baseURL: `${BASE_URL}`,
   withCredentials: true,
 });
 
-// Add a request interceptor to include the Bearer token in all requests
+const authAxios = axios.create({
+  baseURL: `${BASE_URL}`,
+  withCredentials: true,
+});
+
 axiosInstance.interceptors.request.use(
   (config: any) => {
     const token = localStorage.getItem("accessToken");
@@ -19,45 +23,110 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Function to extend the token when expired
 const extendToken = async () => {
   try {
-    const { data } = await axiosInstance.post(
-      `/auth/extend-token`,
+    console.log("🔄 Attempting to extend token...");
+
+    const { data } = await authAxios.post(
+      `/auth/extendToken`,
       {},
       { withCredentials: true }
     );
+
+    console.log("✅ Token extended successfully");
     return data?.newAccessToken || null;
   } catch (error) {
-    console.error("Extend token failed:", error);
+    console.log(
+      "❌ Extend token failed:",
+      error.response?.status,
+      error.response?.data
+    );
     return null;
   }
 };
 
-// Add a response interceptor to handle token renewal on 401 responses
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string | null) => void;
+  reject: (error: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 axiosInstance.interceptors.response.use(
-  (response) => response, // Pass successful responses through
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Avoid infinite retries
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/extendToken")
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (token) {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              return axiosInstance(originalRequest);
+            }
+            return Promise.reject(error);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
         const newAccessToken = await extendToken();
+
         if (newAccessToken) {
-          localStorage.setItem("accessToken", newAccessToken); // Save new token
+          localStorage.setItem("accessToken", newAccessToken);
+          axiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${newAccessToken}`;
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return axiosInstance(originalRequest); // Retry the original request
+
+          processQueue(null, newAccessToken);
+
+          console.log("🔄 Retrying original request with new token");
+          return axiosInstance(originalRequest);
+        } else {
+          console.log("🚪 Cannot extend token, redirecting to login");
+          localStorage.removeItem("accessToken");
+          processQueue(error, null);
+
+          // Redirect to login
+          // window.location.href = "/auth/login";
+          // return Promise.reject(error);
         }
       } catch (err) {
-        console.log("Token renewal failed:", err);
+        console.error("💥 Token renewal process failed:", err);
+        processQueue(err, null);
+        localStorage.removeItem("accessToken");
+        // window.location.href = "/login";
+        // return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(error); // Reject other errors
+    return Promise.reject(error);
   }
 );
 
-// Fetch generic data from the API
 export const fetchFromAPI = async (url: any) => {
   try {
     const { data } = await axiosInstance.get(url);
@@ -66,4 +135,11 @@ export const fetchFromAPI = async (url: any) => {
     console.error("Error fetching from API:", error);
     throw error;
   }
+};
+
+export const debugAuth = () => {
+  console.log("=== AUTH DEBUG INFO ===");
+  console.log("Access Token:", localStorage.getItem("accessToken"));
+  console.log("All Cookies:", document.cookie);
+  console.log("Base URL:", BASE_URL);
 };

@@ -37,7 +37,6 @@ export const useDoctors = () => {
         const { data: mongoDoctorsData } = await axiosInstance.get(
           "/admin/getAllDoctors"
         );
-        console.log("✅ Mongo doctors data:", mongoDoctorsData);
         const mongoDoctors = mongoDoctorsData
           .map((doc) => {
             try {

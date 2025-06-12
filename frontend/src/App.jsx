@@ -36,7 +36,7 @@ const App = () => {
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/my-appointments" element={<MyAppointment />} />
-        <Route path="/appointment/:docId" element={<Appointment />} />
+        <Route path="/appointment/:docId/:userId" element={<Appointment />} />
       </Routes>
       <Footer />
       <Toaster position="top-right"/>

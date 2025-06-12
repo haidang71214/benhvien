@@ -18,10 +18,11 @@ const doctorRouter = express.Router();
 doctorRouter.get("/searchPatients", searchPatients);
 // tạo lịch khám cho tương lai -> truyền thằng userId vô đây
 doctorRouter.post(
-  "/createAppointmentFuture/:id",
+  "/createAppointmentFuture/:id?",
   middlewareTokenAsyncKey,
   createAppointment
 );
+
 // cái getAppointment đó, nhớ sửa, t không biết là nên lấy lịch khám theo user hay theo ngày,
 // sửa lịch khám, đồng thời gửi mail thông báo cho bệnh nhân -> lấy id là id của lịch khám
 doctorRouter.put(

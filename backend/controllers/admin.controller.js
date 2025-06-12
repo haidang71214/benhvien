@@ -214,18 +214,18 @@ const getAllDoctors = async (req, res) => {
 // lấy chi tiết của người dùng, dùng cái này lấy chi tiết của thằng bác sĩ cũng được
 const getDetailUser = async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;
+
   try {
-    if (checkAdmin(userId)) {
-      const data = await users.findById(id);
-      res.status(200).json({ data });
-    } else {
-      res.status(400).json("không có quyền");
+    const data = await users.findById(id);
+    if (!data) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
+    res.status(200).json({ data });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 };
+
 // auth
 const detailSelf = async (req, res) => {
   const userId = req.user.id;

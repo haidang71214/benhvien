@@ -30,7 +30,7 @@ const Doctors = () => {
   const handleSpecialtyClick = (value) => {
     const newSpecialty = selectedSpecialty === value ? "" : value;
     setSelectedSpecialty(newSpecialty);
-    navigate(newSpecialty ? `/doctors/${newSpecialty}` : "/doctors");
+    navigate(`newSpecialty ? /doctors/${newSpecialty} : "/doctors"`);
   };
 
   const handleDoctorClick = (doctor) => {

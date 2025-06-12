@@ -52,7 +52,8 @@ const register = async (req, res) => {
     await transporter.sendMail(mailOption);
 
     res.status(201).json({
-      message: "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.",
+      message:
+        "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.",
       email,
     });
   } catch (error) {
@@ -118,13 +119,21 @@ const login = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
+    console.log("🍪 Setting refresh token cookie...");
+    console.log("Environment:", process.env.NODE_ENV);
+    console.log("Refresh token length:", refreshToken.length);
+
     // Thiết lập cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: "/",
     });
+
+    console.log("✅ Cookie set successfully");
+    console.log("Response headers:", res.getHeaders());
 
     res.status(200).json({
       message: "Đăng nhập thành công",
@@ -137,6 +146,7 @@ const login = async (req, res) => {
         age: user.age,
       },
     });
+    console.log("📤 Login response sent successfully");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Lỗi server", error: error.message });
@@ -207,6 +217,7 @@ const loginFacebook = async (req, res) => {
 const extendToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log("refreshToken in cookie:", refreshToken); // Debug
     if (!refreshToken) {
       return res.status(401).json({ message: "Không tìm thấy refresh token" });
     }
@@ -304,7 +315,9 @@ const logout = async (req, res) => {
     // Lấy refreshToken từ cookie
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(400).json({ message: "Không tìm thấy refreshToken trong cookie" });
+      return res
+        .status(400)
+        .json({ message: "Không tìm thấy refreshToken trong cookie" });
     }
 
     // Tìm user theo refreshToken

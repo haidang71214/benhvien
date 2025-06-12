@@ -83,19 +83,19 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "http://localhost:5173", //
+    origin: "http://localhost:5173",
     credentials: true,
-    preflightContinue: true,
   })
 );
+
+app.use("/api/v1/auth", authRouter);
+
+app.use(rootRouter);
 
 /**
  * Routes setup.
  */
 const apiPrefix = process.env.API_PREFIX;
-
-app.use(rootRouter);
-
 /**
  * Handle errors.
  */
@@ -106,8 +106,6 @@ app.use((err, _req, res, _next) => {
     stack: err?.message,
   });
 });
-
-app.use("/api/v1/auth", authRouter);
 
 /**
  * Create HTTP server.
