@@ -44,7 +44,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const register = async (req, res) => {
   try {
-    const { userName, password, email, dob } = req.body;
+    const { userName, password, email, dob, sex } = req.body;
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,6 +67,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       email,
       dob,
+      sex,
       role: "patient",
     });
 
@@ -144,6 +145,7 @@ const login = async (req, res) => {
         email: user.email,
         avatarUrl: user.avatarUrl,
         dob: user.dob,
+        sex: user.sex,
       },
     });
   } catch (error) {
@@ -375,7 +377,7 @@ const updateMyself = async (req, res) => {
   try {
     const userId = req.user.id;
     const { oldPassword, newPassword } = req.body;
-    const { userName, password, dob } = req.body;
+    const { userName, password, dob, sex } = req.body;
     const file = req.file;
 
     // Tìm user
@@ -386,6 +388,7 @@ const updateMyself = async (req, res) => {
 
     if (userName) user.userName = userName;
     if (dob) user.dob = dob;
+    if (sex) user.sex = sex;
     if (file) user.avatarUrl = file.path;
 
     if (oldPassword && newPassword) {
@@ -440,7 +443,6 @@ passport.use(
               email: profile.emails[0].value,
               password: randomPassword,
               role: "patient",
-              isVerified: true, // Automatically verify new users
               avatarUrl: profile.photos ? profile.photos[0].value : null,
             });
           }

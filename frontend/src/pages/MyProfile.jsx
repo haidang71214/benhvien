@@ -9,6 +9,7 @@ const MyProfile = () => {
   const [form, setForm] = useState({
     userName: user?.userName || "",
     dob: user?.dob || "",
+    sex: user?.sex || "other",
     password: "",
   });
   const [image, setImage] = useState(null);
@@ -20,6 +21,7 @@ const MyProfile = () => {
     setForm({
       userName: user?.userName || "",
       dob: user?.dob || "",
+      sex: user?.sex || "other",
       password: "",
     });
     setPreview(user?.image || user?.avatarUrl || "/default-avatar.png");
@@ -45,6 +47,7 @@ const MyProfile = () => {
       const formData = new FormData();
       formData.append("userName", form.userName);
       formData.append("dob", form.dob);
+      formData.append("sex", form.sex);
       if (form.password) formData.append("password", form.password);
       if (image) formData.append("img", image);
 
@@ -116,6 +119,21 @@ const MyProfile = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sex</label>
+          <select
+            name="sex"
+            value={form.sex}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="other">Other</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
         </div>
 
         <button

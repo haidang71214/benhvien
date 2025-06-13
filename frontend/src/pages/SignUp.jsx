@@ -8,7 +8,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
-  const [form, setForm] = useState({ userName: "", email: "", password: "", dob: "" });
+  const [form, setForm] = useState({ userName: "", email: "", password: "", dob: "", sex: "other" });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -82,6 +82,10 @@ const Signup = () => {
 
     if (!form.dob) {
       newErrors.dob = "Date of birth is required";
+    }
+
+    if (!form.sex) {
+      newErrors.sex = "Sex is required";
     }
 
     return newErrors;
@@ -278,7 +282,7 @@ const Signup = () => {
               </div>
               <div className="mt-3">
                 {/* Segmented Progress Bar */}
-                <div className="flex h-2 w-3 bg-gray-200 rounded-full overflow-hidden">
+                {/* <div className="flex h-2 w-3 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-300
                       ${passwordStrength.score >= 20 ? "bg-red-500" : "bg-gray-200"}`}
@@ -294,7 +298,7 @@ const Signup = () => {
                       ${passwordStrength.score >= 80 ? "bg-green-500" : "bg-gray-200"}`}
                     style={{ width: "33.33%" }}
                   />
-                </div>
+                </div> */}
                 <p
                   id="password-strength"
                   className="mt-2 text-sm text-gray-600"
@@ -363,6 +367,41 @@ const Signup = () => {
                     className="mt-2 text-sm text-red-600"
                   >
                     {errors.dob}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div>
+              <label htmlFor="sex" className="block text-sm font-medium text-gray-700">
+                Sex
+              </label>
+              <select
+                id="sex"
+                name="sex"
+                value={form.sex}
+                onChange={handleChange}
+                required
+                aria-describedby={errors.sex ? "sex-error" : undefined}
+                className={`mt-1 block w-full px-4 py-3 border rounded-lg text-gray-900
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                  transition-all duration-200
+                  ${errors.sex ? "border-red-500" : "border-gray-300"}`}
+              >
+                <option value="other">Other</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              <AnimatePresence>
+                {errors.sex && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    id="sex-error"
+                    className="mt-2 text-sm text-red-600"
+                  >
+                    {errors.sex}
                   </motion.p>
                 )}
               </AnimatePresence>

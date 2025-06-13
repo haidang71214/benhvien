@@ -32,7 +32,7 @@ authRouter.get(
       email: req.user.email,
     });
     res.redirect(
-      `http://localhost:5173/login-success?token=${token}&id=${req.user._id}&userName=${encodeURIComponent(req.user.userName)}&role=${req.user.role}&avatarUrl=${encodeURIComponent(req.user.avatarUrl || "")}&email=${encodeURIComponent(req.user.email)}&isVerified=${req.user.isVerified}`
+      `http://localhost:5173/login-success?token=${token}&id=${req.user._id}&userName=${encodeURIComponent(req.user.userName)}&role=${req.user.role}&avatarUrl=${encodeURIComponent(req.user.avatarUrl || "")}&email=${encodeURIComponent(req.user.email)}`
     );
   }
 );

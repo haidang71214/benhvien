@@ -42,6 +42,11 @@ const userSchema = new Schema(
       type: String, // Store as string (e.g., "1990-01-01")
       default: null,
     },
+    sex: {
+      type: String,
+      enum: ["male", "female", "other"],
+      default: "other",
+    },
     role: {
       type: String,
       enum: ROLE_ENUM, // bỏ role user đi
