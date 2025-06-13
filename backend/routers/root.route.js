@@ -1,8 +1,8 @@
 import express from 'express';
-import authRouter from './auth.router.js';
-import userRouter from './user.router.js';
-import medicineRouter from './medicine.router.js';
-import doctorRouter from './doctor.router.js';
+import authRouter from './auth.route.js';
+import userRouter from './user.route.js';
+import medicineRouter from './medicine.route.js';
+import doctorRouter from './doctor.route.js';
 
 
 const rootRouter = express.Router();

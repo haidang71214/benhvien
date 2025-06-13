@@ -28,6 +28,6 @@ export const onError = (port) => (error) => {
  */
 export const onListening = (server) => () => {
 	const addr = server.address();
-	const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr?.port;
-	console.log(`🚀 App listening on ${bind}`);
+	const bind = typeof addr === "string" ? "pipe " + addr : "" + addr?.port;
+	console.log(`🚀 App listening on http://localhost:${bind}`);
 };

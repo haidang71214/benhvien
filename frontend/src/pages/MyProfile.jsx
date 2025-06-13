@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const MyProfile = () => {
   const { user, setUser, accessToken } = useAuth();
@@ -15,7 +16,6 @@ const MyProfile = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(user?.image || "");
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
 
   useEffect(() => {
     setForm({
@@ -42,7 +42,6 @@ const MyProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMsg("");
     try {
       const formData = new FormData();
       formData.append("userName", form.userName);
@@ -63,22 +62,28 @@ const MyProfile = () => {
         }
       );
 
-      setMsg("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setUser(res.data.user);
-      setPreview(res.data.user.image || res.data.user.avatarUrl || "/default-avatar.png");
+      setPreview(
+        res.data.user.image || res.data.user.avatarUrl || "/default-avatar.png"
+      );
 
       const storedUser = JSON.parse(localStorage.getItem("user")) || {};
       storedUser.image = res.data.user.image || res.data.user.avatarUrl;
       localStorage.setItem("user", JSON.stringify(storedUser));
     } catch (err) {
-      setMsg(err.response?.data?.message || "Update failed. Please try again.");
+      toast.error(
+        err.response?.data?.message || "Update failed. Please try again."
+      );
     }
     setLoading(false);
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
-      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">My Profile</h2>
+    <div className="max-w-xl mx-auto mt-40 p-6 bg-white rounded-2xl shadow-md">
+      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        My Profile
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col items-center">
           <img
@@ -98,7 +103,9 @@ const MyProfile = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Username
+          </label>
           <input
             type="text"
             name="userName"
@@ -110,7 +117,9 @@ const MyProfile = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Date of Birth
+          </label>
           <input
             type="date"
             name="dob"
@@ -139,22 +148,14 @@ const MyProfile = () => {
         <button
           type="submit"
           className={`w-full py-2 px-4 rounded-lg text-black font-medium ${
-            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           } transition`}
           disabled={loading}
         >
           {loading ? "Updating..." : "Update Profile"}
         </button>
-
-        {msg && (
-          <div
-            className={`text-center text-sm mt-2 ${
-              msg.includes("success") ? "text-green-600" : "text-red-500"
-            }`}
-          >
-            {msg}
-          </div>
-        )}
       </form>
 
       <div className="text-center mt-6">

@@ -1,74 +1,156 @@
-import { assets } from "../assets/assets";
+import { assets } from "@/assets/data/doctors";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  Navbar as HeroNavbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  NavbarMenuToggle,
+} from "@heroui/navbar";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [showMenu, setShowMenu] = useState(false);
-
   const { user, logout, isAuthenticated } = useAuth();
 
   return (
-    <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-400">
-      <img
-        className="w-40 cursor-pointer"
-        src={assets.logo}
-        alt="Logo"
-        onClick={() => navigate("/")}
-      />
-      <ul className="hidden md:flex items-start font-medium gap-5">
-        <NavLink to="/">
-          <li className="py-1">Home</li>
-        </NavLink>
-        <NavLink to="/doctors">
-          <li className="py-1">Doctors</li>
-        </NavLink>
-        <NavLink to="/contact">
-          <li className="py-1">Contact</li>
-        </NavLink>
-        <NavLink to="/about">
-          <li className="py-1">About</li>
-        </NavLink>
-      </ul>
-      <div className="flex items-center gap-4">
-        {isAuthenticated ? (
-          <div className="flex items-center gap-2 cursor-pointer relative group">
-            <img className="w-8 rounded-full" src={user?.avatarUrl} alt="profile" />
-            <span className="font-medium text-gray-700">{user?.userName}</span>
-            <img src={assets.dropdown_icon} className="w-2.5" alt="dropdown" />
-            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
-              <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
-                <p onClick={() => navigate("/my-profile")} className="hover:text-black cursor-pointer">
-                  My Profile
-                </p>
-                <p onClick={() => navigate("/my-appointments")} className="hover:text-black cursor-pointer">
-                  My Appointment
-                </p>
-                <p onClick={logout} className="hover:text-black cursor-pointer">
-                  Logout
-                </p>
+    <HeroNavbar
+      shouldHideOnScroll
+      isBordered
+      className="px-4 md:px-8 py-4 bg-white backdrop-blur-sm fixed top-0 left-0 right-0 w-full max-w-none z-50 shadow-md"
+      maxWidth="full"
+    >
+      <NavbarContent justify="start" className="flex-shrink-0">
+        <NavbarBrand
+          onClick={() => navigate("/")}
+          className="cursor-pointer flex items-center"
+        >
+          <img src={assets.logo} alt="Logo" className="w-32 h-auto" />
+        </NavbarBrand>
+      </NavbarContent>
+
+      <NavbarContent className="hidden md:flex gap-8 flex-1 justify-center">
+        <NavbarItem>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+              }`
+            }
+          >
+            Home
+          </NavLink>
+        </NavbarItem>
+        <NavbarItem>
+          <NavLink
+            to="/doctors"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+              }`
+            }
+          >
+            Doctors
+          </NavLink>
+        </NavbarItem>
+        <NavbarItem>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+              }`
+            }
+          >
+            Contact
+          </NavLink>
+        </NavbarItem>
+        <NavbarItem>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+              }`
+            }
+          >
+            About
+          </NavLink>
+        </NavbarItem>
+      </NavbarContent>
+
+      <NavbarContent className="flex items-center gap-4" justify="end">
+        <NavbarMenuToggle
+          className="md:hidden text-gray-600 hover:text-blue-600 transition-colors"
+          aria-label="Toggle navigation menu"
+        />
+
+        <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated ? (
+            <NavbarItem>
+              <div className="relative group">
+                <div className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
+                  <img
+                    src={user?.avatarUrl}
+                    alt="profile"
+                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                  />
+                  <span className="text-base font-medium text-gray-800 group-hover:text-blue-600">
+                    {user?.userName}
+                  </span>
+                </div>
+
+                <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[180px]">
+                  <div className="p-2">
+                    <button
+                      onClick={() => navigate("/my-profile")}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                      My Profile
+                    </button>
+                    <button
+                      onClick={() => navigate("/my-appointments")}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                      My Appointments
+                    </button>
+                    <hr className="my-2 border-gray-200" />
+                    <button
+                      onClick={() => {
+                        logout();
+                        toast.success("Đăng xuất thành công!");
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              className="text-white px-4 md:px-8 py-2 md:py-3 rounded-full font-light bg-blue-500 text-xs md:text-sm"
-              onClick={() => navigate("/signup")}
-            >
-              Create Account
-            </button>
-            <button
-              className="text-blue-500 px-4 md:px-8 py-2 md:py-3 rounded-full font-light bg-white border border-blue-500 text-xs md:text-sm"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+            </NavbarItem>
+          ) : (
+            <NavbarItem>
+              <div className="flex items-center gap-2">
+                <button
+                  className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
+                  onClick={() => navigate("/auth/login")}
+                >
+                  Log In
+                </button>
+                <button
+                  className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-base font-medium transition-colors"
+                  onClick={() => navigate("/auth/register")}
+                >
+                  Get Started
+                </button>
+              </div>
+            </NavbarItem>
+          )}
+        </div>
+      </NavbarContent>
+    </HeroNavbar>
   );
 };
 

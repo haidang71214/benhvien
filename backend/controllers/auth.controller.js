@@ -1,99 +1,91 @@
 import { createRefTokenAsyncKey, createTokenAsyncKey } from "../config/jwt.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { users } from "../config/model/user.js";
+import { users } from "../model/user.js";
 import transporter from "../config/email/transporter.js";
-
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-
-// Đăng ký
-// const register = async (req, res) => {
-//   try {
-//     const { userName, password, email, age } = req.body;
-
-//     // Kiểm tra email hợp lệ
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!emailRegex.test(email)) {
-//       return res.status(400).json({ message: 'Email không hợp lệ' });
-//     }
-
-//     const existingUser = await users.findOne({ $or: [{ email }, { userName }] });
-//     if (existingUser) {
-//       return res.status(400).json({
-//         message: existingUser.email === email ? 'Email đã tồn tại' : 'Tên người dùng đã tồn tại',
-//       });
-//     }
-
-//     // Tạo user mới
-//     const hashedPassword = bcrypt.hashSync(password, 10);
-//     const newUser = await users.create({
-//       userName,
-//       password: hashedPassword,
-//       email,
-//       age,
-//       role: 'patient',
-//     });
-
-//     res.status(201).json({ message: 'Đăng ký thành công', user: newUser });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Lỗi server', error: error.message });
-//   }
-// };
 
 const register = async (req, res) => {
   try {
     const { userName, password, email, dob, sex } = req.body;
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Email không hợp lệ" });
     }
 
-    // Check if user already exists
-    const existingUser = await users.findOne({ $or: [{ email }, { userName }] });
+    const existingUser = await users.findOne({
+      $or: [{ email }, { userName }],
+    });
+
     if (existingUser) {
       return res.status(400).json({
-        message: existingUser.email === email ? "Email đã tồn tại" : "Tên người dùng đã tồn tại",
+        message:
+          existingUser.email === email
+            ? "Email đã tồn tại"
+            : "Tên người dùng đã tồn tại",
       });
     }
 
-    // Create user
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const otpCode = crypto.randomBytes(3).toString("hex"); // 6 ký tự
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
+
     const newUser = await users.create({
       userName,
-      password: hashedPassword,
       email,
       dob,
       sex,
       role: "patient",
+      otpCode,
+      otpExpires,
+      isVerified: false,
     });
-
-    res.status(201).json({ message: "Đăng ký thành công", user: newUser });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Lỗi server", error: error.message });
-  }
-};
-
-const sendOtpEmail = async (req, res) => {
-  try {
-    const { email, userName, otpCode } = req.body;
 
     const mailOption = {
       from: process.env.MAIL_USER,
       to: email,
       subject: "Xác thực email đăng ký",
-      text: `Xin chào ${userName}, mã xác thực của bạn là: ${otpCode}`,
+      text: `Xin chào ${userName}, mã xác thực của bạn là: ${otpCode}. Mã này sẽ hết hạn sau 10 phút.`,
     };
 
     await transporter.sendMail(mailOption);
-    res.status(200).json({ message: "OTP đã được gửi đến email của bạn" });
+
+    res.status(201).json({
+      message:
+        "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.",
+      email,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Lỗi gửi email", error: error.message });
+    console.error("Lỗi khi đăng ký:", error);
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { email, otpCode } = req.body;
+    const user = await users.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: "Email không tồn tại" });
+    if (user.isVerified)
+      return res.status(400).json({ message: "Email đã được xác thực" });
+
+    if (user.otpCode !== otpCode || new Date() > user.otpExpires) {
+      return res
+        .status(400)
+        .json({ message: "Mã OTP không đúng hoặc đã hết hạn" });
+    }
+
+    user.isVerified = true;
+    user.otpCode = null;
+    user.otpExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: "Xác thực email thành công" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
 
@@ -128,13 +120,21 @@ const login = async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
+    console.log("🍪 Setting refresh token cookie...");
+    console.log("Environment:", process.env.NODE_ENV);
+    console.log("Refresh token length:", refreshToken.length);
+
     // Thiết lập cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      path: "/",
     });
+
+    console.log("✅ Cookie set successfully");
+    console.log("Response headers:", res.getHeaders());
 
     res.status(200).json({
       message: "Đăng nhập thành công",
@@ -148,6 +148,7 @@ const login = async (req, res) => {
         sex: user.sex,
       },
     });
+    console.log("📤 Login response sent successfully");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Lỗi server", error: error.message });
@@ -218,6 +219,7 @@ const loginFacebook = async (req, res) => {
 const extendToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log("refreshToken in cookie:", refreshToken); // Debug
     if (!refreshToken) {
       return res.status(401).json({ message: "Không tìm thấy refresh token" });
     }
@@ -241,42 +243,6 @@ const extendToken = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
-
-// Quên mật khẩu
-// const forgotPassword = async (req, res) => {
-//   try {
-//     const { email } = req.body;
-
-//     const user = await users.findOne({ email });
-//     if (!user) {
-//       return res.status(404).json({ message: 'Email không tồn tại' });
-//     }
-
-//     const resetToken = crypto.randomBytes(5).toString('hex');
-
-//     user.resetToken = resetToken;
-//     await user.save();
-
-//     // Gửi email
-//     const mailOption = {
-//       from: 'dangpnhde170023@fpt.edu.vn',
-//       to: email,
-//       subject: `Mã đặt lại mật khẩu: ${resetToken}`,
-//       text: `Xin chào ${user.userName},\n\nSử dụng mã này để đặt lại mật khẩu: ${resetToken}\n\nTrân trọng,`,
-//     };
-
-//     transporter.sendMail(mailOption, (err, info) => {
-//       if (err) {
-//         console.error('Error sending email:', err);
-//         return res.status(500).json({ message: 'Lỗi gửi email' });
-//       }
-//       res.status(200).json({ message: 'Gửi mã đặt lại mật khẩu thành công' });
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Lỗi server', error: error.message });
-//   }
-// };
 
 const forgotPassword = async (req, res) => {
   try {
@@ -348,13 +314,27 @@ const resetPassword = async (req, res) => {
 // Đăng xuất
 const logout = async (req, res) => {
   try {
-    const { id } = req.body;
-
-    const user = await users.findById(id);
-    if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    // Lấy refreshToken từ cookie
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res
+        .status(400)
+        .json({ message: "Không tìm thấy refreshToken trong cookie" });
     }
 
+    // Tìm user theo refreshToken
+    const user = await users.findOne({ refreshToken });
+    if (!user) {
+      // Dù không có user, vẫn xóa cookie (để đảm bảo frontend được logout)
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+      });
+      return res.status(200).json({ message: "Đăng xuất thành công" });
+    }
+
+    // Xóa refreshToken trong DB
     user.refreshToken = null;
     await user.save();
 
@@ -465,5 +445,5 @@ export {
   register,
   logout,
   updateMyself,
-  sendOtpEmail,
+  verifyEmail,
 };

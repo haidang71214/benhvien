@@ -38,8 +38,8 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
     },
-    dob: {
-      type: String, // Store as string (e.g., "1990-01-01")
+    age: {
+      type: Number,
       default: null,
     },
     sex: {
@@ -68,6 +68,12 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png",
+    },
+    otpCode: String,
+    otpExpires: Date,
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     faceAppId: {
       type: String,

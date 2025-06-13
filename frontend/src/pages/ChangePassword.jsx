@@ -1,13 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
 const ChangePassword = () => {
   const { accessToken } = useAuth();
-  const navigate = useNavigate();
-
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -29,12 +26,12 @@ const ChangePassword = () => {
     setMsg("");
 
     if (newPassword !== confirmNewPassword) {
-      return setMsg("New passwords do not match!");
+      return setMsg("Mật khẩu mới không khớp!");
     }
 
     if (!validatePassword(newPassword)) {
       return setMsg(
-        "New password must be at least 8 characters long, include at least one special character and one uppercase letter."
+        "Mật khẩu mới phải có ít nhất 8 ký tự, 1 ký tự đặc biệt và 1 chữ cái in hoa."
       );
     }
 
@@ -50,12 +47,12 @@ const ChangePassword = () => {
           withCredentials: true,
         }
       );
-      setMsg("Password changed successfully!");
+      setMsg("Đổi mật khẩu thành công!");
       setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (err) {
-      setMsg(err.response?.data?.message || "Error changing password");
+      setMsg(err.response?.data?.message || "Lỗi đổi mật khẩu");
     } finally {
       setLoading(false);
     }
@@ -63,28 +60,17 @@ const ChangePassword = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
-      {/* Back button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="text-blue-500 hover:underline mb-4 flex items-center"
-      >
-        ← Back
-      </button>
-
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        Change Password
-      </h2>
-
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Đổi mật khẩu</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="relative">
           <input
             type={showOld ? "text" : "password"}
-            placeholder="Old Password"
+            placeholder="Mật khẩu cũ"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
             className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
             required
-            aria-label="Old Password"
+            aria-label="Mật khẩu cũ"
           />
           <span
             onClick={() => setShowOld(!showOld)}
@@ -97,12 +83,12 @@ const ChangePassword = () => {
         <div className="relative">
           <input
             type={showNew ? "text" : "password"}
-            placeholder="New Password"
+            placeholder="Mật khẩu mới"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
             required
-            aria-label="New Password"
+            aria-label="Mật khẩu mới"
           />
           <span
             onClick={() => setShowNew(!showNew)}
@@ -115,12 +101,12 @@ const ChangePassword = () => {
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}
-            placeholder="Confirm New Password"
+            placeholder="Xác nhận mật khẩu mới"
             value={confirmNewPassword}
             onChange={(e) => setConfirmNewPassword(e.target.value)}
             className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
             required
-            aria-label="Confirm New Password"
+            aria-label="Xác nhận mật khẩu mới"
           />
           <span
             onClick={() => setShowConfirm(!showConfirm)}
@@ -137,37 +123,21 @@ const ChangePassword = () => {
         >
           {loading ? (
             <span className="flex items-center justify-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"
-                ></path>
+              <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"></path>
               </svg>
-              Changing...
+              Đang đổi...
             </span>
           ) : (
-            "Change Password"
+            "Đổi mật khẩu"
           )}
         </button>
 
         {msg && (
           <div
             className={`text-center ${
-              msg.includes("successfully") ? "text-green-500" : "text-red-500"
+              msg.includes("thành công") ? "text-green-500" : "text-red-500"
             }`}
           >
             {msg}
