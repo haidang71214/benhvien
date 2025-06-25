@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/utils/utils";
+import { cn } from "@/lib/utils";
 
 export default function AuthInputFields({ isLogin, formData, onChange, loading, error }) {
   return (

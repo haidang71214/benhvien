@@ -1,6 +1,6 @@
 import { useState } from "react";
 import AuthForm from "../../components/auth/AuthForm";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../context/AuthContext";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';

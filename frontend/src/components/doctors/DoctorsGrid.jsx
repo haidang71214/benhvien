@@ -1,7 +1,7 @@
 import DoctorCard from "./DoctorCard";
-import LoadingState from "./LoadingState";
-import ErrorState from "./ErrorState";
-import EmptyState from "./EmptyState";
+import LoadingState from "../states/LoadingState";
+import ErrorState from "../states/ErrorState";
+import EmptyState from "../states/EmptyState";
 
 const DoctorsGrid = ({
   loading,
