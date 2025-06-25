@@ -15,4 +15,4 @@ medicineRouter.put('/shutDownMedicine/:id',middlewareTokenAsyncKey,deleteMedicin
 // lấy chi tiết của cái thuốc
 medicineRouter.get('/getDetailMedicine/:id',middlewareTokenAsyncKey,getDetailMedicine)
 // medicineRouter.post('/updateMyself',middlewareTokenAsyncKey,uploadCloud.single('img'),updateMyself); // update myself
-export default medicineRouter; 
+export default medicineRouter;
