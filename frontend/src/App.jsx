@@ -20,6 +20,7 @@ import AccountInfo from "./pages/account-settings/AccountInfo";
 import SecuritySettings from "./pages/account-settings/SecuritySettings";
 import AdminDashboard from "../src/admin-fe/AdminUser";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
+import AIDiagnose from "./pages/AIDiagnose";
 
 const App = () => {
   return (
@@ -47,8 +48,7 @@ const App = () => {
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="security" element={<SecuritySettings />} />
         </Route>
-                
-
+        <Route path="/ai-diagnose" element={<AIDiagnose />} />
       </Routes>
       <Footer />
       <Toaster position="top-center"/>
