@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
-import { useAuth } from "../context/AuthContext"; // Make sure you have this
+import { useAuth } from "../../context/AuthContext";
 
 const AppointmentDetail = () => {
   const { appointmentId } = useParams();
@@ -11,7 +11,6 @@ const AppointmentDetail = () => {
   const [appointment, setAppointment] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Medical record form state
   const [medicalRecordId, setMedicalRecordId] = useState(null);
   const [symptoms, setSymptoms] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
@@ -23,7 +22,6 @@ const AppointmentDetail = () => {
   const [editMode, setEditMode] = useState(false);
   const [prescriptionId, setPrescriptionId] = useState(null);
 
-  // Restrict access: Only doctor can edit, patient can view
   useEffect(() => {
     if (!user) return;
     if (user.role !== "doctor" && user.role !== "patient") {
@@ -32,7 +30,6 @@ const AppointmentDetail = () => {
     }
   }, [user, navigate]);
 
-  // Fetch appointment details
   useEffect(() => {
     setLoading(true);
     axiosInstance
@@ -42,7 +39,6 @@ const AppointmentDetail = () => {
       .finally(() => setLoading(false));
   }, [appointmentId]);
 
-  // Fetch medicines for dropdown (doctor only)
   useEffect(() => {
     axiosInstance
       .get("/api/v1/medicines/getAll")
@@ -50,7 +46,6 @@ const AppointmentDetail = () => {
       .catch(() => setMedicines([]));
   }, []);
 
-  // Fetch medical record for this appointment (edit mode)
   useEffect(() => {
     if (!appointmentId) return;
     axiosInstance
@@ -62,7 +57,6 @@ const AppointmentDetail = () => {
           setSymptoms(res.data.data.symptoms || "");
           setDiagnosis(res.data.data.diagnosis || "");
           setConclusion(res.data.data.conclusion || "");
-          // Fetch prescription for this medical record
           axiosInstance
             .get(`/doctor/getPrescriptionByMedicalRecord/${res.data.data._id}`)
             .then((presRes) => {
@@ -86,7 +80,6 @@ const AppointmentDetail = () => {
       });
   }, [appointmentId]);
 
-  // Add prescription row
   const addPrescription = () => {
     setPrescriptions([
       ...prescriptions,
@@ -94,7 +87,6 @@ const AppointmentDetail = () => {
     ]);
   };
 
-  // Remove prescription row (allow removing any, but always keep at least one)
   const removePrescription = (idx) => {
     if (prescriptions.length > 1) {
       setPrescriptions(prescriptions.filter((_, i) => i !== idx));
@@ -103,7 +95,6 @@ const AppointmentDetail = () => {
     }
   };
 
-  // Update prescription row
   const updatePrescription = (idx, field, value) => {
     const updated = prescriptions.map((p, i) =>
       i === idx ? { ...p, [field]: value } : p
@@ -111,13 +102,11 @@ const AppointmentDetail = () => {
     setPrescriptions(updated);
   };
 
-  // Submit medical record and prescriptions (doctor only)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user.role !== "doctor") return; // Prevent patient from submitting
+    if (user.role !== "doctor") return; 
     try {
       let recordId = medicalRecordId;
-      // 1. Create or update medical record
       if (!editMode) {
         const medRes = await axiosInstance.post("/doctor/createmedicalrecord", {
           appointmentId: appointment._id,
@@ -141,7 +130,6 @@ const AppointmentDetail = () => {
         );
       }
 
-      // 2. Create prescription (all medicines at once)
       const medicinesArr = prescriptions.map((pres) => ({
         medicineId: pres.medicineId,
         dosage: pres.dosage,
@@ -149,7 +137,6 @@ const AppointmentDetail = () => {
         duration: pres.duration,
       }));
 
-      // Create or update prescription
       let prescriptionRes;
       if (editMode && prescriptionId) {
         prescriptionRes = await axiosInstance.put(
@@ -169,7 +156,6 @@ const AppointmentDetail = () => {
         );
       }
 
-      // 3. Update medical record's prescriptions field with prescription ID
       const newPrescriptionId =
         prescriptionRes.data?.createPrescription?._id ||
         prescriptionRes.data?.data?._id;
@@ -188,7 +174,7 @@ const AppointmentDetail = () => {
         navigate("/my-appointments");
       }, 2000);
     } catch (err) {
-      toast.error("Error saving medical record or prescriptions");
+      toast.error("Error saving medical record or prescriptions", err);
     }
   };
 

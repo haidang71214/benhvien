@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../providers/AuthProvider';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from "../components/ui/Sidebar";

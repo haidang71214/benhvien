@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AuthForm from "@/components/Auth/AuthForm";
-import { useAuth } from "@/context/AuthContext";
+import AuthForm from "../../components/auth/AuthForm";
+import { useAuth } from "../../providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../utils/axiosInstance";
 import toast from "react-hot-toast";
@@ -11,8 +11,6 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     userName: "",
-    dob: "",
-    sex: ""
   });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -43,8 +41,6 @@ export default function Register() {
         email: formData.email,
         password: formData.password,
         userName: formData.userName,
-        dob: formData.dob,
-        sex: formData.sex
       });
 
       const data = response.data;

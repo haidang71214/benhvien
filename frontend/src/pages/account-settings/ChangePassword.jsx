@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";

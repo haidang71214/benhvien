@@ -1,12 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { AppContext } from "../../providers/AppProvider";
-import { useAuth } from "../../providers/AuthProvider";
+import { AppContext } from "../../context/AppContext";
 
 const TopDoctors = () => {
   const navigate = useNavigate();
   const { doctors } = useContext(AppContext);
-  const { user } = useAuth();
   return (
     <div className="flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10">
       <h1 className="text-3xl font-medium">Top Doctors to Book</h1>
@@ -17,7 +15,7 @@ const TopDoctors = () => {
         {doctors.slice(0, 10).map((item, index) => (
           <div
             onClick={() => {
-              navigate(`/appointment/${item._id}/${user.id}`);
+              navigate(`/appointment/${item._id}`);
               scrollTo(0, 0);
             }}
             key={index}

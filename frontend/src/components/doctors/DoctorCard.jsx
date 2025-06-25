@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 const DoctorCard = ({ doctor }) => {
-  // Map backend fields to frontend expected fields
   const name = doctor.userName || doctor.name || "Unknown";
   const speciality = Array.isArray(doctor.specialty)
     ? doctor.specialty.join(", ")

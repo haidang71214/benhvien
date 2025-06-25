@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAuth } from "../../providers/AuthProvider";
+import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import {
   Loader2,
