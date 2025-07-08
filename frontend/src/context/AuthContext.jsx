@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { axiosInstance } from "../utils/axiosInstance";
-import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -41,14 +40,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("accessToken", token);
     setUser(userData);
     setAccessToken(token);
-    toast.success("Đăng nhập thành công !!!");
   };
 
   const logout = async () => {
     try {
       await axiosInstance.post("/api/v1/auth/logout");
-      toast.success("Đăng xuất thành công !!!");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
     } finally {

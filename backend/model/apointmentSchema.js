@@ -14,7 +14,8 @@ const appointmentSchema = new Schema({
     },
     appointmentTime:Date,
   // lí do cập nhật lịch ?
-    reason:String
+    reason:String,
+    initialSymptom:String,
 })
-const appointments = mongoose.model('appointments',appointmentSchema)
-export default appointments
+const appointments = mongoose.model('appointments', appointmentSchema);
+export default appointments;

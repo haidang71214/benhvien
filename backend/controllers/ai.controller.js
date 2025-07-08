@@ -3,11 +3,7 @@ import { users } from "../model/user.js";
 
 const GENAIHEHE = async (req, res) => {
   const { description } = req.body;
-  console.log("🔍 Mô tả nhận được:", description);
-
-  if (!description) {
-    return res.status(400).json({ error: "Thiếu mô tả triệu chứng" });
-  }
+  if (!description) return res.status(400).json({ error: "Thiếu mô tả triệu chứng" });
 
   try {
     const diagnoses = await get_diagnosis_from_gemini(description);
@@ -18,37 +14,24 @@ const GENAIHEHE = async (req, res) => {
     const results = [];
 
     for (const diag of diagnoses) {
-      if (!diag.enumspecialty) {
-        console.warn("❗️AI không trả về enumspecialty hợp lệ:", diag);
-        continue;
-      }
-      const doctors = await users
-        .find({
-          role: "doctor",
-          speciality: diag.enumspecialty,
-        })
-        .select("-password -refreshToken -resetToken -resetTokenExpires");
-      console.log("📌 Tìm với specialty:", diag.enumspecialty);
+      const doctors = await users.find({
+        role: "doctor",
+        specialty: diag.enumspecialty, // DÙNG enumspecialty để so sánh với DB
+      }).select("-password -refreshToken -resetToken -resetTokenExpires");
+
       results.push({
         reason: diag.reason,
         diagnosis: diag.diagnosis,
         specialty: diag.specialty,
-        enumspecialty: diag.enumspecialty.trim(),
+        enumspecialty: diag.enumspecialty,
         doctors,
       });
     }
 
-    console.log("🎯 Trả về kết quả:", results);
-    if (results.length === 0) {
-      console.warn(
-        "⚠️ Không tìm thấy bác sĩ nào phù hợp với tất cả chẩn đoán."
-      );
-    }
-
     res.json(results);
   } catch (err) {
-    console.error("🔥 Lỗi khi chẩn đoán:", err);
-    res.status(500).json({ error: err.message || "Lỗi máy chủ" });
+    console.error("Lỗi khi chẩn đoán:", err);
+    res.status(500).json({ error: "Lỗi máy chủ" });
   }
 };
 
