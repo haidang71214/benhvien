@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { axiosInstance } from "../utils/axiosInstance";
+import { useAuth } from "../../context/AuthContext";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 const MyAppointment = () => {
   const { user } = useAuth();

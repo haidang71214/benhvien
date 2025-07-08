@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
-import { useAuth } from "../context/AuthContext";
-import { assets } from "../assets/data/doctors";
-import RelatedDoctors from "../components/Doctors/RelatedDoctors";
+import { AppContext } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
+import { assets } from "../../assets/data/doctors";
+import RelatedDoctors from "../../pages/doctors/RelatedDoctors";
 import { CalendarDays, Clock, UserCheck, Info } from "lucide-react";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
-import { transformDoctorData } from "../utils/transformDoctorData";
+import { transformDoctorData } from "../../utils/transformDoctorData";
 
 const daysOfWeeks = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -21,7 +21,8 @@ const Appointment = () => {
   const [selectedTime, setSelectedTime] = useState("");
   const [initialSymptom, setInitialSymptom] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [appointments, setAppointments] = useState([]); // <-- Add this
+  const [appointments, setAppointments] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
   // Fetch doctor info
@@ -101,9 +102,8 @@ const Appointment = () => {
 
   const bookedTimes = getBookedTimes();
 
-  const handleSubmit = async () => {
-  try {
-    setIsLoading(true);
+
+  const handleSubmit = () => {
     if (!selectedDate || !selectedTime) {
       toast.error("Vui lòng chọn ngày và giờ khám");
       return;
@@ -113,34 +113,40 @@ const Appointment = () => {
       navigate("/auth/login");
       return;
     }
+    setShowConfirm(true);
+  };
 
-    // Prepare booking info
-    const [hour, minute] = selectedTime.split(":");
-    const appointmentDate = new Date(selectedDate);
-    appointmentDate.setHours(parseInt(hour), parseInt(minute), 0, 0);
-    const appointmentTime = appointmentDate.toISOString();
-    const doctorId = docId;
+  const handleConfirmBooking = async () => {
+    try {
+      setIsLoading(true);
+      setShowConfirm(false);
+      // Prepare booking info
+      const [hour, minute] = selectedTime.split(":");
+      const appointmentDate = new Date(selectedDate);
+      appointmentDate.setHours(parseInt(hour), parseInt(minute), 0, 0);
+      const appointmentTime = appointmentDate.toISOString();
+      const doctorId = docId;
 
-    // Only request payment link, do NOT create appointment yet
-    const payRes = await axiosInstance.post(
-      "/api/v1/payment/create-payment-link",
-      {
-        appointmentTime,
-        doctorId,
-        initialSymptom,
-        amount: docInfo.fees,
-        patientId: user.id,
-      }
-    );
+      // Only request payment link, do NOT create appointment yet
+      const payRes = await axiosInstance.post(
+        "/api/v1/payment/create-payment-link",
+        {
+          appointmentTime,
+          doctorId,
+          initialSymptom,
+          amount: docInfo.fees,
+          patientId: user.id,
+        }
+      );
 
-    window.location.href = payRes.data.url;
-  } catch (error) {
-    console.error(error);
-    toast.error(error.response?.data?.message || "Đặt lịch thất bại");
-  } finally {
-    setIsLoading(false);
-  }
-};
+      window.location.href = payRes.data.url;
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Đặt lịch thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!docInfo) {
     return (
@@ -152,35 +158,69 @@ const Appointment = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pt-[7rem] space-y-10">
+      {/* Booking Overview Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-pink-600">Xác nhận đặt lịch</h2>
+            <div className="space-y-2 text-gray-700">
+              <div><b>Bác sĩ:</b> {docInfo?.name}</div>
+              <div><b>Chuyên khoa:</b> {docInfo?.speciality}</div>
+              <div><b>Ngày khám:</b> {selectedDate && selectedDate.toLocaleDateString("vi-VN")}</div>
+              <div><b>Giờ khám:</b> {selectedTime}</div>
+              <div><b>Triệu chứng:</b> {initialSymptom || <span className="italic text-gray-400">(Chưa nhập)</span>}</div>
+              <div><b>Phí khám:</b> {currencySymbol}{docInfo?.fees}</div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700"
+                onClick={() => setShowConfirm(false)}
+                disabled={isLoading}
+              >Hủy</button>
+              <button
+                className="px-4 py-2 rounded bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold hover:scale-105 shadow"
+                onClick={handleConfirmBooking}
+                disabled={isLoading}
+              >{isLoading ? "Đang xử lý..." : "Xác nhận & Thanh toán"}</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="bg-white rounded-2xl shadow-md p-6 w-full lg:w-1/3 border border-pink-100">
-          <img
-            src={docInfo.image}
-            alt={docInfo.name}
-            className="rounded-xl w-full h-64 object-cover border-4 border-pink-200 shadow"
-          />
-          <h2 className="text-2xl font-bold text-pink-600 mt-4 flex items-center gap-2">
-            {docInfo.name}
-            <img className="w-5" src={assets.verified_icon} alt="Verified" />
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {docInfo.degree} • {docInfo.speciality}
-          </p>
-          <div className="mt-2 text-sm font-medium bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full inline-block">
-            {docInfo.experience} experience
+        <div className="bg-white rounded-2xl shadow-md p-0 w-full lg:w-1/3 border border-pink-100 overflow-hidden flex flex-col">
+          <div className="relative">
+            <img
+              src={docInfo.image}
+              alt={docInfo.name}
+              className="rounded-t-2xl w-full h-64 object-cover border-b-4 border-pink-200 shadow"
+            />
+            <span className="absolute top-4 right-4 bg-gradient-to-br from-pink-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
+              <img className="w-4" src={assets.verified_icon} alt="Verified" />
+              Đã xác thực
+            </span>
           </div>
-          <div className="mt-4">
-            <p className="flex items-center text-purple-700 font-semibold gap-2 mb-1">
-              <Info className="w-4 h-4" /> About
+          <div className="p-6 flex-1 flex flex-col">
+            <h2 className="text-2xl font-bold text-pink-600 mt-2 flex items-center gap-2">
+              {docInfo.name}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {docInfo.degree} • {docInfo.speciality}
             </p>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {docInfo.about}
+            <div className="mt-2 text-sm font-medium bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full inline-block">
+              {docInfo.experience} kinh nghiệm
+            </div>
+            <div className="mt-4">
+              <p className="flex items-center text-purple-700 font-semibold gap-2 mb-1">
+                <Info className="w-4 h-4" /> Thông tin bác sĩ
+              </p>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {docInfo.about}
+              </p>
+            </div>
+            <p className="text-green-600 font-bold mt-4 text-lg flex items-center gap-2">
+              <span className="text-2xl">💰</span> Phí khám: {currencySymbol}{docInfo.fees}
             </p>
           </div>
-          <p className="text-green-600 font-bold mt-4">
-            💰 Fee: {currencySymbol}
-            {docInfo.fees}
-          </p>
         </div>
 
         <div className="flex-1 space-y-6">

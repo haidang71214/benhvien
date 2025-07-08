@@ -5,7 +5,7 @@ import { useDoctors } from "../hooks/useDoctors";
 import DoctorsHero from "../components/Doctors/DoctorsHero";
 import SpecialtySidebar from "../components/Doctors/SpecialtySidebar";
 import DoctorsHeader from "../components/Doctors/DoctorsHeader";
-import DoctorsGrid from "../components/Doctors/DoctorsGrid";
+import DoctorsGrid from "../components/doctors/DoctorsGrid";
 import DoctorsPagination from "../components/Doctors/DoctorsPagination";
 
 const Doctors = () => {

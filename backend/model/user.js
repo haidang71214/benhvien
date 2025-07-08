@@ -1,17 +1,15 @@
-import mongoose, { mongo, Types } from "mongoose";
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export const ROLE_ENUM = ["patient", "admin", "doctor", "receptionist"];
 export const STATUS_ENUM = ["InUse", "UnderMaintenance", "Broken", "Removed"];
 export const DOCTOR_HEHE = [
-  "internal_medicine",
-  "pediatrics",
-  "dermatology",
-  "dentistry",
-  "ENT",
-  "ophthalmology",
-  "cardiology",
-  "neurology",
+  "General physician",
+  "Gynecologist",
+  "Dermatologist",
+  "Pediatricians",
+  "Neurologist",
+  "Gastroenterologist",
 ];
 export const ROOM_ENUM = [
   "booked",
@@ -97,7 +95,7 @@ const userSchema = new Schema(
     },
     experience: {
       type: String,
-      default: "N/A"
+      default: "N/A",
     },
     about: {
       type: String,

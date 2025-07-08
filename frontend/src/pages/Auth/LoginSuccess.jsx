@@ -17,7 +17,11 @@ const LoginSuccess = () => {
 
     if (token) {
       login({ id, userName, role, avatarUrl, email }, token);
-      navigate("/");
+      if (role === 'admin') {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } else {
       navigate("/");
     }

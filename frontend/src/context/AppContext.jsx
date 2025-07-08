@@ -1,17 +1,20 @@
 import { createContext } from "react";
-import { doctors } from "../assets/data/doctors";
+import { useDoctors } from "../hooks/useDoctors";
 
 export const AppContext = createContext();
 
-const AppContextProvider = (props) => {
+const AppContextProvider = ({ children }) => {
+  const { doctors, loading, error } = useDoctors();
   const currencySymbol = "$";
+
   const value = {
     doctors,
+    loading,
+    error,
     currencySymbol,
   };
-  return (
-    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
-  );
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export default AppContextProvider;

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 import { Info, CalendarDays, Clock, UserCheck } from "lucide-react";
-import { assets } from "../assets/data/doctors";
+import { assets } from "../../assets/data/doctors";
 
 const daysOfWeeks = [
   "Sun",
