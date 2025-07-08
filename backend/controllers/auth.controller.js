@@ -8,7 +8,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const register = async (req, res) => {
   try {
-    const { userName, password, email, dob, sex } = req.body;
+    const { userName, email, password } = req.body;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -36,8 +36,6 @@ const register = async (req, res) => {
       userName,
       email,
       password: hashedPassword,
-      dob,
-      sex,
       role: "patient",
       otpCode,
       otpExpires,
@@ -138,9 +136,8 @@ const login = async (req, res) => {
         userName: user.userName,
         email: user.email,
         avatarUrl: user.avatarUrl,
-        dob: user.dob,
-        sex: user.sex,
-        role: user.role,
+        age: user.age,
+        role: user.role
       },
     });
   } catch (error) {
