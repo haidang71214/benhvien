@@ -1,18 +1,4 @@
 const DoctorInfoCard = ({ doctor }) => {
-  // Map backend fields to frontend expected fields
-  const name = doctor.userName || doctor.name || "Unknown";
-  const speciality = Array.isArray(doctor.specialty)
-    ? doctor.specialty.join(", ")
-    : doctor.specialty || doctor.speciality || "General";
-  const image = doctor.avatarUrl || doctor.image || "/default-doctor-avatar.png";
-  const experience = doctor.experience || "N/A";
-  const degree = doctor.degree || "MBBS";
-  const about = doctor.about || "";
-  const fees = doctor.fees || 50;
-  const availableDays = doctor.availableDays || [];
-  const languages = doctor.languages || [];
-  const ratings = doctor.ratings || 0;
-
   const renderStars = (rating) => (
     <div className="flex items-center gap-1">
       {[...Array(5)].map((_, i) => (
@@ -44,8 +30,8 @@ const DoctorInfoCard = ({ doctor }) => {
         <div className="flex flex-col lg:flex-row items-start gap-8">
           <div className="relative">
             <img
-              src={image}
-              alt={name}
+              src={doctor.image || "/default-doctor-avatar.png"}
+              alt={doctor.name}
               className="w-40 h-40 rounded-2xl border-4 border-white shadow-lg"
               onError={(e) => (e.target.src = "/default-doctor-avatar.png")}
             />
@@ -61,7 +47,7 @@ const DoctorInfoCard = ({ doctor }) => {
           </div>
           <div className="flex-1">
             <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-              {name}
+              {doctor.name}
               {doctor.isVerified && (
                 <img
                   src="/verified-icon.png"
@@ -71,19 +57,19 @@ const DoctorInfoCard = ({ doctor }) => {
               )}
             </h2>
             <p className="text-gray-600 mt-1 mb-2 text-lg">
-              {degree} - {speciality}
+              {doctor.degree} - {doctor.speciality}
             </p>
             <div className="flex items-center gap-4 mb-4">
               <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                {experience} experience
+                {doctor.experience} experience
               </span>
-              {renderStars(ratings)}
+              {doctor.ratings && renderStars(doctor.ratings)}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
               <div>
                 <h4 className="font-semibold mb-2 text-gray-700">Languages</h4>
                 <div className="flex flex-wrap gap-2">
-                  {languages.map((lang, i) => (
+                  {doctor.languages.map((lang, i) => (
                     <span
                       key={i}
                       className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full"
@@ -98,7 +84,7 @@ const DoctorInfoCard = ({ doctor }) => {
                   Available Days
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {availableDays.map((day, i) => (
+                  {doctor.availableDays.map((day, i) => (
                     <span
                       key={i}
                       className="bg-green-100 text-green-800 px-3 py-1 rounded-full"
@@ -112,12 +98,12 @@ const DoctorInfoCard = ({ doctor }) => {
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <h4 className="font-semibold text-gray-700 mb-2">About</h4>
               <p className="text-gray-600 text-sm leading-relaxed">
-                {about}
+                {doctor.about}
               </p>
             </div>
             <div className="mt-4 text-right">
               <span className="text-3xl font-bold text-blue-600">
-                ${fees}
+                ${doctor.fees}
               </span>
               <span className="text-gray-500 ml-2">per visit</span>
             </div>

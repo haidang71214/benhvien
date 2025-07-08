@@ -14,7 +14,6 @@ import cookieParser from "cookie-parser";
 import medicineRouter from "./routers/medicine.route.js";
 import doctorRouter from "./routers/doctor.route.js";
 import paymentRoute from "./routers/payment.route.js";
-import aiRoutes from "./routers/ai.route.js";
 
 dotenv.config();
 
@@ -96,7 +95,6 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/medicines", medicineRouter);
 app.use("/api/v1/doctor", doctorRouter)
 app.use("/api/v1/payment", paymentRoute)
-app.use("/api/v1/ai", aiRoutes);
 
 app.use(rootRouter);
 

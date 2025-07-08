@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 const ReceptionistAppointments = () => {
   const [appointments, setAppointments] = useState([]);
