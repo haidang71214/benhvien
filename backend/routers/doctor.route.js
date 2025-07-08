@@ -10,13 +10,6 @@ import {
   getMedicalRecordPatients,
   searchPatients,
   updateAppointment,
-  getAppointmentsByUserId,
-  getAllAppointments,
-  getAppointmentById,
-  updateMedicalRecord,
-  getMedicalRecordByAppointment,
-  getPrescriptionByMedicalRecord,
-  updatePrescription
 } from "../controllers/doctor.controller.js";
 import { middlewareTokenAsyncKey } from "../config/jwt.js";
 
@@ -28,24 +21,6 @@ doctorRouter.post(
   "/createAppointmentFuture/:id?",
   middlewareTokenAsyncKey,
   createAppointment
-);
-
-doctorRouter.get(
-  "/getAppointmentsByUserId/:id",
-  middlewareTokenAsyncKey,
-  getAppointmentsByUserId
-);
-
-doctorRouter.get(
-  "/getAllAppointments",
-  middlewareTokenAsyncKey,
-  getAllAppointments
-);
-
-doctorRouter.get(
-  "/getAppointmentById/:appointmentId",
-  middlewareTokenAsyncKey,
-  getAppointmentById
 );
 
 // cái getAppointment đó, nhớ sửa, t không biết là nên lấy lịch khám theo user hay theo ngày,
@@ -83,33 +58,17 @@ doctorRouter.post(
 );
 // tạo mới cho những cái thuốc, lấy id là id của từng loại thuốc, mỗi loại có kê đơn khác nhau, liều lượng khác nhau với tạo nhỏ như này
 // dễ cho việc t viết code quản lí thuốc trong khi hơn, chỗ này khi hiểu thì gọi t
-// doctorRouter.post(
-//   "/createPresCription/:id",
-//   middlewareTokenAsyncKey,
-//   createPrescription
-// );
-// // tạo mới hồ sơ bệnh án -> sẽ lấy lịch hẹn và mảng id của thuốc nhét vào đây
-// doctorRouter.post(
-//   "/createmedicalrecord",
-//   middlewareTokenAsyncKey,
-//   createMedicalRecord
-// );
-
-doctorRouter.get("/getMedicalRecordByAppointment/:appointmentId", middlewareTokenAsyncKey, getMedicalRecordByAppointment);
-doctorRouter.get(
-  "/getPrescriptionByMedicalRecord/:medicalRecordId",
+doctorRouter.post(
+  "/createPresCription/:id",
   middlewareTokenAsyncKey,
-  getPrescriptionByMedicalRecord
+  createPrescription
 );
-doctorRouter.post("/createmedicalrecord", middlewareTokenAsyncKey, createMedicalRecord);
-doctorRouter.post("/createPresCription", middlewareTokenAsyncKey, createPrescription);
-doctorRouter.put(
-  "/updatePrescription/:prescriptionId",
+// tạo mới hồ sơ bệnh án -> sẽ lấy lịch hẹn và mảng id của thuốc nhét vào đây
+doctorRouter.post(
+  "/createmedicalrecord",
   middlewareTokenAsyncKey,
-  updatePrescription
+  createMedicalRecord
 );
-doctorRouter.put("/updateMedicalRecord/:medicalRecordId", middlewareTokenAsyncKey, updateMedicalRecord);
-
 // admin tạo lịch khám cho thằng doctor, chỗ này bên fe check phải trước 2 ngày và không được dưới ngày hiện tại
 doctorRouter.post("/createApoinment");
 // filter doctor

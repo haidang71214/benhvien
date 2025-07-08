@@ -1,0 +1,29 @@
+name: CI with Bun
+
+on: [push, pull_request]
+
+jobs:
+  install-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install FE dependencies
+        working-directory: ./frontend
+        run: bun install
+
+      - name: Build FE
+        working-directory: ./frontend
+        run: bun run build
+
+      - name: Install BE dependencies (Node.js)
+        working-directory: ./backend
+        run: bun install
+
+      - name: Run backend (optional)
+        working-directory: ./backend
+        run: bun start

@@ -204,7 +204,7 @@ const getAlluser = async (req, res) => {
 const getAllDoctors = async (req, res) => {
   try {
     const doctors = await users.find({ role: "doctor" });
-    res.status(200).json({ data: doctors });
+    res.status(200).json(doctors);
   } catch (error) {
     console.error("Lỗi khi lấy danh sách bác sĩ:", error);
     res.status(500).json({ message: "Lỗi server khi lấy danh sách bác sĩ" });
