@@ -13,6 +13,7 @@ const appointmentSchema = new Schema({
       required:true
     },
     appointmentTime:Date,
+    initialSymptom:String, // triệu chứng ban đầu của bệnh nhân
   // lí do cập nhật lịch ?
     reason:String
 })

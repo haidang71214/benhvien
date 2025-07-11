@@ -102,7 +102,7 @@ doctorRouter.get(
   getPrescriptionByMedicalRecord
 );
 doctorRouter.post("/createmedicalrecord", middlewareTokenAsyncKey, createMedicalRecord);
-doctorRouter.post("/createPresCription", middlewareTokenAsyncKey, createPrescription);
+doctorRouter.post("/createPrescription", middlewareTokenAsyncKey, createPrescription);
 doctorRouter.put(
   "/updatePrescription/:prescriptionId",
   middlewareTokenAsyncKey,

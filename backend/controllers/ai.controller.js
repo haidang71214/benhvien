@@ -28,13 +28,18 @@ const GENAIHEHE = async (req, res) => {
           speciality: diag.enumspecialty,
         })
         .select("-password -refreshToken -resetToken -resetTokenExpires");
+      // Add appointment link for each doctor, userId will be filled by frontend
+      const doctorsWithLinks = doctors.map(doc => ({
+        ...doc._doc,
+        appointmentLink: `/appointment/${doc._id}/USER_ID` // Replace USER_ID in frontend
+      }));
       console.log("📌 Tìm với specialty:", diag.enumspecialty);
       results.push({
         reason: diag.reason,
         diagnosis: diag.diagnosis,
         specialty: diag.specialty,
         enumspecialty: diag.enumspecialty.trim(),
-        doctors,
+        doctors: doctorsWithLinks,
       });
     }
 

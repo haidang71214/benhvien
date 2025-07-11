@@ -16,7 +16,6 @@ const Appointment = () => {
   const { currencySymbol } = useContext(AppContext);
   const { user } = useAuth();
   const [docInfo, setDocInfo] = useState(null);
-  const [dateButtons, setDateButtons] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");
   const [initialSymptom, setInitialSymptom] = useState("");
@@ -46,35 +45,7 @@ const Appointment = () => {
       .catch(() => setAppointments([]));
   }, [docId]);
 
-  // Generate next 7 days that match doctor's availableDays
-  useEffect(() => {
-    if (!docInfo) return;
-    const today = new Date();
-    const buttons = [];
-    let count = 0;
-    let day = 0;
-    while (count < 7) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + day);
-      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
-      if (
-        docInfo.availableDays &&
-        docInfo.availableDays.includes(dayName)
-      ) {
-        buttons.push({
-          date,
-          label: `${daysOfWeeks[date.getDay()]} ${date.getDate()}/${
-            date.getMonth() + 1
-          }`,
-        });
-        count++;
-      }
-      day++;
-    }
-    setDateButtons(buttons);
-    setSelectedDate(null);
-    setSelectedTime("");
-  }, [docInfo]);
+  // Removed preset date buttons logic. Now using date picker.
 
   // Helper: get booked times for selected date
   const getBookedTimes = () => {
@@ -101,6 +72,17 @@ const Appointment = () => {
   };
 
   const bookedTimes = getBookedTimes();
+
+  // Helper: get available times for selected date
+  const getAvailableTimes = () => {
+    if (!selectedDate || !docInfo || !docInfo.availableSchedule) return [];
+    // Get day name from selectedDate
+    const dayName = selectedDate.toLocaleDateString("en-US", { weekday: "long" });
+    // availableSchedule keys are like "Monday", "Tuesday", ...
+    return docInfo.availableSchedule[dayName] || [];
+  };
+
+  const availableTimes = getAvailableTimes();
 
 
   const handleSubmit = () => {
@@ -194,7 +176,7 @@ const Appointment = () => {
               alt={docInfo.name}
               className="rounded-t-2xl w-full h-64 object-cover border-b-4 border-pink-200 shadow"
             />
-            <span className="absolute top-4 right-4 bg-gradient-to-br from-pink-400 to-purple-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
+            <span className="absolute top-4 right-4 bg-gradient-to-br from-pink-400 to-purple-400 text-black px-3 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1">
               <img className="w-4" src={assets.verified_icon} alt="Verified" />
               Đã xác thực
             </span>
@@ -225,54 +207,56 @@ const Appointment = () => {
 
         <div className="flex-1 space-y-6">
           <div className="bg-white p-6 rounded-2xl border shadow-md space-y-6">
-            <h3 className="text-xl font-bold text-pink-600 flex items-center gap-2">
-              <CalendarDays className="w-5 h-5" /> Chọn ngày khám
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {dateButtons.map((btn, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setSelectedDate(btn.date);
+            {/* Removed duplicate heading for date selection */}
+            <div className="flex flex-col gap-2 mb-6">
+              <label className="flex items-center gap-2 text-lg font-bold text-[#e6007e] mb-2">
+                <CalendarDays className="w-6 h-6" />
+                Chọn ngày khám
+              </label>
+              <div className="relative w-full max-w-xs">
+                <input
+                  type="date"
+                  className="appearance-none w-full rounded-full px-5 py-3 text-lg font-semibold border border-[#e6007e] shadow focus:outline-none focus:ring-2 focus:ring-[#e6007e] bg-white text-gray-700 transition-all duration-300 hover:border-[#e6007e]"
+                  value={selectedDate ? selectedDate.toISOString().slice(0, 10) : ""}
+                  onChange={e => {
+                    const date = new Date(e.target.value);
+                    setSelectedDate(date);
                     setSelectedTime("");
                   }}
-                  className={`rounded-xl px-4 py-3 text-center text-sm font-medium border transition-all duration-300
-                    ${
-                      selectedDate &&
-                      btn.date.toDateString() === selectedDate.toDateString()
-                        ? "bg-gradient-to-br from-pink-500 to-purple-500 text-white scale-105 shadow-lg"
-                        : "bg-white hover:bg-pink-50 text-gray-700 border-gray-200"
-                    }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
+                  min={new Date().toISOString().slice(0, 10)}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#e6007e] pointer-events-none">
+                  {/* <CalendarDays className="w-6 h-6" /> */}
+                </span>
+              </div>
+              {/* Only display picked date here, remove duplicate elsewhere */}
             </div>
             <div>
               <h4 className="text-md font-semibold mb-2 text-purple-600 flex items-center gap-2">
                 <Clock className="w-4 h-4" /> Chọn giờ khám
               </h4>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {selectedDate &&
-                  docInfo.availableTimes &&
-                  docInfo.availableTimes.map((time) => {
+                  availableTimes.map((time) => {
                     const isBooked = bookedTimes.includes(time);
                     return (
                       <button
                         key={time}
                         onClick={() => !isBooked && setSelectedTime(time)}
                         disabled={isBooked}
-                        className={`px-5 py-2 text-sm rounded-full border transition-all
+                        className={`px-6 py-3 text-md rounded-full border font-semibold transition-all duration-200 shadow-sm
                           ${
                             isBooked
-                              ? "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                              ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
                               : selectedTime === time
-                              ? "bg-gradient-to-r from-green-400 to-blue-500 text-white shadow scale-105"
-                              : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                              ? "bg-gradient-to-r from-[#e6007e] to-[#00bcd4] text-black shadow-lg scale-105"
+                              : "bg-white text-gray-700 border-[#e6007e] hover:bg-[#fce4ec] hover:border-[#e6007e]"
                           }`}
                       >
-                        {time}
-                        {isBooked && " (Đã đặt)"}
+                        <span className={selectedTime === time ? "font-bold text-lg" : ""}>
+                          {time}
+                        </span>
+                        {isBooked && <span className="ml-2 text-xs text-gray-400">(Đã đặt)</span>}
                       </button>
                     );
                   })}

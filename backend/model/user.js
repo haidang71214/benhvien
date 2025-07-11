@@ -105,13 +105,16 @@ const userSchema = new Schema(
       type: Number,
       default: 50,
     },
-    availableDays: {
-      type: [String],
-      default: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    },
-    availableTimes: {
-      type: [String],
-      default: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+    availableSchedule: {
+      type: Map,
+      of: [String],
+      default: () => ({
+        Monday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+        Tuesday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+        Wednesday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+        Thursday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+        Friday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+      }),
     },
   },
   { timestamps: true }

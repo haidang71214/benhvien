@@ -454,27 +454,33 @@ const createMedicalRecord = async (req, res) => {
 
 const createPrescription = async (req, res) => {
   try {
-    const { medicineId, medicalRecordId, dosage, frequently, duration } = req.body;
-
-    // Fetch medicine details
-    const medicine = await medicines.findById(medicineId);
-    if (!medicine) {
-      return res.status(404).json({ message: "Medicine not found" });
+    const { medicalRecordId, medicines: medicinesArr } = req.body;
+    if (!Array.isArray(medicinesArr) || medicinesArr.length === 0) {
+      return res.status(400).json({ message: "No medicines provided" });
     }
 
-    // Create prescription with medicines array
+    // Build medicines array for prescription
+    const prescriptionMedicines = [];
+    for (const med of medicinesArr) {
+      // Fix: use 'new' with ObjectId
+      const medicine = await medicines.findById(new mongoose.Types.ObjectId(med.medicineId));
+      if (!medicine) {
+        return res.status(404).json({ message: `Medicine not found` });
+      }
+      prescriptionMedicines.push({
+        medicineId: medicine._id,
+        name: medicine.name,
+        dosage: med.dosage,
+        frequency: med.frequency, // Note: use 'frequency' from frontend
+        duration: med.duration,
+        instructions: medicine.warning || "",
+      });
+    }
+
+    // Create prescription with all medicines
     const prescription = await Prescription.create({
       medicalRecordId,
-      medicines: [
-        {
-          medicineId: medicine._id,
-          name: medicine.name,
-          dosage,
-          frequency: frequently,
-          duration,
-          instructions: medicine.warning || "",
-        },
-      ],
+      medicines: prescriptionMedicines,
     });
     res.status(200).json({ createPrescription: prescription });
   } catch (error) {

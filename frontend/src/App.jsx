@@ -59,6 +59,9 @@ const App = () => {
         />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/appointment/:docId/:userId" element={<Appointment />} />
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/medicines" element={<AdminMedicine />} />
         <Route path="/account-settings" element={<AccountLayout />}>
           <Route index element={<AccountInfo />} />
           <Route path="change-password" element={<ChangePassword />} />
