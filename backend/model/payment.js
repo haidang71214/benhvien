@@ -6,7 +6,7 @@ const paymentSchema = new Schema({
     tranSactionNo:String,
     amount:Number,
     payMethod:{
-      enum:['VNPay,cash'], // trả tiền mặt hoặc vnpay
+      enum:['VNPay', 'cash'], // trả tiền mặt hoặc vnpay
       type:String,
       require:false,
       default:'VNPay'
