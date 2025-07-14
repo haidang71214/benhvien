@@ -112,3 +112,18 @@ export const handlePaymentSuccess = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Get all payments
+export const getAllPayments = async (req, res) => {
+  try {
+    const paymentList = await payments.find()
+      .populate({
+        path: 'patientId',
+        select: 'userName email avatarUrl',
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json({ data: paymentList });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

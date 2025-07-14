@@ -159,7 +159,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar activePath={window.location.pathname} />
-      <div className="flex-1 p-6 md:p-10">
+      <div className="flex-1 p-6 md:p-10 pt-24">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
           <div className="py-8 text-center border-b border-gray-200">
             <h1 className="text-3xl font-bold text-gray-800">
