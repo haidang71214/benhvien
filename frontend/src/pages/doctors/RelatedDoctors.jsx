@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const RelatedDoctors = ({ speciality, docId }) => {
   const { doctors } = useContext(AppContext);
   const navigate = useNavigate();
   const [relDoc, setRelDoc] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (doctors.length && speciality) {
@@ -29,15 +31,17 @@ const RelatedDoctors = ({ speciality, docId }) => {
           <div
             key={item._id}
             onClick={() => {
-              navigate(`/appointment/${item._id}`);
+              navigate(`/appointment/${item._id}/${user.id}`);
               scrollTo(0, 0);
             }}
             className="bg-white border rounded-2xl shadow hover:shadow-xl transition duration-300 cursor-pointer"
           >
             <img
-              src={item.image}
+              src={item.image || '/public/unnamed.png'}
               alt={item.name}
-              className="w-full h-48 object-cover rounded-t-2xl"
+              className="w-full h-48 object-cover object-center rounded-t-2xl"
+              style={{ width: '100%', height: '12rem', objectFit: 'cover', objectPosition: 'center', background: '#f3f4f6' }}
+              onError={e => { e.target.onerror = null; e.target.src = '/public/unnamed.png'; }}
             />
             <div className="p-4 space-y-1">
               <div className="flex items-center gap-2 text-green-500 text-sm font-medium">

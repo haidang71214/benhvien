@@ -15,7 +15,7 @@ const AdminMedicine = () => {
     name: '',
     type: 'tablet',
     description: '',
-    quantities: 0,
+    // quantities removed
     warning: ''
   });
   const [editingMedicine, setEditingMedicine] = useState(null);
@@ -63,7 +63,7 @@ const AdminMedicine = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'quantities' ? parseInt(value) || 0 : value
+      [name]: value
     }));
   };
 
@@ -72,7 +72,7 @@ const AdminMedicine = () => {
     setError('');
     try {
       // Validate required fields
-      if (!formData.name || !formData.type || !formData.description || formData.quantities === undefined) {
+      if (!formData.name || !formData.type || !formData.description) {
         setError('Please fill in all required fields');
         return;
       }
@@ -91,7 +91,6 @@ const AdminMedicine = () => {
           name: '',
           type: 'tablet',
           description: '',
-          quantities: 0,
           warning: ''
         });
         setShowCreateForm(false);
@@ -117,7 +116,7 @@ const AdminMedicine = () => {
     setError('');
     try {
       // Validate required fields
-      if (!formData.name || !formData.type || !formData.description || formData.quantities === undefined) {
+      if (!formData.name || !formData.type || !formData.description) {
         setError('Please fill in all required fields');
         return;
       }
@@ -135,7 +134,6 @@ const AdminMedicine = () => {
           name: '',
           type: 'tablet',
           description: '',
-          quantities: 0,
           warning: ''
         });
         setShowCreateForm(false);
@@ -256,19 +254,7 @@ const AdminMedicine = () => {
                       rows="3"
                     />
                   </div>
-                  <div>
-                    <label htmlFor="quantities" className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                    <input
-                      type="number"
-                      id="quantities"
-                      name="quantities"
-                      value={formData.quantities}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      min="0"
-                    />
-                  </div>
+                  {/* Quantity field removed */}
                   <div>
                     <label htmlFor="warning" className="block text-sm font-medium text-gray-700 mb-1">Warning</label>
                     <textarea
@@ -292,13 +278,12 @@ const AdminMedicine = () => {
                         type="button"
                         onClick={() => {
                           setEditingMedicine(null);
-                          setFormData({
-                            name: '',
-                            type: 'tablet',
-                            description: '',
-                            quantities: 0,
-                            warning: ''
-                          });
+                            setFormData({
+                              name: '',
+                              type: 'tablet',
+                              description: '',
+                              warning: ''
+                            });
                           setError('');
                         }}
                         className="bg-gray-500 text-white px-5 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150 ease-in-out"
@@ -317,21 +302,23 @@ const AdminMedicine = () => {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    {/* Quantity column removed */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {medicines.length === 0 ? (
                     <tr>
-                      <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No medicines found.</td>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">No medicines found.</td>
                     </tr>
                   ) : (
                     medicines.map((medicine) => (
                       <tr key={medicine._id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{medicine.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">{medicine.type}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{medicine.quantities}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 max-w-xs truncate" title={medicine.description}>{medicine.description}</td>
+                        {/* Quantity cell removed */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <button
@@ -341,7 +328,7 @@ const AdminMedicine = () => {
                                   name: medicine.name,
                                   type: medicine.type,
                                   description: medicine.description,
-                                  quantities: medicine.quantities,
+                                  // quantities removed
                                   warning: medicine.warning || ''
                                 });
                                 setShowCreateForm(true);

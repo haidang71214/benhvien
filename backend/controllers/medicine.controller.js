@@ -6,7 +6,7 @@ import { checkAdmin, checkDoctor, checkPatients } from "./admin.controller.js";
 // admin quản lí thuốc
 const createMedicine = async (req, res) => {
   const userId = req.user.id;
-  const { type, description, quantities, warning, name } = req.body;
+  const { type, description, warning, name } = req.body;
   try {
     const isAdmin = await checkAdmin(userId);
     const isDoctor = await checkDoctor(userId);
@@ -30,14 +30,6 @@ const createMedicine = async (req, res) => {
         .status(400)
         .json({ message: "description không được để trống" });
     }
-    if (
-      quantities === undefined ||
-      quantities === null ||
-      isNaN(quantities) ||
-      quantities < 0
-    ) {
-      return res.status(400).json({ message: "quantities phải là số >= 0" });
-    }
     // cấm chỉ định thì có thể có, có thể không, nếu mà trùng tên, trùng loại thì mặc định là có rồi
     // -> response = 0
     const existingMedicine = await medicines.findOne({
@@ -54,7 +46,6 @@ const createMedicine = async (req, res) => {
       name: name.trim(),
       type: type.trim(),
       description: description.trim(),
-      quantities,
       warning: warning ? warning.trim() : "",
     });
     return res.status(200).json({ message: data });
@@ -142,7 +133,7 @@ const searchMedicines = async (req, res) => {
 const updateMedicine = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, description, quantities, warning, name } = req.body;
+    const { type, description, warning, name } = req.body;
     const userId = req.user.id;
 
     if (!(await checkAdmin(userId))) {
@@ -160,8 +151,6 @@ const updateMedicine = async (req, res) => {
     if (type !== undefined && type !== null) medicine.type = type;
     if (description !== undefined && description !== null)
       medicine.description = description;
-    if (quantities !== undefined && quantities !== null)
-      medicine.quantities = quantities;
     if (warning !== undefined && warning !== null) medicine.warning = warning;
     if (name !== undefined && name !== null) medicine.name = name;
 
@@ -185,15 +174,13 @@ const deleteMedicine = async (req, res) => {
     const findMedicine = await medicines.findById(id);
     if (!findMedicine) {
       return res.status(400).json({
-        message: "Hong tìm thấy thuốc",
+        message: "Không tìm thấy thuốc",
       });
     }
-    await medicines.findByIdAndUpdate(id, {
-      quantities: 0,
-    });
-    return res.status(200).json({ message: "update thành công" });
+    await medicines.findByIdAndDelete(id);
+    return res.status(200).json({ message: "Xóa thuốc thành công" });
   } catch (error) {
-    throw new Error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
 // lấy chi tiết của cái thuốc đó, lấy cho cả cái đơn, ai là người dùng ?..
