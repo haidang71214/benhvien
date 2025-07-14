@@ -15,11 +15,7 @@ const paymentSchema = new Schema({
     payment_date: Date,
     vnp_PayDate: Date,
     vnp_TransactionStatus: String,
-    patientId:{
-      type:Types.ObjectId,
-      ref:'User',
-      required:true
-    }
+    patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 })
 // lịch hẹn
 

@@ -24,6 +24,7 @@ import AppointmentDetail from "./pages/appointments/AppointmentDetail";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import AdminDashboard from "../src/admin-fe/AdminUser";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
+import AdminInvoice from "../src/admin-fe/AdminInvoice";
 import AIDiagnose from "./pages/AIDiagnose";
 
 const App = () => {
@@ -62,6 +63,7 @@ const App = () => {
         {/* Admin routes */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/medicines" element={<AdminMedicine />} />
+        <Route path="/admin/invoices" element={<AdminInvoice />} />
         <Route path="/account-settings" element={<AccountLayout />}>
           <Route index element={<AccountInfo />} />
           <Route path="change-password" element={<ChangePassword />} />
