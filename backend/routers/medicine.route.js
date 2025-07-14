@@ -17,8 +17,7 @@ medicineRouter.get("/getAllAndFilter", middlewareTokenAsyncKey, getAllMedicine);
 medicineRouter.get("/getAll", middlewareTokenAsyncKey, getAllMedicines); // lấy tất cả thuốc, có phân trang, có lọc
 //
 medicineRouter.put("/update/:id", middlewareTokenAsyncKey, updateMedicine);
-// hiện tại không nên xóa thuốc, mà mình nên làm thay đổi trạng thái của những loại thuốc đó,
-// hoặc t dang làm theo kiểu hạ cái số lượng của cái thuốc đó về 0 PUT
+// Xóa thuốc khỏi hệ thống (chỉ cho admin)
 medicineRouter.put(
   "/shutDownMedicine/:id",
   middlewareTokenAsyncKey,
