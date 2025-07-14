@@ -3,6 +3,7 @@ import authRouter from './auth.route.js';
 import userRouter from './user.route.js';
 import medicineRouter from './medicine.route.js';
 import doctorRouter from './doctor.route.js';
+import chatRouter from './chat.route.js';
 
 
 const rootRouter = express.Router();
@@ -12,5 +13,6 @@ rootRouter.use('/auth',authRouter);
 rootRouter.use('/admin',userRouter)
 rootRouter.use('/medicine',medicineRouter);
 rootRouter.use('/doctor',doctorRouter);
+rootRouter.use('/chat',chatRouter);
 
 export default rootRouter; 

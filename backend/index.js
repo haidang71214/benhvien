@@ -11,6 +11,7 @@ import rootRouter from "./routers/root.route.js";
 import authRouter from "./routers/auth.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import { setupSocketIo } from "./config/socket-io.js";
 
 dotenv.config();
 
@@ -51,7 +52,6 @@ const app = express();
 app.use(cookieParser());
 
 //session
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -111,6 +111,11 @@ app.use((err, _req, res, _next) => {
  * Create HTTP server.
  */
 const server = createServer(app);
+
+/**
+ * Setup Socket.IO
+ */
+setupSocketIo(server);
 
 /**
  * Listen on provided port, on all network interfaces.
