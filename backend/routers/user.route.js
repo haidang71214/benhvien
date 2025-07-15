@@ -7,6 +7,7 @@ import {
   detailSelf,
   getAllDoctors,
   getAlluser,
+  getAllUsers,
   getDetailUser,
   searchDoctors,
   updateUser,
@@ -24,6 +25,7 @@ userRouter.post(
 userRouter.delete("/deleteUser/:id", middlewareTokenAsyncKey, deleteUser); // delete admin
 userRouter.get("/getAllUser", middlewareTokenAsyncKey, getAlluser); // get all
 // cần check admin
+userRouter.get("/getAllUsers", middlewareTokenAsyncKey, getAllUsers); // get all users
 userRouter.get("/getAllDoctors", getAllDoctors);
 userRouter.get("/getDetailUser/:id", middlewareTokenAsyncKey, getDetailUser); // get detail user by id
 userRouter.get("/getDetailMySelf", middlewareTokenAsyncKey, detailSelf); // get my information

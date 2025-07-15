@@ -26,6 +26,7 @@ import AdminDashboard from "../src/admin-fe/AdminUser";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
 import AdminInvoice from "../src/admin-fe/AdminInvoice";
 import AIDiagnose from "./pages/AIDiagnose";
+import Chat from "./pages/Chat";
 
 const App = () => {
   return (
@@ -46,6 +47,7 @@ const App = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/my-appointments" element={<MyAppointment />} />
         <Route path="/ai-diagnose" element={<AIDiagnose />} />
+        <Route path="/chat" element={<Chat />} />
         <Route
           path="/receptionist-appointments"
           element={<ReceptionistAppointments />}
@@ -72,6 +74,7 @@ const App = () => {
       </Routes>
       <Footer />
       <Toaster position="top-right" />
+      
     </div>
   );
 };
