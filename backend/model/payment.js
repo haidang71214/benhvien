@@ -6,7 +6,7 @@ const paymentSchema = new Schema({
     tranSactionNo:String,
     amount:Number,
     payMethod:{
-      enum:['VNPay,cash'], // trả tiền mặt hoặc vnpay
+      enum:['VNPay', 'cash'], // trả tiền mặt hoặc vnpay
       type:String,
       require:false,
       default:'VNPay'
@@ -15,11 +15,7 @@ const paymentSchema = new Schema({
     payment_date: Date,
     vnp_PayDate: Date,
     vnp_TransactionStatus: String,
-    patientId:{
-      type:Types.ObjectId,
-      ref:'User',
-      required:true
-    }
+    patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 })
 // lịch hẹn
 

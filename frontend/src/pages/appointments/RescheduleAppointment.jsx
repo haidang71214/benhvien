@@ -50,30 +50,8 @@ const RescheduleAppointment = () => {
       .catch(() => setAppointments([]));
   }, [doctor]);
 
-  // Generate next 7 days that match doctor's availableDays
-  const getDateButtons = () => {
-    if (!doctor?.availableDays) return [];
-    const today = new Date();
-    const buttons = [];
-    let count = 0;
-    let day = 0;
-    while (count < 7) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + day);
-      const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
-      if (doctor.availableDays.includes(dayName)) {
-        buttons.push({
-          date,
-          label: `${daysOfWeeks[date.getDay()]} ${date.getDate()}/${
-            date.getMonth() + 1
-          }`,
-        });
-        count++;
-      }
-      day++;
-    }
-    return buttons;
-  };
+  // Date picker min date (today)
+  const minDate = new Date().toISOString().slice(0, 10);
 
   // Pre-select the old date when data is loaded
   useEffect(() => {
@@ -106,6 +84,15 @@ const RescheduleAppointment = () => {
 
   const bookedTimes = getBookedTimes();
 
+  // Get available times for selected date (like Appointment.jsx)
+  const getAvailableTimes = () => {
+    if (!selectedDate || !doctor || !doctor.availableSchedule) return [];
+    const dayName = selectedDate.toLocaleDateString("en-US", { weekday: "long" });
+    return doctor.availableSchedule[dayName] || [];
+  };
+
+  const availableTimes = getAvailableTimes();
+
   const handleReschedule = async () => {
     if (!selectedDate || !selectedTime) {
       toast.error("Vui lòng chọn ngày và giờ mới");
@@ -131,7 +118,6 @@ const RescheduleAppointment = () => {
   if (!appointment || !doctor)
     return <div className="pt-32 text-center text-gray-500 text-lg">Đang tải...</div>;
 
-  const dateButtons = getDateButtons();
 
   // Get old appointment time for marking
   let oldDateStr = "";
@@ -146,7 +132,7 @@ const RescheduleAppointment = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pt-[7rem] space-y-10">
-        {/* Back Button */}
+      {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
         className="mb-4 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
@@ -196,39 +182,35 @@ const RescheduleAppointment = () => {
                 </span>
               </div>
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-pink-600 flex items-center gap-2">
-                <CalendarDays className="w-5 h-5" /> Chọn ngày mới
-              </h3>
-              <div className="flex flex-wrap gap-3 mt-2">
-                {dateButtons.map((btn, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setSelectedDate(btn.date);
-                      setSelectedTime("");
-                    }}
-                    className={`rounded-xl px-4 py-3 text-center text-sm font-medium border transition-all duration-300
-                      ${
-                        selectedDate &&
-                        btn.date.toDateString() === selectedDate.toDateString()
-                          ? "bg-gradient-to-br from-pink-500 to-purple-500 text-white scale-105 shadow-lg"
-                          : "bg-white hover:bg-pink-50 text-gray-700 border-gray-200"
-                      }`}
-                  >
-                    {btn.label}
-                  </button>
-                ))}
+            <div className="flex flex-col gap-2 mb-6">
+              <label className="flex items-center gap-2 text-lg font-bold text-[#e6007e] mb-2">
+                <CalendarDays className="w-6 h-6" />
+                Chọn ngày mới
+              </label>
+              <div className="relative w-full max-w-xs">
+                <input
+                  type="date"
+                  className="appearance-none w-full rounded-full px-5 py-3 text-lg font-semibold border border-[#e6007e] shadow focus:outline-none focus:ring-2 focus:ring-[#e6007e] bg-white text-gray-700 transition-all duration-300 hover:border-[#e6007e]"
+                  value={selectedDate ? selectedDate.toISOString().slice(0, 10) : ""}
+                  onChange={e => {
+                    const date = new Date(e.target.value);
+                    setSelectedDate(date);
+                    setSelectedTime("");
+                  }}
+                  min={minDate}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#e6007e] pointer-events-none">
+                  {/* <CalendarDays className="w-6 h-6" /> */}
+                </span>
               </div>
             </div>
             <div>
-              <h4 className="text-md font-semibold mb-2 text-purple-600 flex items-center gap-2 mt-4">
+              <h4 className="text-md font-semibold mb-2 text-purple-600 flex items-center gap-2">
                 <Clock className="w-4 h-4" /> Chọn giờ mới
               </h4>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {selectedDate &&
-                  doctor.availableTimes &&
-                  doctor.availableTimes.map((time) => {
+                  availableTimes.map((time) => {
                     const isBooked = bookedTimes.includes(time);
 
                     // Mark old appointment time as "current" and disable it
@@ -243,20 +225,22 @@ const RescheduleAppointment = () => {
                         key={time}
                         onClick={() => !isBooked && !isCurrentTime && setSelectedTime(time)}
                         disabled={isBooked || isCurrentTime}
-                        className={`px-5 py-2 text-sm rounded-full border transition-all
+                        className={`px-6 py-3 text-md rounded-full border font-semibold transition-all duration-200 shadow-sm
                           ${
                             isBooked
-                              ? "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+                              ? "bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed"
                               : isCurrentTime
                               ? "bg-yellow-300 text-yellow-800 cursor-not-allowed border-yellow-400"
                               : selectedTime === time
-                              ? "bg-gradient-to-r from-green-400 to-blue-500 text-white shadow scale-105"
-                              : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                              ? "bg-gradient-to-r from-[#e6007e] to-[#00bcd4] text-black shadow-lg scale-105"
+                              : "bg-white text-gray-700 border-[#e6007e] hover:bg-[#fce4ec] hover:border-[#e6007e]"
                           }`}
                       >
-                        {time}
-                        {isBooked && " (Đã đặt)"}
-                        {isCurrentTime && " (Hiện tại)"}
+                        <span className={selectedTime === time ? "font-bold text-lg" : ""}>
+                          {time}
+                        </span>
+                        {isBooked && <span className="ml-2 text-xs text-gray-400">(Đã đặt)</span>}
+                        {isCurrentTime && <span className="ml-2 text-xs text-yellow-800">(Hiện tại)</span>}
                       </button>
                     );
                   })}

@@ -1,6 +1,6 @@
 import { assets } from "@/assets/data/doctors";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import {
   Navbar as HeroNavbar,
   NavbarBrand,
@@ -92,21 +92,6 @@ const Navbar = () => {
           </NavLink>
         </NavbarItem>
         <NavbarItem>
-          {/* Admin-only link */}
-          {user?.role === "admin" && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) =>
-                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-                }`
-              }
-            >
-              Admin Dashboard
-            </NavLink>
-          )}
-        </NavbarItem>
-        <NavbarItem>
           {/* Receptionist-only link */}
           {user?.role === "receptionist" && (
             <NavLink
@@ -118,6 +103,21 @@ const Navbar = () => {
               }
             >
               Manage Appointments
+            </NavLink>
+          )}
+        </NavbarItem>
+        <NavbarItem>
+          {/* Admin-only link */}
+          {user?.role === "admin" && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+                }`
+              }
+            >
+              Admin Dashboard
             </NavLink>
           )}
         </NavbarItem>
@@ -162,8 +162,7 @@ const Navbar = () => {
                     <button
                       onClick={() => {
                         logout();
-                        // Only show toast if logout() does not already show it
-                        // toast.success("Đăng xuất thành công!");
+                        toast.success("Đăng xuất thành công!");
                       }}
                       className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                     >

@@ -200,11 +200,21 @@ const getAlluser = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await users.find();
+    res.status(200).json({ data: allUsers });
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách người dùng:", error);
+    res.status(500).json({ message: "Lỗi server khi lấy danh sách người dùng" });
+  }
+};
+
 //lấy toàn bộ bác sĩ
 const getAllDoctors = async (req, res) => {
   try {
     const doctors = await users.find({ role: "doctor" });
-    res.status(200).json(doctors);
+    res.status(200).json({ data: doctors });
   } catch (error) {
     console.error("Lỗi khi lấy danh sách bác sĩ:", error);
     res.status(500).json({ message: "Lỗi server khi lấy danh sách bác sĩ" });
@@ -308,4 +318,5 @@ export {
   searchDoctors,
   changeRoleUserToDoctor,
   getAllDoctors,
+  getAllUsers
 };

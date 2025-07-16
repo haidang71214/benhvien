@@ -14,10 +14,7 @@ const medicineSchema = new Schema({
     type:String,
     required:true
   }, // mô tả công dụng thuốc,
-  quantities:{
-   type:Number,
-   required:true
-  }, // tổng số lượng
+  // quantities removed
   warning:String // cảnh báo, cấm chỉ định 
 })
 
