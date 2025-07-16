@@ -5,7 +5,7 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function get_diagnosis_from_gemini(description) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Sửa tên model hợp lệ
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // Sửa tên model hợp lệ
 
   const prompt = `
 Bạn là một bác sĩ AI có kiến thức y học chính xác.

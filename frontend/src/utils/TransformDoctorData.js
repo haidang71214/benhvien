@@ -3,6 +3,15 @@ export const transformDoctorData = (doc, source) => {
     ? doc.speciality[0]
     : doc.speciality || "General physician";
 
+  // Convert availableSchedule (Map) to plain object if needed
+  let availableSchedule = doc.availableSchedule;
+  if (availableSchedule && typeof availableSchedule === "object" && availableSchedule instanceof Map === false) {
+    // If it's a plain object, keep as is
+  } else if (availableSchedule && typeof availableSchedule.get === "function") {
+    // If it's a Map, convert to object
+    availableSchedule = Object.fromEntries(availableSchedule);
+  }
+
   const transformedDoc = {
     _id: doc._id,
     name: doc.userName || doc.name,
@@ -17,15 +26,7 @@ export const transformDoctorData = (doc, source) => {
     ratings: doc.ratings || 4.5,
     totalReviews: doc.totalReviews || 0,
     languages: doc.languages || ["English"],
-    availableDays: doc.availableDays || [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-    ],
-    availableTimes: doc.availableTimes || ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-    timeSlots: doc.timeSlots || ["09:00 AM - 12:00 PM", "02:00 PM - 05:00 PM"],
+    availableSchedule: availableSchedule || {},
     isVerified: doc.isVerified || false,
     source: source,
   };

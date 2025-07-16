@@ -3,6 +3,7 @@ const { json, urlencoded } = express;
 import dotenv from "dotenv";
 import logger from "morgan";
 import { createServer } from "http";
+import setupSocket from "./config/socket.js";
 import { connect } from "mongoose";
 import cors from "cors";
 import normalizePort from "./utils/normalizePort.js";
@@ -11,6 +12,12 @@ import rootRouter from "./routers/root.route.js";
 import authRouter from "./routers/auth.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import medicineRouter from "./routers/medicine.route.js";
+import doctorRouter from "./routers/doctor.route.js";
+import paymentRoute from "./routers/payment.route.js";
+import aiRoutes from "./routers/ai.route.js";
+import chatRouter from "./routers/chat.route.js";
+import userRouter from "./routers/user.route.js";
 
 dotenv.config();
 
@@ -89,6 +96,12 @@ app.use(
 );
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/medicines", medicineRouter);
+app.use("/api/v1/doctor", doctorRouter)
+app.use("/api/v1/payment", paymentRoute)
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/chat", chatRouter);
+app.use("/api/v1/ai", aiRoutes);
 
 app.use(rootRouter);
 
@@ -115,6 +128,10 @@ const server = createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
+
+// Setup Socket.IO
+setupSocket(server);
+
 server.listen(port);
 server.on("error", onError(port));
 server.on("listening", onListening(server));

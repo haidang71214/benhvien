@@ -1,4 +1,6 @@
+
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { axiosInstance } from "../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 
@@ -6,6 +8,7 @@ export default function AIDiagnose() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
+  const { user } = useAuth();
 
   const handleDiagnose = async () => {
     if (!description.trim()) {
@@ -60,12 +63,35 @@ export default function AIDiagnose() {
                 <ul className="list-disc ml-6">
                   {item.doctors && item.doctors.length > 0 ? (
                     item.doctors.map(doc => (
-                      <li key={doc._id}>
-                        {doc.userName || doc.name} ({doc.specialty})
+                      <li key={doc._id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={doc.avatarUrl}
+                            alt={doc.userName || doc.name}
+                            className="w-10 h-10 rounded-full border border-blue-200 shadow-sm object-cover"
+                          />
+                          <div>
+                            <span className="font-semibold text-blue-700">{doc.userName || doc.name}</span>
+                            <span className="ml-2 text-sm text-gray-500">({Array.isArray(doc.speciality) ? doc.speciality.join(", ") : doc.speciality})</span>
+                            {doc.isVerified && (
+                              <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">Đã xác thực</span>
+                            )}
+                          </div>
+                        </div>
+                        {user && (
+                          <a
+                            href={doc.appointmentLink.replace("USER_ID", user.id)}
+                            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white rounded-full font-semibold shadow hover:scale-105 transition"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Đặt lịch khám
+                          </a>
+                        )}
                       </li>
                     ))
                   ) : (
-                    <li>Không tìm thấy bác sĩ phù hợp.</li>
+                    <li className="text-gray-400 italic">Không tìm thấy bác sĩ phù hợp.</li>
                   )}
                 </ul>
               </div>

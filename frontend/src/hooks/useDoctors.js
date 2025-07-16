@@ -20,7 +20,7 @@ export const useDoctors = () => {
 
     try {
       const { data } = await axiosInstance.get("/admin/getAllDoctors");
-      const mongoDoctors = (data || []).map((doc) =>
+      const mongoDoctors = (data.data || []).map((doc) =>
         transformDoctorData(doc, "mongodb")
       );
       setDoctors(mongoDoctors);

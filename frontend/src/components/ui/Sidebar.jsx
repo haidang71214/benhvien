@@ -1,16 +1,12 @@
 import React from "react";
-import { FaTachometerAlt, FaUsers, FaBoxOpen, FaHeart, FaShoppingBag, FaFileInvoiceDollar, FaHistory, FaCog, FaFacebookMessenger, FaPills } from "react-icons/fa";
+import { FaTachometerAlt, FaUsers, FaFileInvoiceDollar, FaFacebookMessenger, FaPills } from "react-icons/fa";
 
 const menuItems = [
-  { icon: <FaTachometerAlt />, label: "Dashboard", path: "/admin." },
+  { icon: <FaTachometerAlt />, label: "Dashboard", path: "/admin" },
   { icon: <FaUsers />, label: "User", path: "/admin" },
-  { icon: <FaPills />, label: "Medicine", path: "/admin/medicine" },
-  { icon: <FaBoxOpen />, label: "Products", path: "/admin/products" },
-  { icon: <FaHeart />, label: "Wishlist", path: "/admin/wishlist" },
+  { icon: <FaPills />, label: "Medicine", path: "/admin/medicines" },
   { icon: <FaFacebookMessenger />, label: "Messenger", path: "/admin/orders" },
-  { icon: <FaFileInvoiceDollar />, label: "Invoice", path: "/admin/invoice" },
-  { icon: <FaHistory />, label: "History", path: "/admin/history" },
-  { icon: <FaCog />, label: "Settings", path: "/admin/settings" },
+  { icon: <FaFileInvoiceDollar />, label: "Invoice", path: "/admin/invoices" },
 ];
 
 const Sidebar = ({ activePath }) => (

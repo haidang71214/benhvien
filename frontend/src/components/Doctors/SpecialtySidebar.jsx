@@ -1,4 +1,11 @@
-import { specialityData } from "../../assets/data/doctors";
+const DOCTOR_SPECIALTIES = [
+  "General physician",
+  "Gynecologist",
+  "Dermatologist",
+  "Pediatricians",
+  "Neurologist",
+  "Gastroenterologist",
+];
 
 const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
   return (
@@ -29,7 +36,7 @@ const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
               </div>
             </button>
             
-            {specialityData.map(({ speciality }) => (
+            {DOCTOR_SPECIALTIES.map((speciality) => (
               <button
                 key={speciality}
                 onClick={() => onSpecialtyClick(speciality)}

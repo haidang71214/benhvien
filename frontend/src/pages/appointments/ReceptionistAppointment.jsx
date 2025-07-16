@@ -56,7 +56,7 @@ const ReceptionistAppointments = () => {
                 {new Date(appt.appointmentTime).toLocaleString()}
               </div>
               <div className="mt-1 text-sm">
-                <span className="font-semibold">Status:</span>{" "}
+                {/* <span className="font-semibold">Status:</span>{" "} */}
                 <span
                   className={
                     appt.status === "pending"
