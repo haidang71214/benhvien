@@ -51,7 +51,7 @@ export default function Login() {
       console.log("User role:", userData.role);
       if (userData.role === 'admin') {
         console.log("Redirecting to admin page");
-        navigate("/admin");
+        navigate("/admin/dashboard");
       } else {
         console.log("Redirecting to home page");
         navigate("/");
