@@ -9,6 +9,7 @@ import {
   NavbarMenuToggle,
 } from "@heroui/navbar";
 import toast from "react-hot-toast";
+import NotificationBell from "../NotificationBell";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -91,11 +92,23 @@ const Navbar = () => {
             AI Diagnose
           </NavLink>
         </NavbarItem>
+         <NavbarItem>
+          <NavLink
+            to="/chat"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+              }`
+            }
+          >
+            Chat
+          </NavLink>
+        </NavbarItem>
         <NavbarItem>
           {/* Admin-only link */}
           {user?.role === "admin" && (
             <NavLink
-              to="/admin"
+              to="/admin/dashboard"
               className={({ isActive }) =>
                 `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
                   isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
@@ -130,6 +143,7 @@ const Navbar = () => {
         />
 
         <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated && <NotificationBell />}
           {isAuthenticated ? (
             <NavbarItem>
               <div className="relative group">
