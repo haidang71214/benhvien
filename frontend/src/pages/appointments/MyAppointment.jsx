@@ -2,10 +2,29 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { axiosInstance } from "../../utils/axiosInstance";
 
+import { Calendar as BigCalendar, Views, dateFnsLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
+
+
+const locales = {
+  'en-US': enUS,
+};
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
+  getDay,
+  locales,
+});
+
 const MyAppointment = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user?.id) return;
@@ -51,56 +70,52 @@ const MyAppointment = () => {
     </div>
   );
 
+
+  // Transform appointments to events for react-big-calendar
+  const events = appointments.map(appt => ({
+    id: appt._id,
+    title: `${appt.doctorId?.userName || 'Unknown'}${appt.initialSymptom ? ' - ' + appt.initialSymptom : ''}`,
+    start: new Date(appt.appointmentTime),
+    end: new Date(new Date(appt.appointmentTime).getTime() + 30 * 60 * 1000), // 30 min slot
+    resource: appt,
+  }));
+
   return (
     <div className="max-w-4xl mx-auto pt-24 px-4">
       <h2 className="text-3xl font-bold mb-8 text-gray-800">My Appointments</h2>
-      <ul className="space-y-6">
-        {appointments.map((appt) => (
-          <li
-            key={appt._id}
-            className="p-8 bg-white rounded-xl shadow-lg flex items-start gap-4 cursor-pointer hover:shadow-xl transition-all duration-200 hover:bg-gray-50"
-            onClick={() => (window.location.href = `/appointment-detail/${appt._id}`)}
-          >
-            {/* Doctor Avatar */}
-            <div className="flex-shrink-0">
-              {appt.doctorId?.avatarUrl ? (
-                <img
-                  src={appt.doctorId.avatarUrl}
-                  alt={appt.doctorId.userName}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-blue-100"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                  {appt.doctorId?.userName?.[0] || "D"}
-                </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <div>
-                <span className="font-semibold text-gray-700">Doctor:</span>{" "}
-                <span className="text-gray-900">{appt.doctorId?.userName || "Unknown"}</span>
+      <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <BigCalendar
+          localizer={localizer}
+          events={events}
+          defaultView={Views.WEEK}
+          views={['week', 'day']}
+          step={30}
+          timeslots={2}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 540 }}
+          onSelectEvent={event => navigate(`/appointment-detail/${event.id}`)}
+          popup
+          eventPropGetter={(event) => ({
+            style: {
+              backgroundColor: '#2563eb',
+              color: 'white',
+              borderRadius: '8px',
+              border: 'none',
+              padding: '4px 8px',
+              fontWeight: 500,
+              boxShadow: '0 2px 8px 0 rgba(37,99,235,0.08)'
+            }
+          })}
+          components={{
+            event: ({ event }) => (
+              <div className="truncate">
+                <span className="font-semibold">{event.title}</span>
               </div>
-              <div className="mt-1">
-                <span className="font-semibold text-gray-700">Patient:</span>{" "}
-                <span className="text-gray-900">{appt.patientId?.userName || "Unknown"}</span>
-              </div>
-              <div className="mt-1">
-                <span className="font-semibold text-gray-700">Time:</span>{" "}
-                <span className="text-gray-900">
-                  {new Date(appt.appointmentTime).toLocaleString("en-US", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </span>
-              </div>
-              <div className="mt-1">
-                <span className="font-semibold text-gray-700">Initial Symptom:</span>{" "}
-                <span className="text-gray-900">{appt.initialSymptom || "Not specified"}</span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            )
+          }}
+        />
+      </div>
     </div>
   );
 };

@@ -18,6 +18,8 @@ import paymentRoute from "./routers/payment.route.js";
 import aiRoutes from "./routers/ai.route.js";
 import chatRouter from "./routers/chat.route.js";
 import userRouter from "./routers/user.route.js";
+import notificationRouter from "./routers/notification.route.js";
+import dashboardRouter from "./routers/dashboard.route.js";
 
 dotenv.config();
 
@@ -95,6 +97,7 @@ app.use(
   })
 );
 
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/medicines", medicineRouter);
 app.use("/api/v1/doctor", doctorRouter)
@@ -102,6 +105,8 @@ app.use("/api/v1/payment", paymentRoute)
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/ai", aiRoutes);
+app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 
 app.use(rootRouter);
 

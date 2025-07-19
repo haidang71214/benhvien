@@ -22,10 +22,12 @@ import ReceptionistAppointments from "./pages/appointments/ReceptionistAppointme
 import RescheduleAppointment from "./pages/appointments/RescheduleAppointment";
 import AppointmentDetail from "./pages/appointments/AppointmentDetail";
 import PaymentSuccess from "./pages/PaymentSuccess";
-import AdminDashboard from "../src/admin-fe/AdminUser";
+import AdminUser from "./admin-fe/AdminUser";
+import AdminDashboard from "../src/admin-fe/AdminDashboard";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
 import AdminInvoice from "../src/admin-fe/AdminInvoice";
 import AIDiagnose from "./pages/AIDiagnose";
+import PaymentCancel from "./pages/PaymentCancel";
 import Chat from "./pages/Chat";
 
 const App = () => {
@@ -61,11 +63,14 @@ const App = () => {
           element={<AppointmentDetail />}
         />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-cancel" element={<PaymentCancel />} />
         <Route path="/appointment/:docId/:userId" element={<Appointment />} />
         {/* Admin routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/users" element={<AdminUser />} />
         <Route path="/admin/medicines" element={<AdminMedicine />} />
         <Route path="/admin/invoices" element={<AdminInvoice />} />
+        {/* Optionally keep /admin for user management */}
         <Route path="/account-settings" element={<AccountLayout />}>
           <Route index element={<AccountInfo />} />
           <Route path="change-password" element={<ChangePassword />} />

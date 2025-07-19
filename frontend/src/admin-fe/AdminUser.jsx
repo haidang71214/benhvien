@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/ui/Sidebar";
 
-const AdminDashboard = () => {
+const AdminUser = () => {
   const { user, accessToken } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -381,4 +381,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminUser;
