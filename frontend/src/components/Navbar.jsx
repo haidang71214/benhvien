@@ -9,6 +9,7 @@ import {
   NavbarMenuToggle,
 } from "@heroui/navbar";
 import toast from "react-hot-toast";
+import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -128,8 +129,8 @@ const Navbar = () => {
           className="md:hidden text-gray-600 hover:text-blue-600 transition-colors"
           aria-label="Toggle navigation menu"
         />
-
         <div className="hidden md:flex items-center gap-4">
+          {isAuthenticated && <NotificationBell />}
           {isAuthenticated ? (
             <NavbarItem>
               <div className="relative group">
@@ -143,7 +144,6 @@ const Navbar = () => {
                     {user?.userName}
                   </span>
                 </div>
-
                 <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[180px]">
                   <div className="p-2">
                     <button

@@ -2,10 +2,9 @@ import React from "react";
 import { FaTachometerAlt, FaUsers, FaFileInvoiceDollar, FaFacebookMessenger, FaPills } from "react-icons/fa";
 
 const menuItems = [
-  { icon: <FaTachometerAlt />, label: "Dashboard", path: "/admin" },
-  { icon: <FaUsers />, label: "User", path: "/admin" },
+  { icon: <FaTachometerAlt />, label: "Dashboard", path: "/admin/dashboard" },
+  { icon: <FaUsers />, label: "User", path: "/admin/users" },
   { icon: <FaPills />, label: "Medicine", path: "/admin/medicines" },
-  { icon: <FaFacebookMessenger />, label: "Messenger", path: "/admin/orders" },
   { icon: <FaFileInvoiceDollar />, label: "Invoice", path: "/admin/invoices" },
 ];
 
@@ -20,7 +19,7 @@ const Sidebar = ({ activePath }) => (
           key={item.label}
           href={item.path}
           className={`flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 font-medium hover:bg-blue-50 transition ${
-            activePath === item.path ? "bg-blue-50 text-blue-600" : ""
+            (activePath === item.path || (item.path === "/admin" && activePath.startsWith("/admin") && activePath !== "/admin/dashboard")) ? "bg-blue-50 text-blue-600" : ""
           }`}
         >
           <span className="text-xl">{item.icon}</span>
