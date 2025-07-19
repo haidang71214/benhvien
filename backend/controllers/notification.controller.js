@@ -2,6 +2,7 @@ import Notification from '../model/notification.js';
 import appointments from '../model/apointmentSchema.js';
 import { users } from '../model/user.js';
 import nodeCron from 'node-cron';
+import transporter from '../config/email/transporter.js';
 
 // Send notification to user
 export const sendNotification = async (userId, message, appointmentId = null, type = 'appointment') => {
@@ -51,6 +52,21 @@ nodeCron.schedule('* * * * *', async () => { // every 1 minute
         appt._id,
         'reminder'
       );
+      // Send email to patient
+      const patient = await users.findById(appt.patientId);
+      if (patient && patient.email) {
+        try {
+          await transporter.sendMail({
+            from: process.env.MAIL_USER,
+            to: patient.email,
+            subject: 'Nhắc nhở lịch hẹn',
+            text: `Xin chào ${patient.userName || 'bạn'},\n\nBạn có lịch hẹn với bác sĩ vào lúc ${new Date(appt.appointmentTime).toLocaleString()}.\n\nVui lòng đến đúng giờ.\n\nTrân trọng.`
+          });
+          console.log(`Sent appointment reminder email to patient: ${patient.email}`);
+        } catch (err) {
+          console.error(`Failed to send appointment reminder email to patient: ${patient.email}`, err);
+        }
+      }
     }
     // Prevent duplicate notifications for doctor
     const doctorNotiExists = await Notification.findOne({
