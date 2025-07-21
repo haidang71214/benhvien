@@ -96,17 +96,20 @@ export const handlePaymentSuccess = async (req, res) => {
     await payments.create({
       tranSactionNo: orderCode,
       amount: tempBooking.amount,
-      payMethod: "VNPay", // or get from payment gateway response if available
+      payMethod: "PayOS", // or get from payment gateway response if available
       payment_date: new Date(),
       patientId: tempBooking.patientId,
       // Add more fields if needed (e.g., appointmentId, response_code, etc.)
     });
 
+    // Get the payment record just created
+    const paymentRecord = await payments.findOne({ tranSactionNo: orderCode });
+
     // Optionally, delete tempBooking
     await TempBooking.deleteOne({ _id: tempBooking._id });
 
-    // Respond with appointmentId for frontend
-    res.json({ appointmentId: appointment._id });
+    // Respond with appointmentId and order detail for frontend
+    res.json({ appointmentId: appointment._id, order: paymentRecord });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
