@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext"; // Make sure you have this
@@ -197,6 +198,13 @@ const AppointmentDetail = () => {
 
   return (
     <div className="max-w-2xl mx-auto pt-24 px-4">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition"
+      >
+        <ArrowLeft className="w-5 h-5" /> Back
+      </button>
       <h2 className="text-2xl font-bold mb-6 text-blue-700">
         Appointment Detail
       </h2>
