@@ -17,6 +17,7 @@ import Register from "./pages/Auth/Register";
 import { Toaster } from "react-hot-toast";
 import AccountLayout from "./pages/account-settings/AccountLayout";
 import AccountInfo from "./pages/account-settings/AccountInfo";
+import MedicalRecordsHistory from "./pages/account-settings/MedicalRecordsHistory";
 import SecuritySettings from "./pages/account-settings/SecuritySettings";
 import ReceptionistAppointments from "./pages/appointments/ReceptionistAppointment";
 import RescheduleAppointment from "./pages/appointments/RescheduleAppointment";
@@ -28,7 +29,9 @@ import AdminMedicine from "../src/admin-fe/AdminMedicine";
 import AdminInvoice from "../src/admin-fe/AdminInvoice";
 import AIDiagnose from "./pages/AIDiagnose";
 import PaymentCancel from "./pages/PaymentCancel";
+
 import Chat from "./pages/Chat";
+import AllNotifications from "./pages/AllNotifications";
 
 const App = () => {
   return (
@@ -75,7 +78,9 @@ const App = () => {
           <Route index element={<AccountInfo />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="security" element={<SecuritySettings />} />
+          <Route path="medical-records-history" element={<MedicalRecordsHistory />} />
         </Route>
+        <Route path="/notifications" element={<AllNotifications />} />
       </Routes>
       <Footer />
       <Toaster position="top-right" />
