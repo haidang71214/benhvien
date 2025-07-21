@@ -172,6 +172,15 @@ const Navbar = () => {
                     >
                       My Appointments
                     </button>
+                    {/* Only show for patients */}
+                    {user?.role === "patient" && (
+                      <button
+                        onClick={() => navigate("/account-settings/medical-records-history")}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                      >
+                        Medical Records History
+                      </button>
+                    )}
                     <hr className="my-2 border-gray-200" />
                     <button
                       onClick={() => {

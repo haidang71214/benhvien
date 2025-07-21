@@ -31,6 +31,16 @@ export default function NotificationBell() {
     fetchNotifications();
   };
 
+  // Filter notifications to only those from today
+  const today = new Date();
+  const isToday = (dateString) => {
+    const d = new Date(dateString);
+    return d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate();
+  };
+  const todaysNotifications = notifications.filter(n => isToday(n.createdAt));
+
   return (
     <div className="relative">
       <button
@@ -50,10 +60,10 @@ export default function NotificationBell() {
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-80 bg-white border rounded shadow-lg z-50 max-h-96 overflow-y-auto">
           <div className="p-3 font-bold border-b">Notifications</div>
-          {notifications.length === 0 ? (
+          {todaysNotifications.length === 0 ? (
             <div className="p-4 text-gray-500">No notifications</div>
           ) : (
-            notifications.map((n) => (
+            todaysNotifications.map((n) => (
               <div
                 key={n._id}
                 className={`p-3 border-b last:border-b-0 cursor-pointer ${n.read ? "bg-white" : "bg-blue-50"}`}
@@ -62,7 +72,7 @@ export default function NotificationBell() {
                   if (n.type === 'chat') {
                     navigate('/chat');
                   } else if (n.appointmentId) {
-                    navigate(`/appointment-detail/${n.appointmentId}`);
+                    navigate(`/my-appointments`);
                   }
                 }}
               >
@@ -75,6 +85,18 @@ export default function NotificationBell() {
               </div>
             ))
           )}
+          {/* View all notifications button */}
+          <div className="p-2 border-t text-center bg-gray-50">
+            <button
+              className="text-blue-600 hover:underline text-sm font-medium"
+              onClick={() => {
+                setShowDropdown(false);
+                navigate("/notifications");
+              }}
+            >
+              View all notifications
+            </button>
+          </div>
         </div>
       )}
     </div>
