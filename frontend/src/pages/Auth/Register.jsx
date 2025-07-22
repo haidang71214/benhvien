@@ -11,6 +11,8 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     userName: "",
+    dob: "",
+    sex: "other",
   });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -37,10 +39,12 @@ export default function Register() {
     }
 
     try {
-      const response = await axiosInstance.post("/auth/register", {
+      const response = await axiosInstance.post("/api/v1/auth/register", {
         email: formData.email,
         password: formData.password,
         userName: formData.userName,
+        dob: formData.dob,
+        sex: formData.sex,
       });
 
       const data = response.data;

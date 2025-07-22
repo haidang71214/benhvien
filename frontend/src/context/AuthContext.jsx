@@ -16,6 +16,17 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
+  const [dob, setDob] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (!savedUser || savedUser === "undefined") return null;
+      const parsed = JSON.parse(savedUser);
+      return parsed?.dob || null;
+    } catch {
+      return null;
+    }
+  });
+
   const [accessToken, setAccessToken] = useState(() => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -40,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("accessToken", token);
     setUser(userData);
+    setDob(userData?.dob || null);
     setAccessToken(token);
     toast.success("Đăng nhập thành công !!!");
   };
@@ -55,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
       setUser(null);
+      setDob(null);
       setAccessToken(null);
       window.location.href = "/";
     }
@@ -64,7 +77,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, login, logout, isAuthenticated, accessToken }}
+      value={{ user, setUser, dob, setDob, login, logout, isAuthenticated, accessToken }}
     >
       {children}
     </AuthContext.Provider>

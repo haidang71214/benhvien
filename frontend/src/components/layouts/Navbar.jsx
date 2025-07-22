@@ -82,14 +82,14 @@ const Navbar = () => {
         </NavbarItem>
         <NavbarItem>
           <NavLink
-            to="/ai-diagnose"
+            to="/ai-suggest"
             className={({ isActive }) =>
               `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
                 isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
               }`
             }
           >
-            AI Diagnose
+            AI Suggest
           </NavLink>
         </NavbarItem>
          <NavbarItem>

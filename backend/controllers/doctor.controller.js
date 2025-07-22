@@ -462,7 +462,6 @@ const createPrescription = async (req, res) => {
     // Build medicines array for prescription
     const prescriptionMedicines = [];
     for (const med of medicinesArr) {
-      // Fix: use 'new' with ObjectId
       const medicine = await medicines.findById(new mongoose.Types.ObjectId(med.medicineId));
       if (!medicine) {
         return res.status(404).json({ message: `Medicine not found` });
@@ -471,9 +470,8 @@ const createPrescription = async (req, res) => {
         medicineId: medicine._id,
         name: medicine.name,
         dosage: med.dosage,
-        frequency: med.frequency, // Note: use 'frequency' from frontend
         duration: med.duration,
-        instructions: medicine.warning || "",
+        instructions: Array.isArray(med.instructions) ? med.instructions : [],
       });
     }
 
@@ -490,7 +488,7 @@ const createPrescription = async (req, res) => {
 
 const updateMedicalRecord = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { medicalRecordId } = req.params;
     const { symptoms, diagnosis, conclusion, prescriptions } = req.body;
     const updateData = {};
     if (symptoms !== undefined) updateData.symptoms = symptoms;
@@ -499,7 +497,7 @@ const updateMedicalRecord = async (req, res) => {
     if (prescriptions !== undefined) updateData.prescriptions = prescriptions;
 
     const updated = await MedicalRecords.findByIdAndUpdate(
-      id,
+      medicalRecordId,
       updateData,
       { new: true }
     );
