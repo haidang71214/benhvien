@@ -18,7 +18,14 @@ const AppointmentDetail = () => {
   const [diagnosis, setDiagnosis] = useState("");
   const [conclusion, setConclusion] = useState("");
   const [prescriptions, setPrescriptions] = useState([
-    { medicineId: "", dosage: "", frequency: "", duration: "" },
+    {
+      medicineId: "",
+      dosage: "",
+      duration: "",
+      instructions: [
+        { mealTime: "", mealRelation: "", custom: "" },
+      ],
+    },
   ]);
   const [medicines, setMedicines] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -77,8 +84,10 @@ const AppointmentDetail = () => {
                   presRes.data.data.medicines.map((med) => ({
                     medicineId: med.medicineId,
                     dosage: med.dosage,
-                    frequency: med.frequency,
                     duration: med.duration,
+                    instructions: Array.isArray(med.instructions) && med.instructions.length > 0
+                      ? med.instructions
+                      : [{ mealTime: '', mealRelation: '', custom: '' }],
                   }))
                 );
               }
@@ -91,7 +100,7 @@ const AppointmentDetail = () => {
   const addPrescription = () => {
     setPrescriptions([
       ...prescriptions,
-      { medicineId: "", dosage: "", frequency: "", duration: "" },
+      { medicineId: "", dosage: "", duration: "", instructions: [{ mealTime: "", mealRelation: "", custom: "" }] },
     ]);
   };
 
@@ -112,10 +121,60 @@ const AppointmentDetail = () => {
     setPrescriptions(updated);
   };
 
+  // Add instruction row for a prescription
+  const addInstruction = (presIdx) => {
+    setPrescriptions((prev) =>
+      prev.map((p, i) =>
+        i === presIdx
+          ? {
+              ...p,
+              instructions: [
+                ...p.instructions,
+                { mealTime: "", mealRelation: "", custom: "" },
+              ],
+            }
+          : p
+      )
+    );
+  };
+
+  // Remove instruction row for a prescription
+  const removeInstruction = (presIdx, instrIdx) => {
+    setPrescriptions((prev) =>
+      prev.map((p, i) =>
+        i === presIdx
+          ? {
+              ...p,
+              instructions:
+                p.instructions.length > 1
+                  ? p.instructions.filter((_, j) => j !== instrIdx)
+                  : p.instructions,
+            }
+          : p
+      )
+    );
+  };
+
+  // Update instruction field for a prescription
+  const updateInstruction = (presIdx, instrIdx, field, value) => {
+    setPrescriptions((prev) =>
+      prev.map((p, i) =>
+        i === presIdx
+          ? {
+              ...p,
+              instructions: p.instructions.map((instr, j) =>
+                j === instrIdx ? { ...instr, [field]: value } : instr
+              ),
+            }
+          : p
+      )
+    );
+  };
+
   // Submit medical record and prescriptions (doctor only)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (user.role !== "doctor") return; // Prevent patient from submitting
+    if (user.role !== "doctor") return;
     try {
       let recordId = medicalRecordId;
       // 1. Create or update medical record
@@ -146,8 +205,10 @@ const AppointmentDetail = () => {
       const medicinesArr = prescriptions.map((pres) => ({
         medicineId: pres.medicineId,
         dosage: pres.dosage,
-        frequency: pres.frequency,
         duration: pres.duration,
+        instructions: pres.instructions.filter(
+          (instr) => instr.mealTime || instr.mealRelation || instr.custom
+        ),
       }));
 
       // Create or update prescription
@@ -265,12 +326,13 @@ const AppointmentDetail = () => {
           </div>
           <div>
             <label className="block font-semibold mb-2">Prescriptions</label>
-            <div className="space-y-3">
-              {prescriptions.map((pres, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-wrap gap-2 items-center bg-gray-50 rounded-lg p-3 shadow-sm"
-                >
+          <div className="space-y-3">
+            {prescriptions.map((pres, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col gap-2 bg-gray-50 rounded-lg p-3 shadow-sm"
+              >
+                <div className="flex flex-wrap gap-2 items-center">
                   <div className="flex flex-col">
                     <label className="text-xs font-medium mb-1">Medicine</label>
                     <select
@@ -301,20 +363,7 @@ const AppointmentDetail = () => {
                       required
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">
-                      Frequency
-                    </label>
-                    <input
-                      placeholder="Frequency"
-                      value={pres.frequency}
-                      onChange={(e) =>
-                        updatePrescription(idx, "frequency", e.target.value)
-                      }
-                      className="border border-gray-300 rounded px-2 py-1 w-24 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
-                    />
-                  </div>
+                  {/* Frequency removed */}
                   <div className="flex flex-col">
                     <label className="text-xs font-medium mb-1">Duration</label>
                     <input
@@ -338,15 +387,67 @@ const AppointmentDetail = () => {
                     </button>
                   )}
                 </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addPrescription}
-              className="mt-3 text-blue-600 hover:text-blue-800 font-medium transition"
-            >
-              + Add Prescription
-            </button>
+                {/* Instruction sets for this medicine */}
+                <div className="ml-2 mt-2">
+                  <label className="text-xs font-semibold">Instructions</label>
+                  {pres.instructions.map((instr, instrIdx) => (
+                    <div key={instrIdx} className="flex flex-wrap gap-2 items-center mt-1">
+                      <select
+                        value={instr.mealTime}
+                        onChange={(e) => updateInstruction(idx, instrIdx, "mealTime", e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
+                      >
+                        <option value="">Meal Time</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                      </select>
+                      <select
+                        value={instr.mealRelation}
+                        onChange={(e) => updateInstruction(idx, instrIdx, "mealRelation", e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
+                      >
+                        <option value="">Meal Relation</option>
+                        <option value="Before Meal">Before Meal</option>
+                        <option value="After Meal">After Meal</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Custom instruction"
+                        value={instr.custom}
+                        onChange={(e) => updateInstruction(idx, instrIdx, "custom", e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1 min-w-[120px] focus:outline-none"
+                      />
+                      {pres.instructions.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeInstruction(idx, instrIdx)}
+                          className="text-red-600 px-2 text-lg hover:bg-red-50 rounded transition"
+                          title="Remove instruction"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addInstruction(idx)}
+                    className="mt-1 text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  >
+                    + Add Instruction
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addPrescription}
+            className="mt-3 text-blue-600 hover:text-blue-800 font-medium transition"
+          >
+            + Add Prescription
+          </button>
           </div>
           <button
             type="submit"
@@ -384,18 +485,18 @@ const AppointmentDetail = () => {
           </div>
           <div>
             <label className="block font-semibold mb-2">Prescriptions</label>
-            <div className="space-y-3">
-              {prescriptions.map((pres, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-wrap gap-2 items-center bg-gray-50 rounded-lg p-3 shadow-sm"
-                >
+          <div className="space-y-3">
+            {prescriptions.map((pres, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col gap-2 bg-gray-50 rounded-lg p-3 shadow-sm"
+              >
+                <div className="flex flex-wrap gap-2 items-center">
                   <div className="flex flex-col">
                     <label className="text-xs font-medium mb-1">Medicine</label>
                     <input
                       value={
-                        medicines.find((m) => m._id === pres.medicineId)
-                          ?.name || ""
+                        medicines.find((m) => m._id === pres.medicineId)?.name || ""
                       }
                       className="border border-gray-300 rounded px-2 py-1 min-w-[120px] bg-gray-100"
                       readOnly
@@ -409,16 +510,7 @@ const AppointmentDetail = () => {
                       readOnly
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">
-                      Frequency
-                    </label>
-                    <input
-                      value={pres.frequency}
-                      className="border border-gray-300 rounded px-2 py-1 w-24 bg-gray-100"
-                      readOnly
-                    />
-                  </div>
+                  {/* Frequency removed */}
                   <div className="flex flex-col">
                     <label className="text-xs font-medium mb-1">Duration</label>
                     <input
@@ -428,8 +520,44 @@ const AppointmentDetail = () => {
                     />
                   </div>
                 </div>
-              ))}
-            </div>
+                {/* Show all instructions for this medicine */}
+                <div className="ml-2 mt-2">
+                  <label className="text-xs font-semibold mb-1">Instructions</label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {(pres.instructions && pres.instructions.length > 0
+                      ? pres.instructions
+                      : (pres.instructionsString || "").split("; ").map((s) => ({ combined: s }))
+                    ).map((instr, instrIdx) => {
+                      let hasMeal = instr.mealTime || instr.mealRelation;
+                      let hasCustom = instr.custom && instr.custom.trim() !== "";
+                      let main = [
+                        instr.mealTime && <span key="mealTime" className="font-bold text-blue-700">{instr.mealTime}</span>,
+                        instr.mealRelation && <span key="mealRel" className="ml-1 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-semibold">{instr.mealRelation}</span>
+                      ].filter(Boolean);
+                      return (
+                        <div key={instrIdx} className="flex items-center gap-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-200 shadow-sm">
+                          <span role="img" aria-label="pill" className="text-blue-400 text-lg">💊</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 w-full">
+                            <div className="flex gap-2 items-center flex-wrap">
+                              {main.length > 0 ? main : <span className="text-gray-400 italic">No meal info</span>}
+                            </div>
+                            {hasCustom && (
+                              <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium whitespace-pre-line">
+                                {instr.custom}
+                              </span>
+                            )}
+                            {!hasMeal && !hasCustom && instr.combined && (
+                              <span className="text-gray-500 italic">{instr.combined}</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
           </div>
         </div>
       )}

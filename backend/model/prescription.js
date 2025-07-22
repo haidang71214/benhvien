@@ -1,6 +1,12 @@
 import mongoose, { Types } from 'mongoose';
 const { Schema } = mongoose;
 
+const instructionSchema = new Schema({
+  mealTime: String,
+  mealRelation: String,
+  custom: String,
+}, { _id: false });
+
 const medicineItemSchema = new Schema({
   medicineId: {
     type: Types.ObjectId,
@@ -9,9 +15,8 @@ const medicineItemSchema = new Schema({
   },
   name: String,
   dosage: String, // liều lượng
-  frequency: String,
-  duration: String, 
-  instructions: String
+  duration: String,
+  instructions: [instructionSchema], // now an array of instruction objects
 }, { _id: false });
 
 const prescriptionSchema = new Schema({
