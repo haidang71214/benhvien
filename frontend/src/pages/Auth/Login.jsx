@@ -35,13 +35,14 @@ export default function Login() {
       console.log("Data user object:", data.user);
       console.log("Data role:", data.role);
       
-      // Create user data object with the correct role from API
+      // Create user data object with the correct role and dob from API
       const userData = {
         id: data.user.id,
         userName: data.user.userName,
         email: data.user.email,
         avatarUrl: data.user.avatarUrl,
-        role: data.role || data.user.role // Try both possible locations for role
+        role: data.role || data.user.role, // Try both possible locations for role
+        dob: data.user.dob || null
       };
       
       console.log("Final user data being saved:", userData);
