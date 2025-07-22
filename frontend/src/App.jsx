@@ -27,7 +27,7 @@ import AdminUser from "./admin-fe/AdminUser";
 import AdminDashboard from "../src/admin-fe/AdminDashboard";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
 import AdminInvoice from "../src/admin-fe/AdminInvoice";
-import AIDiagnose from "./pages/AIDiagnose";
+import AISuggest from "./pages/AISuggest";
 import PaymentCancel from "./pages/PaymentCancel";
 
 import Chat from "./pages/Chat";
@@ -51,7 +51,7 @@ const App = () => {
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/my-appointments" element={<MyAppointment />} />
-        <Route path="/ai-diagnose" element={<AIDiagnose />} />
+        <Route path="/ai-suggest" element={<AISuggest />} />
         <Route path="/chat" element={<Chat />} />
         <Route
           path="/receptionist-appointments"

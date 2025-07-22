@@ -71,12 +71,12 @@ export default function MedicalRecordsHistory() {
                   </div>
                   <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
                     <CalendarDays className="w-4 h-4" />
-                    {rec.appointmentId?.appointmentTime
-                      ? new Date(rec.appointmentId.appointmentTime).toLocaleString(undefined, {
+                    {rec.createdAt
+                      ? new Date(rec.createdAt).toLocaleString(undefined, {
                           dateStyle: "medium",
                           timeStyle: "short",
                         })
-                      : "No appointment time"}
+                      : "No record date"}
                   </div>
                 </div>
 
