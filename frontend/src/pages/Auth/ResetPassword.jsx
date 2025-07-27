@@ -19,7 +19,7 @@ const ResetPassword = () => {
       toast.success(
         "Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập..."
       );
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/auth/login"), 2000);
     } catch (err) {
       toast.error(err.response?.data?.message || "Có lỗi xảy ra");
     }
