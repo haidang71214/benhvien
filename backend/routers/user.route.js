@@ -11,6 +11,7 @@ import {
   getDetailUser,
   searchDoctors,
   updateUser,
+  banUser,
 } from "../controllers/admin.controller.js";
 
 import { getMyMedicalRecords } from "../controllers/user.controller.js";
@@ -18,7 +19,11 @@ import { uploadCloud } from "../config/uploadCloud.js";
 
 const userRouter = express.Router();
 // Patient: get their own medical records
-userRouter.get("/medical-records", middlewareTokenAsyncKey, getMyMedicalRecords);
+userRouter.get(
+  "/medical-records",
+  middlewareTokenAsyncKey,
+  getMyMedicalRecords
+);
 userRouter.post("/createUser", middlewareTokenAsyncKey, createUser); // create new user with admin rol
 userRouter.post(
   "/updateUser/:id",
@@ -40,4 +45,5 @@ userRouter.put(
   middlewareTokenAsyncKey,
   changeRoleUserToDoctor
 );
+userRouter.post("/banUser/:id", middlewareTokenAsyncKey, banUser);
 export default userRouter;
