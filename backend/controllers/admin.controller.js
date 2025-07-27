@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { users } from "../model/user.js";
+import transporter from "../config/email/transporter.js";
 // hàm để check admin
 export const checkAdmin = async (userId) => {
   try {
@@ -206,7 +207,9 @@ const getAllUsers = async (req, res) => {
     res.status(200).json({ data: allUsers });
   } catch (error) {
     console.error("Lỗi khi lấy danh sách người dùng:", error);
-    res.status(500).json({ message: "Lỗi server khi lấy danh sách người dùng" });
+    res
+      .status(500)
+      .json({ message: "Lỗi server khi lấy danh sách người dùng" });
   }
 };
 
@@ -308,6 +311,58 @@ const changeRoleUserToDoctor = async (req, res) => {
   }
 };
 
+const banUser = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const { id } = req.params;
+
+    const admin = await users.findById(adminId);
+    if (!admin || admin.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Không đủ quyền thực hiện thao tác" });
+    }
+
+    const userToChange = await users.findById(id);
+    if (!userToChange) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    const isBlocked = userToChange.block;
+    const updatedBlockStatus = !isBlocked;
+
+    await users.findByIdAndUpdate(id, { block: updatedBlockStatus });
+
+    const subject = updatedBlockStatus
+      ? "Nền tảng đã block bạn do phát hiện vi phạm bất thường"
+      : "Nền tảng đã mở block cho bạn";
+    const text = "Trân trọng,\nĐội ngũ hỗ trợ.";
+
+    const mailOption = {
+      from: "dangpnhde170023@fpt.edu.vn",
+      to: userToChange.email,
+      subject,
+      text,
+    };
+
+    transporter.sendMail(mailOption, (err, info) => {
+      if (err) {
+        console.error("Error sending email:", err);
+        // Không return ở đây để tiếp tục trả kết quả cho client
+      }
+    });
+
+    return res.status(200).json({
+      message: `Tài khoản đã được ${
+        updatedBlockStatus ? "block" : "mở block"
+      } thành công`,
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res.status(500).json({ message: `Lỗi server: ${error.message}` });
+  }
+};
+
 export {
   createUser,
   updateUser,
@@ -318,5 +373,6 @@ export {
   searchDoctors,
   changeRoleUserToDoctor,
   getAllDoctors,
-  getAllUsers
+  getAllUsers,
+  banUser,
 };

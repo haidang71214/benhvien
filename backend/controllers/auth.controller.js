@@ -8,7 +8,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const register = async (req, res) => {
   try {
-    const { userName, email, password, dob, sex } = req.body;
+    const { userName, email, password, dob, sex, role } = req.body;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -38,7 +38,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       dob: dob ? new Date(dob) : null,
       sex: sex || "other",
-      role: "patient",
+      role: role || "patient",
       otpCode,
       otpExpires,
       isVerified: false,
@@ -101,7 +101,12 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Email không tồn tại" });
     }
-
+    // block
+    if (user.block === true) {
+      return res
+        .status(401)
+        .json({ message: "Người dùng đã bị cấm bởi nền tảng" });
+    }
     // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -140,7 +145,7 @@ const login = async (req, res) => {
         avatarUrl: user.avatarUrl,
         age: user.age,
         dob: user.dob,
-        role: user.role
+        role: user.role,
       },
     });
   } catch (error) {
