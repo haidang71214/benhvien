@@ -32,7 +32,7 @@ export const markAsRead = async (req, res) => {
 };
 
 // Scheduled job: send reminders for upcoming appointments (e.g., 1 hour before)
-nodeCron.schedule('* * * * *', async () => { // every 1 minute
+nodeCron.schedule('*/10 * * * *', async () => { // every 10 minutes
   const now = new Date();
   const soon = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
   const appts = await appointments.find({

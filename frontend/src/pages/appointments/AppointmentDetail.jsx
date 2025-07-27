@@ -113,13 +113,35 @@ const AppointmentDetail = () => {
     }
   };
 
+  // Helper: get medicine type by id
+  const getMedicineType = (medicineId) => {
+    const med = medicines.find((m) => m._id === medicineId);
+    return med?.type || "";
+  } 
+
+  // Get dosage placeholder by type
+  const getDosagePlaceholder = (medicineType) => {
+    switch (medicineType) {
+      case "tablet":
+        return "e.g. 1 tablet";
+      case "capsule":
+        return "e.g. 1 capsule";
+      case "syrup":
+        return "e.g. 5ml";
+      case "ointment":
+        return "e.g. apply thin layer";
+      default:
+        return "Dosage";
+    }
+  } 
+
   // Update prescription row
   const updatePrescription = (idx, field, value) => {
     const updated = prescriptions.map((p, i) =>
       i === idx ? { ...p, [field]: value } : p
     );
     setPrescriptions(updated);
-  };
+  } 
 
   // Add instruction row for a prescription
   const addInstruction = (presIdx) => {
@@ -300,8 +322,8 @@ const AppointmentDetail = () => {
         >
           <div>
             <label className="block font-semibold mb-1">Symptoms</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
               required
@@ -309,8 +331,8 @@ const AppointmentDetail = () => {
           </div>
           <div>
             <label className="block font-semibold mb-1">Diagnosis</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={diagnosis}
               onChange={(e) => setDiagnosis(e.target.value)}
               required
@@ -318,8 +340,8 @@ const AppointmentDetail = () => {
           </div>
           <div>
             <label className="block font-semibold mb-1">Conclusion</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={conclusion}
               onChange={(e) => setConclusion(e.target.value)}
             />
@@ -353,15 +375,30 @@ const AppointmentDetail = () => {
                   </div>
                   <div className="flex flex-col">
                     <label className="text-xs font-medium mb-1">Dosage</label>
-                    <input
-                      placeholder="Dosage"
-                      value={pres.dosage}
-                      onChange={(e) =>
-                        updatePrescription(idx, "dosage", e.target.value)
-                      }
-                      className="border border-gray-300 rounded px-2 py-1 w-24 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      required
-                    />
+                    {getMedicineType(pres.medicineId) === "ointment" ? (
+                      <select
+                        value={pres.dosage}
+                        onChange={(e) => updatePrescription(idx, "dosage", e.target.value)}
+                        className="border border-gray-300 rounded px-2 py-1 min-w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      >
+                        <option value="">Select amount</option>
+                        <option value="apply thin layer">Apply thin layer</option>
+                        <option value="pea-sized amount">Pea-sized amount</option>
+                        <option value="cover affected area">Cover affected area</option>
+                        <option value="as directed">As directed</option>
+                      </select>
+                    ) : (
+                      <input
+                        placeholder={getDosagePlaceholder(getMedicineType(pres.medicineId))}
+                        value={pres.dosage}
+                        onChange={(e) =>
+                          updatePrescription(idx, "dosage", e.target.value)
+                        }
+                        className="border border-gray-300 rounded px-2 py-1 min-w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      />
+                    )}
                   </div>
                   {/* Frequency removed */}
                   <div className="flex flex-col">
@@ -392,25 +429,29 @@ const AppointmentDetail = () => {
                   <label className="text-xs font-semibold">Instructions</label>
                   {pres.instructions.map((instr, instrIdx) => (
                     <div key={instrIdx} className="flex flex-wrap gap-2 items-center mt-1">
-                      <select
-                        value={instr.mealTime}
-                        onChange={(e) => updateInstruction(idx, instrIdx, "mealTime", e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
-                      >
-                        <option value="">Meal Time</option>
-                        <option value="Breakfast">Breakfast</option>
-                        <option value="Lunch">Lunch</option>
-                        <option value="Dinner">Dinner</option>
-                      </select>
-                      <select
-                        value={instr.mealRelation}
-                        onChange={(e) => updateInstruction(idx, instrIdx, "mealRelation", e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
-                      >
-                        <option value="">Meal Relation</option>
-                        <option value="Before Meal">Before Meal</option>
-                        <option value="After Meal">After Meal</option>
-                      </select>
+                      {getMedicineType(pres.medicineId) !== "ointment" && (
+                        <>
+                          <select
+                            value={instr.mealTime}
+                            onChange={(e) => updateInstruction(idx, instrIdx, "mealTime", e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
+                          >
+                            <option value="">Meal Time</option>
+                            <option value="Breakfast">Breakfast</option>
+                            <option value="Lunch">Lunch</option>
+                            <option value="Dinner">Dinner</option>
+                          </select>
+                          <select
+                            value={instr.mealRelation}
+                            onChange={(e) => updateInstruction(idx, instrIdx, "mealRelation", e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
+                          >
+                            <option value="">Meal Relation</option>
+                            <option value="Before Meal">Before Meal</option>
+                            <option value="After Meal">After Meal</option>
+                          </select>
+                        </>
+                      )}
                       <input
                         type="text"
                         placeholder="Custom instruction"
@@ -461,24 +502,24 @@ const AppointmentDetail = () => {
         <div className="space-y-6 bg-white rounded-xl shadow p-8">
           <div>
             <label className="block font-semibold mb-1">Symptoms</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={symptoms}
               readOnly
             />
           </div>
           <div>
             <label className="block font-semibold mb-1">Diagnosis</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={diagnosis}
               readOnly
             />
           </div>
           <div>
             <label className="block font-semibold mb-1">Conclusion</label>
-            <input
-              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100"
+            <textarea
+              className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={conclusion}
               readOnly
             />
@@ -524,35 +565,40 @@ const AppointmentDetail = () => {
                 <div className="ml-2 mt-2">
                   <label className="text-xs font-semibold mb-1">Instructions</label>
                   <div className="grid grid-cols-1 gap-2">
-                    {(pres.instructions && pres.instructions.length > 0
-                      ? pres.instructions
-                      : (pres.instructionsString || "").split("; ").map((s) => ({ combined: s }))
-                    ).map((instr, instrIdx) => {
-                      let hasMeal = instr.mealTime || instr.mealRelation;
-                      let hasCustom = instr.custom && instr.custom.trim() !== "";
-                      let main = [
-                        instr.mealTime && <span key="mealTime" className="font-bold text-blue-700">{instr.mealTime}</span>,
-                        instr.mealRelation && <span key="mealRel" className="ml-1 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-semibold">{instr.mealRelation}</span>
-                      ].filter(Boolean);
-                      return (
-                        <div key={instrIdx} className="flex items-center gap-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-200 shadow-sm">
-                          <span role="img" aria-label="pill" className="text-blue-400 text-lg">💊</span>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 w-full">
-                            <div className="flex gap-2 items-center flex-wrap">
-                              {main.length > 0 ? main : <span className="text-gray-400 italic">No meal info</span>}
+                    {(!pres.instructions || pres.instructions.length === 0 ||
+                      pres.instructions.every(instr => !instr.mealTime && !instr.mealRelation && !instr.custom)) ? (
+                      <div className="text-gray-400 italic">No instructions provided</div>
+                    ) : (
+                      (pres.instructions && pres.instructions.length > 0
+                        ? pres.instructions
+                        : (pres.instructionsString || "").split("; ").map((s) => ({ combined: s }))
+                      ).map((instr, instrIdx) => {
+                        let hasMeal = instr.mealTime || instr.mealRelation;
+                        let hasCustom = instr.custom && instr.custom.trim() !== "";
+                        let main = [
+                          instr.mealTime && <span key="mealTime" className="font-bold text-blue-700">{instr.mealTime}</span>,
+                          instr.mealRelation && <span key="mealRel" className="ml-1 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-semibold">{instr.mealRelation}</span>
+                        ].filter(Boolean);
+                        return (
+                          <div key={instrIdx} className="flex items-center gap-3 bg-blue-50 rounded-lg px-3 py-2 border border-blue-200 shadow-sm">
+                            <span role="img" aria-label="pill" className="text-blue-400 text-lg">💊</span>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 w-full">
+                              <div className="flex gap-2 items-center flex-wrap">
+                                {main.length > 0 ? main : <span className="text-gray-400 italic">No meal info</span>}
+                              </div>
+                              {hasCustom && (
+                                <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium whitespace-pre-line">
+                                  {instr.custom}
+                                </span>
+                              )}
+                              {!hasMeal && !hasCustom && instr.combined && (
+                                <span className="text-gray-500 italic">{instr.combined}</span>
+                              )}
                             </div>
-                            {hasCustom && (
-                              <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium whitespace-pre-line">
-                                {instr.custom}
-                              </span>
-                            )}
-                            {!hasMeal && !hasCustom && instr.combined && (
-                              <span className="text-gray-500 italic">{instr.combined}</span>
-                            )}
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
