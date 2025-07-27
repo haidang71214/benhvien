@@ -40,6 +40,9 @@ const Doctors = () => {
   const handleDoctorClick = (doctor) => {
     if (!user?.id) {
       toast.error("Please login to book an appointment!");
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 2000);
       return;
     }
     navigate(`/appointment/${doctor._id}/${user.id}`);

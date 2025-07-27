@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-export const ROLE_ENUM = ["patient", "admin", "doctor", "receptionist"];
+export const ROLE_ENUM = ["patient", "admin", "doctor", "nurse"];
 export const STATUS_ENUM = ["InUse", "UnderMaintenance", "Broken", "Removed"];
 export const DOCTOR_HEHE = [
   "General physician",

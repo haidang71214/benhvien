@@ -27,8 +27,10 @@ import AdminUser from "./admin-fe/AdminUser";
 import AdminDashboard from "../src/admin-fe/AdminDashboard";
 import AdminMedicine from "../src/admin-fe/AdminMedicine";
 import AdminInvoice from "../src/admin-fe/AdminInvoice";
+import AdminTestManager from "../src/admin-fe/AdminTestManager";
 import AISuggest from "./pages/AISuggest";
 import PaymentCancel from "./pages/PaymentCancel";
+import NurseDashboard from "./pages/nurse/NurseDashboard";
 
 import Chat from "./pages/Chat";
 import AllNotifications from "./pages/AllNotifications";
@@ -44,6 +46,8 @@ const App = () => {
         <Route path="/auth/login" element={<Login />} />
         <Route path="/login-success" element={<LoginSuccess />} />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
+        {/* Nurse dashboard route */}
+        <Route path="/nurse-dashboard" element={<NurseDashboard />} />
         <Route path="/auth/register" element={<Register />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -73,6 +77,7 @@ const App = () => {
         <Route path="/admin/users" element={<AdminUser />} />
         <Route path="/admin/medicines" element={<AdminMedicine />} />
         <Route path="/admin/invoices" element={<AdminInvoice />} />
+        <Route path="/admin/tests" element={<AdminTestManager />} />
         {/* Optionally keep /admin for user management */}
         <Route path="/account-settings" element={<AccountLayout />}>
           <Route index element={<AccountInfo />} />

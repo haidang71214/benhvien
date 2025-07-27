@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import logger from "morgan";
 import { createServer } from "http";
 import setupSocket from "./config/socket.js";
+import Appointment from "./model/apointmentSchema.js";
 import { connect } from "mongoose";
 import cors from "cors";
 import normalizePort from "./utils/normalizePort.js";
@@ -20,6 +21,8 @@ import chatRouter from "./routers/chat.route.js";
 import userRouter from "./routers/user.route.js";
 import notificationRouter from "./routers/notification.route.js";
 import dashboardRouter from "./routers/dashboard.route.js";
+import testAssignmentRouter from "./routers/testAssignment.route.js";
+import testRoutes from "./routers/test.route.js";
 
 dotenv.config();
 
@@ -107,6 +110,8 @@ app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
+app.use("/api/v1/test-assignment", testAssignmentRouter);
+app.use("/api/v1/test", testRoutes);
 
 app.use(rootRouter);
 
