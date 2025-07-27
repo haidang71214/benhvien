@@ -134,6 +134,21 @@ const Navbar = () => {
             </NavLink>
           )}
         </NavbarItem>
+        <NavbarItem>
+          {/* Nurse-only link */}
+          {user?.role === "nurse" && (
+            <NavLink
+              to="/nurse-dashboard"
+              className={({ isActive }) =>
+                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+                }`
+              }
+            >
+              Nurse Dashboard
+            </NavLink>
+          )}
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="flex items-center gap-4" justify="end">

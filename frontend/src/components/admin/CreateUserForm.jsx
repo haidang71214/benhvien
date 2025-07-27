@@ -10,15 +10,6 @@ const CreateUserForm = ({
 }) => {
   return (
     <>
-      {/* Create User Button */}
-      <div className="mb-8 flex justify-end">
-        <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-        >
-          {showCreateForm ? "Hủy" : "Tạo người dùng mới"}
-        </button>
-      </div>
 
       {/* Create User Form */}
       {showCreateForm && (
