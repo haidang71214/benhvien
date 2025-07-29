@@ -8,7 +8,6 @@ import {
   NavbarItem,
   NavbarMenuToggle,
 } from "@heroui/navbar";
-import toast from "react-hot-toast";
 import NotificationBell from "../NotificationBell";
 
 const Navbar = () => {
@@ -41,33 +40,44 @@ const Navbar = () => {
               }`
             }
           >
-            Home
+            Trang chủ
           </NavLink>
         </NavbarItem>
-        <NavbarItem>
-          <NavLink
-            to="/doctors"
-            className={({ isActive }) =>
-              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-              }`
-            }
-          >
-            Doctors
-          </NavLink>
+        <NavbarItem className="relative group">
+          <div className="px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors text-gray-700 cursor-pointer group-hover:text-blue-600">
+            Dịch vụ khám bệnh
+          </div>
+
+          {/* Dropdown menu */}
+          <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px]">
+            <NavLink
+              to="/doctors"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 text-sm"
+            >
+              Danh sách bác sĩ
+            </NavLink>
+            <NavLink
+              to="/book-appointment"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 text-sm"
+            >
+              Đặt lịch khám
+            </NavLink>
+            <NavLink
+              to="/departments"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 text-sm"
+            >
+              Chuyên khoa
+            </NavLink>
+            <NavLink
+              to="/packages"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600 text-sm"
+            >
+              Gói khám sức khỏe
+            </NavLink>
+          </div>
         </NavbarItem>
-        <NavbarItem>
-          <NavLink
-            to="/contact"
-            className={({ isActive }) =>
-              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-              }`
-            }
-          >
-            Contact
-          </NavLink>
-        </NavbarItem>
+
+        <NavbarItem></NavbarItem>
         <NavbarItem>
           <NavLink
             to="/about"
@@ -77,7 +87,7 @@ const Navbar = () => {
               }`
             }
           >
-            About
+            Về chúng tôi
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -89,10 +99,10 @@ const Navbar = () => {
               }`
             }
           >
-            AI Suggest
+            AI Gợi ý bệnh
           </NavLink>
         </NavbarItem>
-         <NavbarItem>
+        <NavbarItem>
           <NavLink
             to="/chat"
             className={({ isActive }) =>
@@ -101,7 +111,7 @@ const Navbar = () => {
               }`
             }
           >
-            Chat
+            Trò chuyện với bác sĩ
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -115,12 +125,11 @@ const Navbar = () => {
                 }`
               }
             >
-              Admin Dashboard
+              Trang quản trị
             </NavLink>
           )}
         </NavbarItem>
         <NavbarItem>
-          {/* Receptionist-only link */}
           {user?.role === "receptionist" && (
             <NavLink
               to="/receptionist-appointments"
@@ -130,7 +139,7 @@ const Navbar = () => {
                 }`
               }
             >
-              Manage Appointments
+              Quản lý lịch khám{" "}
             </NavLink>
           )}
         </NavbarItem>
@@ -145,7 +154,7 @@ const Navbar = () => {
                 }`
               }
             >
-              Nurse Dashboard
+              Trang y tá
             </NavLink>
           )}
         </NavbarItem>
@@ -179,29 +188,29 @@ const Navbar = () => {
                       onClick={() => navigate("/account-settings")}
                       className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                     >
-                      Account Settings
+                      Cài đặt hồ sơ
                     </button>
                     <button
                       onClick={() => navigate("/my-appointments")}
                       className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                     >
-                      My Appointments
+                      Phiếu khám bệnh
                     </button>
                     {/* Only show for patients */}
                     {user?.role === "patient" && (
                       <button
-                        onClick={() => navigate("/account-settings/medical-records-history")}
+                        onClick={() =>
+                          navigate("/account-settings/medical-records-history")
+                        }
                         className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                       >
-                        Medical Records History
+                        Lịch sử hồ sơ y tế
                       </button>
                     )}
                     <hr className="my-2 border-gray-200" />
                     <button
                       onClick={() => {
                         logout();
-                        // Only show toast if logout() does not already show it
-                        // toast.success("Đăng xuất thành công!");
                       }}
                       className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                     >

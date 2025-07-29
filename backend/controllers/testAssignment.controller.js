@@ -3,7 +3,6 @@
 import TestAssignment from '../model/testAssignment.js';
 import Notification from '../model/notification.js';
 import Test from '../model/test.js';
-import { users as User } from '../model/user.js';
 
 const testAssignmentController = {};
 

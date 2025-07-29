@@ -6,18 +6,18 @@ const AccountLayout = () => {
     {
       to: "/account-settings",
       icon: User,
-      label: "Account",
+      label: "Hồ sơ bệnh nhân",
       end: true
     },
     {
       to: "/account-settings/change-password", 
       icon: Lock,
-      label: "Password"
+      label: "Đổi mật khẩu"
     },
     {
       to: "/account-settings/security",
       icon: Shield, 
-      label: "Security"
+      label: "Bảo mật tài khoản"
     }
   ];
 

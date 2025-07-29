@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Doctors from "./pages/doctors/Doctors";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import MyAppointment from "./pages/appointments/MyAppointment";
 import Appointment from "./pages/appointments/Appointment";
@@ -11,7 +10,7 @@ import ChangePassword from "./pages/account-settings/ChangePassword";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import LoginSuccess from "./pages/Auth/LoginSuccess";
-import Footer from "./components/Footer";
+import Footer from "./components/layouts/Footer";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import { Toaster } from "react-hot-toast";
@@ -31,7 +30,6 @@ import AdminTestManager from "../src/admin-fe/AdminTestManager";
 import AISuggest from "./pages/AISuggest";
 import PaymentCancel from "./pages/PaymentCancel";
 import NurseDashboard from "./pages/nurse/NurseDashboard";
-
 import Chat from "./pages/Chat";
 import AllNotifications from "./pages/AllNotifications";
 
@@ -46,11 +44,9 @@ const App = () => {
         <Route path="/auth/login" element={<Login />} />
         <Route path="/login-success" element={<LoginSuccess />} />
         <Route path="/auth/verify-email" element={<VerifyEmail />} />
-        {/* Nurse dashboard route */}
         <Route path="/nurse-dashboard" element={<NurseDashboard />} />
         <Route path="/auth/register" element={<Register />} />
         <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />

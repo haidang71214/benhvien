@@ -26,6 +26,7 @@ export default function MedicalRecordsHistory() {
       setRecords(res.data.data || []);
     } catch (err) {
       setRecords([]);
+      console.error("Failed to fetch medical records:", err);
     } finally {
       setLoading(false);
     }

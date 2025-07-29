@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../utils/axiosInstance.ts";
-import { transformDoctorData } from "../utils/transformDoctorData";
 
 export const useDoctors = () => {
   const { speciality: urlSpeciality } = useParams();
@@ -20,10 +19,8 @@ export const useDoctors = () => {
 
     try {
       const { data } = await axiosInstance.get("/admin/getAllDoctors");
-      const mongoDoctors = (data.data || []).map((doc) =>
-        transformDoctorData(doc, "mongodb")
-      );
-      setDoctors(mongoDoctors);
+        setDoctors(data.data || []);
+
     } catch (err) {
       console.error("Error fetching doctors:", err);
       setError("Unable to load doctors list");

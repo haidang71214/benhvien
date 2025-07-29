@@ -1,10 +1,8 @@
 const DOCTOR_SPECIALTIES = [
-  "General physician",
-  "Gynecologist",
-  "Dermatologist",
-  "Pediatricians",
-  "Neurologist",
-  "Gastroenterologist",
+  "Bác sĩ mắt",
+  "Bác sĩ nhi khoa",
+  "Bác sĩ tổng quát",
+  "Bác sĩ tim mạch",
 ];
 
 const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
@@ -29,7 +27,7 @@ const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">All Specialties</span>
+                <span className="font-medium">Tất cả chuyên khoa</span>
                 {!selectedSpecialty && (
                   <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Active</span>
                 )}

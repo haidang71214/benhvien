@@ -14,9 +14,6 @@ export default function Chat() {
   const [selectedUser, setSelectedUser] = useState("");
   const [loading, setLoading] = useState(false);
 
-
-
-  // If not logged in, show message in page
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
@@ -26,7 +23,6 @@ export default function Chat() {
     );
   }
 
-  // fallback: always render something for debugging
   if (!user && users.length === 0 && !loading) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-red-500">
@@ -35,7 +31,6 @@ export default function Chat() {
       </div>
     );
   }
-  // Fetch all users for chat selection
   useEffect(() => {
     if (!user || !user?.accessToken) return;
     axiosInstance

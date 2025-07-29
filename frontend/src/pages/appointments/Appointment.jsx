@@ -7,9 +7,6 @@ import RelatedDoctors from "../../pages/doctors/RelatedDoctors";
 import { CalendarDays, Clock, UserCheck, Info } from "lucide-react";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
-import { transformDoctorData } from "../../utils/transformDoctorData";
-
-const daysOfWeeks = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -24,19 +21,17 @@ const Appointment = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch doctor info
   useEffect(() => {
     setIsLoading(true);
     axiosInstance
       .get(`/admin/getDetailUser/${docId}`)
       .then((res) => {
-        setDocInfo(transformDoctorData(res.data.data, "mongodb"));
+        setDocInfo(res.data.data);
       })
       .catch(() => setDocInfo(null))
       .finally(() => setIsLoading(false));
   }, [docId]);
 
-  // Fetch all appointments for this doctor
   useEffect(() => {
     if (!docId) return;
     axiosInstance
@@ -45,18 +40,11 @@ const Appointment = () => {
       .catch(() => setAppointments([]));
   }, [docId]);
 
-  // Removed preset date buttons logic. Now using date picker.
-
-  // Helper: get booked times for selected date
   const getBookedTimes = () => {
     if (!selectedDate) return [];
-    const selectedDateStr = selectedDate.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const selectedDateStr = selectedDate.toISOString().slice(0, 10);
     return appointments
-      .filter(
-        (appt) =>
-          appt.doctorId?._id === docId ||
-          appt.doctorId === docId // in case of string
-      )
+      .filter((appt) => appt.doctorId?._id === docId || appt.doctorId === docId)
       .filter((appt) => {
         const apptDateStr = new Date(appt.appointmentTime)
           .toISOString()
@@ -73,17 +61,15 @@ const Appointment = () => {
 
   const bookedTimes = getBookedTimes();
 
-  // Helper: get available times for selected date
   const getAvailableTimes = () => {
     if (!selectedDate || !docInfo || !docInfo.availableSchedule) return [];
-    // Get day name from selectedDate
-    const dayName = selectedDate.toLocaleDateString("en-US", { weekday: "long" });
-    // availableSchedule keys are like "Monday", "Tuesday", ...
+    const dayName = selectedDate.toLocaleDateString("en-US", {
+      weekday: "long",
+    });
     return docInfo.availableSchedule[dayName] || [];
   };
 
   const availableTimes = getAvailableTimes();
-
 
   const handleSubmit = () => {
     if (!selectedDate || !selectedTime) {
@@ -109,7 +95,6 @@ const Appointment = () => {
       const appointmentTime = appointmentDate.toISOString();
       const doctorId = docId;
 
-      // Only request payment link, do NOT create appointment yet
       const payRes = await axiosInstance.post(
         "/api/v1/payment/create-payment-link",
         {
@@ -144,26 +129,49 @@ const Appointment = () => {
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4 text-pink-600">Xác nhận đặt lịch</h2>
+            <h2 className="text-xl font-bold mb-4 text-pink-600">
+              Xác nhận đặt lịch
+            </h2>
             <div className="space-y-2 text-gray-700">
-              <div><b>Bác sĩ:</b> {docInfo?.name}</div>
-              <div><b>Chuyên khoa:</b> {docInfo?.speciality}</div>
-              <div><b>Ngày khám:</b> {selectedDate && selectedDate.toLocaleDateString("vi-VN")}</div>
-              <div><b>Giờ khám:</b> {selectedTime}</div>
-              <div><b>Triệu chứng:</b> {initialSymptom || <span className="italic text-gray-400">(Chưa nhập)</span>}</div>
-              <div><b>Phí khám:</b> {currencySymbol}{docInfo?.fees}</div>
+              <div>
+                <b>Bác sĩ:</b> {docInfo?.name}
+              </div>
+              <div>
+                <b>Chuyên khoa:</b> {docInfo?.speciality}
+              </div>
+              <div>
+                <b>Ngày khám:</b>{" "}
+                {selectedDate && selectedDate.toLocaleDateString("vi-VN")}
+              </div>
+              <div>
+                <b>Giờ khám:</b> {selectedTime}
+              </div>
+              <div>
+                <b>Triệu chứng:</b>{" "}
+                {initialSymptom || (
+                  <span className="italic text-gray-400">(Chưa nhập)</span>
+                )}
+              </div>
+              <div>
+                <b>Phí khám:</b> {currencySymbol}
+                {docInfo?.fees}
+              </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button
                 className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700"
                 onClick={() => setShowConfirm(false)}
                 disabled={isLoading}
-              >Hủy</button>
+              >
+                Hủy
+              </button>
               <button
                 className="px-4 py-2 rounded bg-gradient-to-r from-orange-400 to-pink-500 text-white font-semibold hover:scale-105 shadow"
                 onClick={handleConfirmBooking}
                 disabled={isLoading}
-              >{isLoading ? "Đang xử lý..." : "Xác nhận & Thanh toán"}</button>
+              >
+                {isLoading ? "Đang xử lý..." : "Xác nhận & Thanh toán"}
+              </button>
             </div>
           </div>
         </div>
@@ -200,7 +208,8 @@ const Appointment = () => {
               </p>
             </div>
             <p className="text-green-600 font-bold mt-4 text-lg flex items-center gap-2">
-              <span className="text-2xl">💰</span> Phí khám: {currencySymbol}{docInfo.fees}
+              <span className="text-2xl">💰</span> Phí khám: {currencySymbol}
+              {docInfo.fees}
             </p>
           </div>
         </div>
@@ -217,8 +226,10 @@ const Appointment = () => {
                 <input
                   type="date"
                   className="appearance-none w-full rounded-full px-5 py-3 text-lg font-semibold border border-[#e6007e] shadow focus:outline-none focus:ring-2 focus:ring-[#e6007e] bg-white text-gray-700 transition-all duration-300 hover:border-[#e6007e]"
-                  value={selectedDate ? selectedDate.toISOString().slice(0, 10) : ""}
-                  onChange={e => {
+                  value={
+                    selectedDate ? selectedDate.toISOString().slice(0, 10) : ""
+                  }
+                  onChange={(e) => {
                     const date = new Date(e.target.value);
                     setSelectedDate(date);
                     setSelectedTime("");
@@ -253,10 +264,18 @@ const Appointment = () => {
                               : "bg-white text-gray-700 border-[#e6007e] hover:bg-[#fce4ec] hover:border-[#e6007e]"
                           }`}
                       >
-                        <span className={selectedTime === time ? "font-bold text-lg" : ""}>
+                        <span
+                          className={
+                            selectedTime === time ? "font-bold text-lg" : ""
+                          }
+                        >
                           {time}
                         </span>
-                        {isBooked && <span className="ml-2 text-xs text-gray-400">(Đã đặt)</span>}
+                        {isBooked && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            (Đã đặt)
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -271,7 +290,7 @@ const Appointment = () => {
                 rows={3}
                 placeholder="Nhập triệu chứng ban đầu của bạn..."
                 value={initialSymptom}
-                onChange={e => setInitialSymptom(e.target.value)}
+                onChange={(e) => setInitialSymptom(e.target.value)}
               />
             </div>
             <div className="text-right">
