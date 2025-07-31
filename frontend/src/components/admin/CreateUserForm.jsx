@@ -2,7 +2,6 @@ import React from "react";
 
 const CreateUserForm = ({
   showCreateForm,
-  setShowCreateForm,
   formData,
   handleInputChange,
   handleCreateUser,

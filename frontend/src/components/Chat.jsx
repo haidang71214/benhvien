@@ -24,7 +24,7 @@ export default function Chat() {
     
     const loadUsers = async () => {
       try {
-        const res = await axiosInstance.get("/user/getAllUsers");
+        const res = await axiosInstance.get("/admin/getAllUsers");
         const filtered = (res?.data?.data || []).filter(
           (u) => (u._id || u.id || u.email) !== (user._id || user.id || user.email)
         );

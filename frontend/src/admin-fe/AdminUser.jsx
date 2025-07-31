@@ -99,9 +99,6 @@ const AdminUser = () => {
     setError("");
     try {
       await axiosInstance.post("/admin/createUser", formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
       });
       toast.success("Tạo người dùng thành công!");
       setFormData({
