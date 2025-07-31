@@ -11,6 +11,7 @@ export const checkAdmin = async (userId) => {
     if (user.role === "admin") {
       return true;
     }
+    return false
   } catch (error) {
     console.error("Lỗi khi kiểm tra quyền admin:", error.message);
     return false;

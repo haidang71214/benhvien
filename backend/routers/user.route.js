@@ -14,11 +14,16 @@ import {
   banUser,
 } from "../controllers/admin.controller.js";
 
-import { getMyMedicalRecords } from "../controllers/user.controller.js";
+import { acceptRejectFormToChangeRole, detailform, getAllForm, getMyMedicalRecords } from "../controllers/user.controller.js";
 import { uploadCloud } from "../config/uploadCloud.js";
 
 const userRouter = express.Router();
 // Patient: get their own medical records
+//  form
+userRouter.post("/acceptOrReject/:formId",middlewareTokenAsyncKey,acceptRejectFormToChangeRole)
+userRouter.get("/getDetailForm/:id",detailform)
+userRouter.get("/getAllForm",getAllForm);
+// 
 userRouter.get(
   "/medical-records",
   middlewareTokenAsyncKey,

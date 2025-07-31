@@ -5,7 +5,7 @@ import medicines from "../model/medicines.js";
 import Prescription from "../model/prescription.js";
 import { users } from "../model/user.js";
 import { checkAdmin, checkDoctor, checkReceptionist } from "./admin.controller.js";
-
+import doctorRequest from "../model/doctorRequestSchema.js"
 // tạo lịch khám, tạo đơn thuốc, kiểm tra thuốc trong kho
 // tạo hồ sơ bệnh án, cập nhật hồ so bệnh án, xem hồ sơ bệnh án
 // cập nhật cái trạng thái của thằng dụng cụ y tế, hỏng hay loại bỏ, hay đang vệ sinh
@@ -454,8 +454,38 @@ const getAndFilterDoctor = async (req, res) => {
     });
   }
 };
+ const userCreateRequest = async (req, res) => {
+  try {
+    const { speciality, licenseNumber, bio, degree, experience, about, fees,province,warn,distric } = req.body;
+    console.log(req.speciality);
+    
+    const existing = await doctorRequest.findOne({ userId: req.user.id });
+    if (existing) {
+      return res.status(400).json({ message: "Bạn đã gửi yêu cầu trước đó" });
+    }
 
+    const imageUrl = req.file?.path;
+    const newRequest = await doctorRequest.create({
+      userId: req.user.id,
+      speciality: speciality, // đảm bảo là mảng
+      licenseNumber,
+      bio,
+      degree,
+      experience,
+      about,
+      fees,
+      imgHanhNghe: imageUrl,
+      province,
+      address:`${province}` + `${distric}` + `${warn}`
+    });
+
+    res.status(201).json({ message: "Gửi yêu cầu thành công", data: newRequest });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+} 
 export {
+  userCreateRequest,
   getAppointment,
   createAppointment, // tạo lịch khám ngẫu nhiên, t biết tạo như này thừa nhma t ngứa tay :v
   updateAppointment,

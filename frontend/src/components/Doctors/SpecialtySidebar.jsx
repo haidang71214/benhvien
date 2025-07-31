@@ -1,3 +1,13 @@
+// filter lại chỗ ni theo enum này
+const DOCTOR_HEHE = [
+  "general_practitioner",
+  "gynecologist",
+  "dermatologist",
+  "pediatrician",
+  "neurologist",
+  "gastroenterologist",
+];
+// 
 const DOCTOR_SPECIALTIES = [
   "Bác sĩ mắt",
   "Bác sĩ nhi khoa",

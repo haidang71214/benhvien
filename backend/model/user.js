@@ -3,21 +3,16 @@ const { Schema } = mongoose;
 
 export const ROLE_ENUM = ["patient", "admin", "doctor", "nurse"];
 export const STATUS_ENUM = ["InUse", "UnderMaintenance", "Broken", "Removed"];
+
 export const DOCTOR_HEHE = [
-  "Bác sĩ đa khoa",
-  "Bác sĩ phụ khoa",
-  "Bác sĩ da liễu",
-  "Bác sĩ nhi khoa",
-  "Bác sĩ thần kinh",
-  "Bác sĩ tiêu hóa",
+  "general_practitioner",
+  "gynecologist",
+  "dermatologist",
+  "pediatrician",
+  "neurologist",
+  "gastroenterologist",
 ];
-export const ROOM_ENUM = [
-  "booked",
-  "checkedIn",
-  "inProgress",
-  "completed",
-  "cancelled",
-];
+
 const userSchema = new Schema(
   {
     userName: {
