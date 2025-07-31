@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
-import { axiosInstance } from "../utils/axiosInstance";
+import { axiosInstance, SOCKET_URL } from "../utils/axiosInstance";
 
-const socket = io("http://localhost:8080");
+const socket = io(SOCKET_URL);
 
 export default function Chat() {
   const [userSearch, setUserSearch] = useState("");
@@ -222,8 +222,6 @@ export default function Chat() {
                     {selectedUserInfo.userName || selectedUserInfo.name || selectedUserInfo.email}
                   </h3>
                   <p className="text-sm text-green-500 flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    Online
                   </p>
                 </div>
               </>

@@ -33,7 +33,7 @@ userRouter.post(
 ); // update user with admin role
 userRouter.delete("/deleteUser/:id", middlewareTokenAsyncKey, deleteUser); // delete admin
 userRouter.get("/getAllUser", getAlluser); // get all
-// cần check admin
+// cần check admin  
 userRouter.get("/getAllUsers", getAllUsers); // get all users
 userRouter.get("/getAllDoctors", getAllDoctors);
 userRouter.get("/getDetailUser/:id", middlewareTokenAsyncKey, getDetailUser); // get detail user by id

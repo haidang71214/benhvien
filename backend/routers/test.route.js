@@ -7,12 +7,12 @@ import {
   deleteTest,
 } from '../controllers/test.controller.js';
 
-const router = express.Router();
+const testRoutes = express.Router();
+// sửa cái này r
+testRoutes.post('/create', createTest);
+testRoutes.get('/getAll', getAllTests);
+testRoutes.get('/:id', getTestById);
+testRoutes.put('/:id', updateTest);
+testRoutes.delete('/:id', deleteTest);
 
-router.post('/create', createTest);
-router.get('/getAll', getAllTests);
-router.get('/:id', getTestById);
-router.put('/:id', updateTest);
-router.delete('/:id', deleteTest);
-
-export default router;
+export default testRoutes;

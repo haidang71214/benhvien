@@ -6,12 +6,11 @@ import { createServer } from "http";
 import setupSocket from "./config/socket.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import normalizePort from "./utils/normalizePort.js";
-import { onError, onListening } from "./utils/appEvents.js";
+import normalizePort from "./routers/utils/normalizePort.js";
+import { onError, onListening } from "./routers/utils/appEvents.js";
 import rootRouter from "./routers/root.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-
 dotenv.config();
 
 let __max = 0; // Biến max length cho log
@@ -103,9 +102,7 @@ app.use(
 );
 // để yên cái này đây
 app.use('/api/v1', rootRouter);
-// nhớ sửa cái ni
-
-
+// nhớ sửa cái ni 
 app.use(rootRouter);
 
 /**

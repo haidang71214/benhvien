@@ -17,6 +17,8 @@ export default function setupSocket(server) {
     socket.on("chat message", async (data) => {
       // data: { sender, receiver, message }
       await saveMessage(data);
+      console.log('hehe');
+      
       // Fetch sender's userName
       let senderName = "Someone";
       try {

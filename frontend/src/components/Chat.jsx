@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { io } from "socket.io-client";
-import { axiosInstance, BASE_URL } from "../utils/axiosInstance";
+import { axiosInstance, SOCKET_URL } from "../utils/axiosInstance";
 
-const socket = io(`${BASE_URL}`);
+const socket = io(`${SOCKET_URL}`);
 
 export default function Chat() {
   const [userSearch, setUserSearch] = useState("");
@@ -14,17 +14,20 @@ export default function Chat() {
   const [selectedUser, setSelectedUser] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null); // New ref for the messages container
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
     if (!user) return;
-    
+
     const loadUsers = async () => {
       try {
-        const res = await axiosInstance.get("/admin/getAllUsers");
+        const res = await axiosInstance.get("/user/getAllUsers");
         const filtered = (res?.data?.data || []).filter(
           (u) => (u._id || u.id || u.email) !== (user._id || user.id || user.email)
         );
@@ -61,7 +64,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (!user || !selectedUser) return;
-    
+
     const loadHistory = async () => {
       setLoading(true);
       try {
@@ -86,7 +89,7 @@ export default function Chat() {
   const sendMessage = useCallback((e) => {
     e.preventDefault();
     if (!input.trim() || !user || !selectedUser) return;
-    
+
     socket.emit("chat message", {
       sender: user._id || user.id || user.email || "unknown",
       receiver: selectedUser,
@@ -222,8 +225,6 @@ export default function Chat() {
                     {selectedUserInfo.userName || selectedUserInfo.name || selectedUserInfo.email}
                   </h3>
                   <p className="text-sm text-green-500 flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    Online
                   </p>
                 </div>
               </>
@@ -245,7 +246,10 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
+        <div
+          className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50 to-white"
+          ref={messagesContainerRef} // Attach ref to the messages container
+        >
           {loading ? (
             <div className="flex justify-center items-center h-full">
               <div className="flex items-center gap-3 text-gray-500">
@@ -270,7 +274,7 @@ export default function Chat() {
                 const senderUser = isMe
                   ? user
                   : users.find((u) => (u._id || u.id || u.email) === msg.sender);
-                
+
                 return (
                   <div
                     key={idx}

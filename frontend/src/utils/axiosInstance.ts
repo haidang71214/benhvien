@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export const BASE_URL = "http://localhost:8080/api/v1";
-
+// VÌ CÁI NÀY KHÁC VỚI GIAO THỨC THÔNG THƯỜNG NÊN ĐỂ RIÊNG RA
+export const SOCKET_URL = "http://localhost:8080"
 export const axiosInstance = axios.create({
   baseURL: `${BASE_URL}`,
   withCredentials: true,
