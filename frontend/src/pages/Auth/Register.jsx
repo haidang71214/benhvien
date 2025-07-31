@@ -39,7 +39,7 @@ export default function Register() {
     }
 
     try {
-      const response = await axiosInstance.post("/api/v1/auth/register", {
+      const response = await axiosInstance.post("/auth/register", {
         email: formData.email,
         password: formData.password,
         userName: formData.userName,

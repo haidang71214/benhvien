@@ -17,7 +17,7 @@ export default function AISuggest() {
     setLoading(true);
     setResults([]);
     try {
-      const res = await axiosInstance.post("/api/v1/ai/diagnose", { description });
+      const res = await axiosInstance.post("/ai/diagnose", { description });
       setResults(res.data);
     } catch (err) {
       toast.error("Không thể gợi ý AI.");

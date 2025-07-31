@@ -15,9 +15,14 @@ export default function AllNotifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axiosInstance.get("/api/v1/notifications");
+      const res = await axiosInstance.get("/notifications");
+      console.log(res);
+      
       setNotifications(res.data.notifications || []);
     } catch (err) {
+      console.log(err);
+      console.log('loz');
+      
       setNotifications([]);
     } finally {
       setLoading(false);
@@ -25,7 +30,7 @@ export default function AllNotifications() {
   };
 
   const markAsRead = async (id) => {
-    await axiosInstance.put(`/api/v1/notifications/${id}/read`);
+    await axiosInstance.put(`/notifications/${id}/read`);
     fetchNotifications();
   };
 

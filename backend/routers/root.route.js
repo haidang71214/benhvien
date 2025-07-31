@@ -7,6 +7,7 @@ import userRouter from './user.route.js';
 import medicineRouter from './medicine.route.js';
 
 import dashboardRouter from './dashboard.route.js';
+import notificationRouter from './notification.route.js';
 
 
 const rootRouter = express.Router();
@@ -18,5 +19,5 @@ rootRouter.use('/admin',userRouter)
 rootRouter.use('/dashboard', dashboardRouter);
 rootRouter.use('/medicine',medicineRouter);
 rootRouter.use('/doctor',doctorRouter);
-
+rootRouter.use('/notifications',notificationRouter)
 export default rootRouter; 

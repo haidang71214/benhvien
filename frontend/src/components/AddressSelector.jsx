@@ -1,14 +1,35 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const AddressSelector = () => {
+const AddressSelector = ({
+  setValue,
+  initialProvince = "",
+  initialDistrict = "",
+  initialWard = "",
+}) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState(initialProvince);
+  const [selectedDistrict, setSelectedDistrict] = useState(initialDistrict);
+  const [selectedWard, setSelectedWard] = useState(initialWard);
+
+  // Khi province, district, ward thay đổi -> gọi setValue từ react-hook-form
+useEffect(() => {
+  const selected = provinces.find(p => p.code.toString() === selectedProvince);
+  setValue("address.province", selected?.name || "");
+}, [selectedProvince, provinces]);
+useEffect(() => {
+  const selected = districts.find(d => d.code.toString() === selectedDistrict);
+  setValue("address.district", selected?.name || "");
+}, [selectedDistrict, districts]);
+
+useEffect(() => {
+  const selected = wards.find(w => w.code.toString() === selectedWard);
+  setValue("address.ward", selected?.name || "");
+}, [selectedWard, wards]);
+
 
   useEffect(() => {
     axios
@@ -44,9 +65,7 @@ const AddressSelector = () => {
   }, [selectedDistrict]);
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4">
-      <h2 className="text-xl font-semibold mb-4">Chọn địa chỉ</h2>
-
+    <div className="space-y-4">
       <div>
         <label className="block mb-1 font-medium">Tỉnh / Thành phố</label>
         <select

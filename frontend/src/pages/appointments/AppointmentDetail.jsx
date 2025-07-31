@@ -61,7 +61,7 @@ const AppointmentDetail = () => {
   // Fetch medicines for dropdown (doctor only)
   useEffect(() => {
     axiosInstance
-      .get("/api/v1/medicines/getAll")
+      .get("/medicines/getAll")
       .then((res) => setMedicines(res.data.data || []))
       .catch(() => setMedicines([]));
   }, []);
@@ -70,14 +70,14 @@ const AppointmentDetail = () => {
   useEffect(() => {
     if (user?.role === "doctor") {
       axiosInstance
-        .get("/api/v1/user/getAllUsers")
+        .get("/user/getAllUsers")
         .then((res) => {
           setNurses((res.data.data || []).filter(u => u.role === "nurse"));
         })
         .catch(() => setNurses([]));
       // Fetch available tests
       axiosInstance
-        .get("/api/v1/test/getAll")
+        .get("/test/getAll")
         .then((res) => setAvailableTests(res.data.data || []))
         .catch(() => setAvailableTests([]));
     }
@@ -161,7 +161,7 @@ const AppointmentDetail = () => {
   useEffect(() => {
     if (!appointmentId) return;
     axiosInstance
-      .get(`/api/v1/test-assignment/results/${appointmentId}`)
+      .get(`/test-assignment/results/${appointmentId}`)
       .then((res) => setAssignedTests(res.data.data || []))
       .catch(() => setAssignedTests([]));
   }, [appointmentId]);
@@ -342,7 +342,7 @@ const AppointmentDetail = () => {
         navigate("/my-appointments");
       }, 2000);
     } catch (err) {
-      toast.error("Error saving medical record or prescriptions");
+      toast.error(`Error saving medical record or prescriptions ${err}`);
     }
   };
 
@@ -355,7 +355,7 @@ const AppointmentDetail = () => {
     }
     setAssignLoading(true);
     try {
-      await axiosInstance.post("/api/v1/test-assignment/assign", {
+      await axiosInstance.post("/test-assignment/assign", {
         appointmentId,
         patientId: appointment.patientId._id,
         doctorId: appointment.doctorId._id,
@@ -367,7 +367,7 @@ const AppointmentDetail = () => {
       setSelectedNurse("");
       // Refresh assigned tests
       axiosInstance
-        .get(`/api/v1/test-assignment/results/${appointmentId}`)
+        .get(`/test-assignment/results/${appointmentId}`)
         .then((res) => setAssignedTests(res.data.data || []));
     } catch {
       toast.error("Failed to assign test");
@@ -527,7 +527,7 @@ const AppointmentDetail = () => {
                       onClick={async () => {
                         try {
                           // Send all unpaid test IDs to backend for payment link
-                          const res = await axiosInstance.post(`/api/v1/test-assignment/pay-multi`, {
+                          const res = await axiosInstance.post(`/test-assignment/pay-multi`, {
                             testIds: unpaidTests.map(test => test._id),
                           });
                           if (res.data && res.data.url) {

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
-import NotificationBell from '../../components/NotificationBell';
 
 const NurseDashboard = () => {
   const { user } = useAuth();
@@ -18,7 +17,7 @@ useEffect(() => {
   console.log("NurseDashboard: Fetching assigned tests for nurse", user.id);
   setLoading(true);
   axiosInstance
-    .get(`/api/v1/test-assignment/assigned/${user.id}`)
+    .get(`/test-assignment/assigned/${user.id}`)
     .then((res) => {
       console.log("NurseDashboard: API response", res.data);
       setAssignedTests(res.data.data || []);
@@ -41,7 +40,7 @@ useEffect(() => {
       return;
     }
     try {
-      await axiosInstance.put(`/api/v1/test-assignment/result/${testId}`, { result });
+      await axiosInstance.put(`/test-assignment/result/${testId}`, { result });
       toast.success("Đã cập nhật kết quả!");
       setAssignedTests((prev) => prev.filter((t) => t._id !== testId));
       setResultInputs((prev) => ({ ...prev, [testId]: "" }));
@@ -130,7 +129,7 @@ useEffect(() => {
                           if (input.image) formData.append('image', input.image);
                           if (input.notes) formData.append('notes', input.notes);
                           try {
-                            await axiosInstance.put(`/api/v1/test-assignment/result/${test._id}`, formData, {
+                            await axiosInstance.put(`/test-assignment/result/${test._id}`, formData, {
                               headers: { 'Content-Type': 'multipart/form-data' }
                             });
                             toast.success("Đã cập nhật kết quả!");

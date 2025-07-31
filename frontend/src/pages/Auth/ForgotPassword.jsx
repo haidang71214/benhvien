@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -11,7 +11,7 @@ const ForgotPassword = () => {
     setMsg("");
     setError("");
     try {
-      const res = await axios.post("http://localhost:8080/api/v1/auth/forgotPassword", { email });
+      const res = await axiosInstance.post("/auth/forgotPassword", { email });
       setMsg(res.data.message || "Vui lòng kiểm tra email để đặt lại mật khẩu.");
     } catch (err) {
       setError(err.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.");

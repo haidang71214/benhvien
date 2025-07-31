@@ -1,7 +1,7 @@
 import { useState } from "react";
 import AuthForm from "../../components/auth/AuthForm";
 import { useAuth } from "../../context/AuthContext";
-import { axiosInstance } from "@/utils/axiosInstance";
+import { axiosInstance } from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 
@@ -10,6 +10,8 @@ export default function Login() {
     email: "",
     password: "",
   });
+  console.log(formData);
+  
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post("/auth/login", formData);
+      const response = await axiosInstance.post(`/auth/login`, formData);
       const data = response.data;
       console.log("Full API response:", response);
       console.log("Response data:", data);
@@ -58,9 +60,9 @@ export default function Login() {
         navigate("/");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      toast.error(err.response.data.message || 'Đăng nhập thất bại !!!');
-    }
+  console.error("Login error:", err.response?.data || err.message);
+  toast.error(err.response?.data?.message || 'Email hoặc mật khẩu không đúng. Vui lòng thử lại!');
+}
 
     setLoading(false);
   };

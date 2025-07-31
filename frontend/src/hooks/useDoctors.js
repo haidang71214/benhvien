@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance.ts";
+import { axiosInstance } from "../utils/axiosInstance";
 
 export const useDoctors = () => {
   const { speciality: urlSpeciality } = useParams();

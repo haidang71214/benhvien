@@ -4,25 +4,13 @@ import dotenv from "dotenv";
 import logger from "morgan";
 import { createServer } from "http";
 import setupSocket from "./config/socket.js";
-import Appointment from "./model/apointmentSchema.js";
-import { connect } from "mongoose";
+import mongoose from "mongoose";
 import cors from "cors";
 import normalizePort from "./utils/normalizePort.js";
 import { onError, onListening } from "./utils/appEvents.js";
 import rootRouter from "./routers/root.route.js";
-import authRouter from "./routers/auth.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import medicineRouter from "./routers/medicine.route.js";
-import doctorRouter from "./routers/doctor.route.js";
-import paymentRoute from "./routers/payment.route.js";
-import aiRoutes from "./routers/ai.route.js";
-import chatRouter from "./routers/chat.route.js";
-import userRouter from "./routers/user.route.js";
-import notificationRouter from "./routers/notification.route.js";
-import dashboardRouter from "./routers/dashboard.route.js";
-import testAssignmentRouter from "./routers/testAssignment.route.js";
-import testRoutes from "./routers/test.route.js";
 
 dotenv.config();
 
@@ -69,18 +57,24 @@ app.use(
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: { secure: true }
   })
 );
+
 /**
  * Init mongoose.
+ * process.env.MONGODB_URL ||
  */
-connect(process.env.MONGODB_URL)
-  .then(() => {
-    console.log("🚀 Connected to MongoDB successfully!");
-  })
-  .catch((reason) => console.log(reason));
 
+
+const uri = "mongodb+srv://haidang:300102@cluster0.upngisz.mongodb.net/hehe?retryWrites=true&w=majority&appName=Cluster0";
+
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ Connected to MongoDB 'hehe' database!"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
 /**
  * Get port from .env and store in Express.
  */
@@ -93,25 +87,24 @@ app.set("port", port);
 app.use(logger("dev"));
 app.use(json());
 app.use(urlencoded({ extended: false }));
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+    origin: (origin, callback) => {
+      const allowedOrigins = ['http://localhost:5173', 'https://your-production-url.com'];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
   })
 );
+// để yên cái này đây
+app.use('/api/v1', rootRouter);
+// nhớ sửa cái ni
 
-
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/medicines", medicineRouter);
-app.use("/api/v1/doctor", doctorRouter)
-app.use("/api/v1/payment", paymentRoute)
-app.use("/api/v1/user", userRouter);
-app.use("/api/v1/chat", chatRouter);
-app.use("/api/v1/ai", aiRoutes);
-app.use("/api/v1/notifications", notificationRouter);
-app.use("/api/v1/dashboard", dashboardRouter);
-app.use("/api/v1/test-assignment", testAssignmentRouter);
-app.use("/api/v1/test", testRoutes);
 
 app.use(rootRouter);
 

@@ -24,7 +24,7 @@ export default function Chat() {
     
     const loadUsers = async () => {
       try {
-        const res = await axiosInstance.get("/api/v1/user/getAllUsers");
+        const res = await axiosInstance.get("/user/getAllUsers");
         const filtered = (res?.data?.data || []).filter(
           (u) => (u._id || u.id || u.email) !== (user._id || user.id || user.email)
         );
@@ -66,7 +66,7 @@ export default function Chat() {
       setLoading(true);
       try {
         const res = await axiosInstance.get(
-          `/api/v1/chat/history?user1=${encodeURIComponent(
+          `/chat/history?user1=${encodeURIComponent(
             user._id || user.id || user.email
           )}&user2=${encodeURIComponent(selectedUser)}`
         );

@@ -7,6 +7,7 @@ import { CheckCircle2, XCircle } from "lucide-react";
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("loading");
+  // nhớ fix cái này
   const [appointmentId, setAppointmentId] = useState(null);
   const [orderDetail, setOrderDetail] = useState(null);
   const navigate = useNavigate();
@@ -30,15 +31,15 @@ export default function PaymentSuccess() {
     if (type === "test") {
       // Test payment (single or multi)
       if (orderCode) {
-        apiUrl = `/api/v1/test-assignment/pay-success?orderCode=${orderCode}`;
+        apiUrl = `/test-assignment/pay-success?orderCode=${orderCode}`;
       } else if (testId) {
-        apiUrl = `/api/v1/test-assignment/pay-success?testId=${testId}`;
+        apiUrl = `/test-assignment/pay-success?testId=${testId}`;
       }
       testPayment = true;
     } else {
       // Booking payment (appointment)
       if (orderCode) {
-        apiUrl = `/api/v1/payment/payment-success?orderCode=${orderCode}`;
+        apiUrl = `/payment/payment-success?orderCode=${orderCode}`;
       }
       testPayment = false;
     }

@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import { FaUserMd, FaUserInjured, FaPills, FaFileInvoiceDollar, FaChartBar } from "react-icons/fa";
 import Sidebar from "../components/ui/Sidebar";
 import { useLocation } from "react-router-dom";
-
-
-
-import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, LabelList, LineChart, Line } from "recharts";
+import { axiosInstance } from "../utils/axiosInstance";
 
 export default function AdminDashboard() {
   const location = useLocation();
@@ -41,7 +38,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setLoading(true);
-    axios.get("http://localhost:8080/api/v1/dashboard/stats")
+    axiosInstance.get("/dashboard/stats")
       .then(res => {
         const d = res.data;
         setStats([
@@ -109,9 +106,9 @@ export default function AdminDashboard() {
                       <YAxis allowDecimals={false} tick={{ fontWeight: 600, fontSize: 14 }} />
                       <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: 8, fontWeight: 500 }} />
                       <Legend verticalAlign="top" height={36} iconType="circle"/>
-                      {chartData.map((entry, idx) => (
+                      {chartData.map((entry, idx ) => (
                         <Bar key={entry.name} dataKey="value" name={entry.name} fill={entry.fill} radius={[8, 8, 0, 0]} isAnimationActive={true} >
-                          <LabelList dataKey="value" position="top" style={{ fontWeight: 700, fill: entry.fill }} />
+                          <LabelList dataKey="value"  position="top" style={{ fontWeight: 700, fill: entry.fill }} />
                         </Bar>
                       ))}
                     </BarChart>

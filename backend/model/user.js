@@ -22,13 +22,19 @@ const userSchema = new Schema(
   {
     userName: {
       type: String,
-      required: [true, "Name cannot be null"],
+      required: [false],
       trim: true,
       unique: true,
     },
     password: {
       type: String,
       required: true,
+    },
+    address:{
+      type:String
+    },
+    province:{
+      type:String
     },
     email: {
       type: String,

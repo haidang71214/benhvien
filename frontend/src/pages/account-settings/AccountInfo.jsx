@@ -23,12 +23,12 @@ import { formatDate, isValidDate, dateToLocalString } from "@/utils/dateUtils";
 import AddressSelector from "../../components/AddressSelector";
 
 const AccountInfo = () => {
-  const { user, setUser, accessToken } = useAuth();
+  const { user, setUser } = useAuth();
   const [dob, setDob] = useState(null);
   const [dobInput, setDobInput] = useState("");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  
   const {
     register,
     handleSubmit,
@@ -49,25 +49,30 @@ const AccountInfo = () => {
     },
   });
 
-  useEffect(() => {
-    if (!user) return;
+  // Hàm khởi tạo dữ liệu khi user thay đổi
+  const initializeForm = (userData) => {
+    if (!userData) return;
 
     reset({
-      fullName: user.fullName || user.userName || "",
-      email: user.email || "",
-      bio: user.bio || "",
+      fullName: userData.fullName || userData.userName || "",
+      email: userData.email || "",
+      bio: userData.bio || "",
       address: {
-        province: user.address?.province || "",
-        district: user.address?.district || "",
-        ward: user.address?.ward || "",
-        street: user.address?.street || "",
+        province: userData.address?.province || "",
+        district: userData.address?.district || "",
+        ward: userData.address?.ward || "",
+        street: userData.address?.street || "",
       },
     });
 
-    const date = user.dob ? new Date(user.dob) : null;
+    const date = userData.dob ? new Date(userData.dob) : null;
     setDob(date);
     setDobInput(date ? formatDate(date) : "");
-  }, [user, reset]);
+  };
+
+  useEffect(() => {
+    initializeForm(user);
+  }, [user]);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -78,32 +83,29 @@ const AccountInfo = () => {
         ward: data.address?.ward || "",
         street: data.address?.street || "",
       };
+      console.log(address);
 
       const dobToSend = dob && isValidDate(dob) ? dateToLocalString(dob) : null;
       const payload = {
-        fullName: data.fullName,
+        userName: data.fullName,
         email: data.email,
         bio: data.bio,
-        address: address,
+        address: `${address.province} ${address.district} ${address.ward}`,
         dob: dobToSend,
+        province:`${address.province}`
       };
 
       const res = await axiosInstance.post(
-        "/api/v1/auth/updateMyself",
+        "/auth/updateMyself",
         payload,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          withCredentials: true,
-        }
       );
+      console.log(res);
 
       toast.success("Cập nhật thành công!");
       const updatedUser = { ...user, ...res.data.user };
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      console.log("6. User updated in state and localStorage:", updatedUser);
+      console.log("User updated in state and localStorage:", updatedUser);
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi cập nhật.");
     } finally {
@@ -159,16 +161,12 @@ const AccountInfo = () => {
                     Họ và tên *
                   </label>
                   <input
-                    {...register("fullName", {
-                      required: "Vui lòng nhập họ tên",
-                    })}
+                    {...register("fullName", { required: "Vui lòng nhập họ tên" })}
                     className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
                     placeholder="Nhập họ và tên"
                   />
                   {errors.fullName && (
-                    <p className="text-red-500 text-sm">
-                      {errors.fullName.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.fullName.message}</p>
                   )}
                 </div>
 
@@ -184,9 +182,7 @@ const AccountInfo = () => {
                     placeholder="example@email.com"
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm">
-                      {errors.email.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.email.message}</p>
                   )}
                 </div>
               </div>
@@ -266,30 +262,17 @@ const AccountInfo = () => {
           <div className="bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-3xl shadow-xl border border-white/20">
             <div className="flex items-center gap-2 mb-6">
               <MapPin className="w-5 h-5 text-green-500" />
-              <h2 className="text-xl font-bold text-slate-800">
-                Địa chỉ theo CCCD
-              </h2>
+              <h2 className="text-xl font-bold text-slate-800">Địa chỉ</h2>
             </div>
 
             <div className="space-y-6">
               <AddressSelector
-                register={register}
                 setValue={setValue}
                 initialProvince={user?.address?.province || ""}
                 initialDistrict={user?.address?.district || ""}
                 initialWard={user?.address?.ward || ""}
               />
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <Home className="w-4 h-4 text-green-500" />
-                  Địa chỉ cụ thể
-                </label>
-                <input
-                  {...register("address.street")}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50/50 focus:bg-white focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all duration-200"
-                  placeholder="Số nhà, đường, ngõ..."
-                />
-              </div>
+
             </div>
           </div>
 

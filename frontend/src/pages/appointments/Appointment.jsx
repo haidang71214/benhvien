@@ -9,6 +9,7 @@ import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 
 const Appointment = () => {
+  // thường thì cái này lấy cái params của phía bác sĩ thôi á, không cần truyền vào params của user đâu, cái userId có trong chỗ localStorage rồi
   const { docId } = useParams();
   const { currencySymbol } = useContext(AppContext);
   const { user } = useAuth();
@@ -20,7 +21,8 @@ const Appointment = () => {
   const [appointments, setAppointments] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
-
+  console.log(docInfo);
+  
   useEffect(() => {
     setIsLoading(true);
     axiosInstance
@@ -96,7 +98,7 @@ const Appointment = () => {
       const doctorId = docId;
 
       const payRes = await axiosInstance.post(
-        "/api/v1/payment/create-payment-link",
+        "/payment/create-payment-link",
         {
           appointmentTime,
           doctorId,
@@ -180,7 +182,7 @@ const Appointment = () => {
         <div className="bg-white rounded-2xl shadow-md p-0 w-full lg:w-1/3 border border-pink-100 overflow-hidden flex flex-col">
           <div className="relative">
             <img
-              src={docInfo.image}
+              src={docInfo.avatarUrl}
               alt={docInfo.name}
               className="rounded-t-2xl w-full h-64 object-cover border-b-4 border-pink-200 shadow"
             />
@@ -207,6 +209,8 @@ const Appointment = () => {
                 {docInfo.about}
               </p>
             </div>
+            {/* với lại muốn đăng kí doctor thì có cần admin confirm không? */}
+            {/* doctor có fees riêng đúng hong */}
             <p className="text-green-600 font-bold mt-4 text-lg flex items-center gap-2">
               <span className="text-2xl">💰</span> Phí khám: {currencySymbol}
               {docInfo.fees}
