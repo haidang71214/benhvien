@@ -9,6 +9,7 @@ import { axiosInstance } from "../../utils/axiosInstance";
 import { toast } from "react-hot-toast";
 
 const Appointment = () => {
+  // thường thì cái này lấy cái params của phía bác sĩ thôi á, không cần truyền vào params của user đâu, cái userId có trong chỗ localStorage rồi
   const { docId } = useParams();
   const { currencySymbol } = useContext(AppContext);
   const { user } = useAuth();

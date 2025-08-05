@@ -1,18 +1,25 @@
 import { assets } from "@/assets/data/doctors";
 import { Link } from "react-router-dom";
-import { Search, Calendar, Shield, ArrowRight, Star, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import {
+  Search,
+  Calendar,
+  Shield,
+  ArrowRight,
+  Star,
+  Clock,
+} from "lucide-react";
 
 const Header = () => {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  
+
   const placeholderTexts = [
     "Tìm bác sĩ, chuyên khoa, bệnh viện...",
     "Tìm kiếm theo triệu chứng...",
     "Đặt lịch khám với bác sĩ uy tín...",
     "Tư vấn sức khỏe trực tuyến...",
-    "Tìm phòng khám gần nhà..."
+    "Tìm phòng khám gần nhà...",
   ];
 
   useEffect(() => {
@@ -34,18 +41,16 @@ const Header = () => {
             <Star className="w-4 h-4 mr-2 text-blue-500" />
             Nền tảng Y tế hàng đầu Việt Nam
           </div>
-          
+
           <div className="space-y-4">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
               Kết nối Người Dân{" "}
-              <span className="text-blue-600">
-                với Cơ sở Y tế
-              </span>{" "}
-              hàng đầu
+              <span className="text-blue-600">với Cơ sở Y tế</span> hàng đầu
             </h1>
-            
+
             <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
-              Đặt khám nhanh chóng, tư vấn từ xa và quản lý sức khỏe một cách thông minh
+              Đặt khám nhanh chóng, tư vấn từ xa và quản lý sức khỏe một cách
+              thông minh
             </p>
           </div>
 
@@ -58,9 +63,11 @@ const Header = () => {
                 type="text"
                 className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
               />
-              <div 
+              <div
                 className={`absolute inset-y-0 left-12 right-4 flex items-center pointer-events-none transition-all duration-300 ${
-                  isAnimating ? 'opacity-0 transform translate-x-2' : 'opacity-100 transform translate-x-0'
+                  isAnimating
+                    ? "opacity-0 transform translate-x-2"
+                    : "opacity-100 transform translate-x-0"
                 }`}
               >
                 <span className="text-gray-500 truncate">
@@ -77,7 +84,9 @@ const Header = () => {
               </div>
               <div>
                 <h3 className="text-gray-900 font-semibold">Đặt khám nhanh</h3>
-                <p className="text-gray-600 text-sm mt-1">Lấy số thứ tự trực tuyến, tư vấn từ xa</p>
+                <p className="text-gray-600 text-sm mt-1">
+                  Lấy số thứ tự trực tuyến, tư vấn từ xa
+                </p>
               </div>
             </div>
 
@@ -87,7 +96,9 @@ const Header = () => {
               </div>
               <div>
                 <h3 className="text-gray-900 font-semibold">Đặt theo giờ</h3>
-                <p className="text-gray-600 text-sm mt-1">Đặt sớm để có số thứ tự thấp nhất</p>
+                <p className="text-gray-600 text-sm mt-1">
+                  Đặt sớm để có số thứ tự thấp nhất
+                </p>
               </div>
             </div>
 
@@ -96,8 +107,12 @@ const Header = () => {
                 <Shield className="w-6 h-6 text-orange-600" />
               </div>
               <div>
-                <h3 className="text-gray-900 font-semibold">Hoàn tiền khi hủy</h3>
-                <p className="text-gray-600 text-sm mt-1">Được hoàn tiền và nhận ưu đãi đặc biệt</p>
+                <h3 className="text-gray-900 font-semibold">
+                  Hoàn tiền khi hủy
+                </h3>
+                <p className="text-gray-600 text-sm mt-1">
+                  Được hoàn tiền và nhận ưu đãi đặc biệt
+                </p>
               </div>
             </div>
           </div>
@@ -110,7 +125,7 @@ const Header = () => {
               Đặt khám ngay
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
+
             <button className="flex items-center justify-center gap-3 border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-300 hover:text-blue-600 transition-all">
               Tư vấn miễn phí
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -127,7 +142,7 @@ const Header = () => {
                 src={assets.header_img}
                 alt="Minh họa bác sĩ"
               />
-              
+
               {/* Rating card */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-4 shadow-lg border border-gray-100">
                 <div className="flex items-center gap-3">
@@ -136,7 +151,9 @@ const Header = () => {
                   </div>
                   <div>
                     <div className="font-bold text-gray-900">4.9/5 ⭐</div>
-                    <div className="text-sm text-gray-600">Đánh giá từ bệnh nhân</div>
+                    <div className="text-sm text-gray-600">
+                      Đánh giá từ bệnh nhân
+                    </div>
                   </div>
                 </div>
               </div>
