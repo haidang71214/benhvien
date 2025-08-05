@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -10,12 +9,10 @@ import UsersTable from "../components/admin/UsersTable";
 import ConfirmModal from "../components/admin/ConfirmModal";
 
 const AdminUser = () => {
-
   const { user, accessToken } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,23 +64,19 @@ const AdminUser = () => {
 
   const fetchUsers = async () => {
     try {
-
       const response = await axiosInstance.get("/admin/getAllUser", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-
       });
       setUsers(response.data.user);
       setLoading(false);
     } catch (err) {
-
       setError("Failed to fetch users. Please try again.");
       console.error("Error fetching users:", err);
       setLoading(false);
     }
   };
-
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -103,7 +96,6 @@ const AdminUser = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-
     setError("");
     try {
       await axiosInstance.post("/admin/createUser", formData, {
@@ -189,7 +181,6 @@ const AdminUser = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
-
         <div className="text-gray-700 text-lg">Đang tải...</div>
       </div>
     );
@@ -198,7 +189,6 @@ const AdminUser = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar activePath={window.location.pathname} />
-
       <div className="flex-1 md:p-10 mt-16 md:mt-20 lg:mt-[50px]">
         <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
           <div className="py-8 text-center border-b border-gray-200">
@@ -254,12 +244,10 @@ const AdminUser = () => {
                 )}
               </div>
 
->>>>>>> master
               <button
                 onClick={() => setShowCreateForm(!showCreateForm)}
                 className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
-
                 {showCreateForm ? "Đóng form" : "Tạo người dùng mới"}
               </button>
             </div>
@@ -312,6 +300,5 @@ const AdminUser = () => {
     </div>
   );
 };
-
 
 export default AdminUser;
