@@ -33,4 +33,3 @@ const storage = new CloudinaryStorage({
 }); // đằng trên là setup mọi thứ định nghĩa bla bla
 // khởi tạo multer với cloudinary storage
    export const uploadCloud = multer({storage})
-// imginstagramsfile

@@ -1,4 +1,23 @@
-import { specialityData } from "../../assets/data/doctors";
+// filter lại chỗ ni theo enum này
+const DOCTOR_HEHE = [
+  "general_practitioner",
+  "gynecologist",
+  "dermatologist",
+  "pediatrician",
+  "neurologist", 
+  "gastroenterologist",
+];
+// 
+const DOCTOR_SPECIALTIES = [
+  "Bác sĩ mắt",
+  "Bác sĩ nhi khoa",
+  "Bác sĩ tổng quát",
+  "Bác sĩ tim mạch",
+  "Bác sĩ mắt",
+  "Bác sĩ nhi khoa",
+  "Bác sĩ tổng quát",
+  "Bác sĩ tim mạch",
+];
 
 const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
   return (
@@ -22,14 +41,15 @@ const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">All Specialties</span>
+                <span className="font-medium">Tất cả chuyên khoa</span>
+                <span className="font-medium">Tất cả chuyên khoa</span>
                 {!selectedSpecialty && (
                   <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Active</span>
                 )}
               </div>
             </button>
             
-            {specialityData.map(({ speciality }) => (
+            {DOCTOR_SPECIALTIES.map((speciality) => (
               <button
                 key={speciality}
                 onClick={() => onSpecialtyClick(speciality)}

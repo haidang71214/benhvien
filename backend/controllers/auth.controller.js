@@ -8,7 +8,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const register = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, dob, sex, role } = req.body;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -36,7 +36,9 @@ const register = async (req, res) => {
       userName,
       email,
       password: hashedPassword,
-      role: "patient",
+      dob: dob ? new Date(dob) : null,
+      sex: sex || "other",
+      role: role || "patient",
       otpCode,
       otpExpires,
       isVerified: false,
@@ -99,13 +101,20 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Email không tồn tại" });
     }
-
+    // block
+    if (user.block === true) {
+      return res
+        .status(401)
+        .json({ message: "Người dùng đã bị cấm bởi nền tảng" });
+    }
     // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+            console.log(isMatch);
       return res.status(401).json({ message: "Mật khẩu không đúng" });
-    }
 
+      
+    }
     // Tạo token
     const accessToken = await createTokenAsyncKey({
       id: user._id,
@@ -115,7 +124,6 @@ const login = async (req, res) => {
       id: user._id,
       role: user.role,
     });
-
     // Cập nhật refreshToken
     user.refreshToken = refreshToken;
     await user.save();
@@ -137,7 +145,8 @@ const login = async (req, res) => {
         email: user.email,
         avatarUrl: user.avatarUrl,
         age: user.age,
-        role: user.role
+        dob: user.dob,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -209,8 +218,10 @@ const loginFacebook = async (req, res) => {
 const extendToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log("aaaa",req);
+    
     console.log("refreshToken in cookie:", refreshToken); // Debug
-    if (!refreshToken) {
+    if (!refreshToken || refreshToken == undefined) {
       return res.status(401).json({ message: "Không tìm thấy refresh token" });
     }
 
@@ -223,7 +234,8 @@ const extendToken = async (req, res) => {
       id: user._id,
       role: user.role,
     });
-
+    console.log("aaaaaaaaaaaa",newAccessToken);
+    
     res.status(200).json({
       message: "Gia hạn token thành công",
       accessToken: newAccessToken,
@@ -356,6 +368,8 @@ const updateMyself = async (req, res) => {
       bio,
       location,
       dob,
+      address,
+      province
     } = req.body;
     const file = req.file;
 
@@ -379,7 +393,12 @@ const updateMyself = async (req, res) => {
     if (bio !== undefined) user.bio = bio;
     if (location) user.location = location;
     if (dob) user.dob = new Date(dob);
-
+ if (address && address.trim() !== "") {
+  user.address = address;
+}
+    if (province!== "") user.province = province;
+    console.log("aaa",address, province);
+    
     // Cập nhật avatar nếu có file upload
     if (file) {
       user.avatarUrl = file.path;
@@ -438,7 +457,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:8080/api/v1/auth/auth/google/callback",
+      callbackURL: `${process.env.BASE_URL}/auth/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

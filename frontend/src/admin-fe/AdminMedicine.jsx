@@ -1,34 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Pill,
+  Search,
+  Filter,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { axiosInstance } from "../utils/axiosInstance";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import Sidebar from "../components/ui/Sidebar";
 
 const AdminMedicine = () => {
   const { user, accessToken } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    type: 'tablet',
-    description: '',
-    quantities: 0,
-    warning: ''
+    name: "",
+    type: "tablet",
+    description: "",
+    warning: "",
   });
   const [editingMedicine, setEditingMedicine] = useState(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [currentWarning, setCurrentWarning] = useState("");
+
+  const medicineTypes = [
+    { value: "tablet", label: "Tablet", icon: "💊" },
+    { value: "syrup", label: "Syrup", icon: "🍯" },
+    { value: "capsule", label: "Capsule", icon: "💊" },
+    { value: "ointment", label: "Ointment", icon: "🧴" },
+  ];
 
   useEffect(() => {
     if (!user) {
-      navigate('/auth/login');
+      navigate("/auth/login");
       return;
     }
 
-    if (!user.role || user.role !== 'admin') {
-      alert('Bạn không có quyền truy cập trang admin. Chuyển hướng về trang chủ.');
-      navigate('/');
+    if (!user.role || user.role !== "admin") {
+      toast.error("Bạn không có quyền truy cập trang admin.");
+      navigate("/");
       return;
     }
 
@@ -37,336 +56,460 @@ const AdminMedicine = () => {
 
   const fetchMedicines = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/medicine/getAllAndFilter', {
+      setLoading(true);
+      const response = await axiosInstance.get("/medicine/getAll", {
         headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
-      console.log('Raw API response:', response);
-      console.log('Response data:', response.data);
-      
-      // Ensure we're getting an array of medicines
       const medicinesData = response.data?.data || response.data || [];
-      console.log('Processed medicines data:', medicinesData);
-      
       setMedicines(Array.isArray(medicinesData) ? medicinesData : []);
-      setLoading(false);
     } catch (err) {
-      console.error('Error fetching medicines:', err);
-      setError('Failed to fetch medicines. Please try again.');
-      setLoading(false);
+      console.error("Error fetching medicines:", err);
+      toast.error("Failed to fetch medicines. Please try again.");
       setMedicines([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'quantities' ? parseInt(value) || 0 : value
+      [name]: value,
     }));
   };
 
   const handleCreateMedicine = async (e) => {
-    e.preventDefault();
-    setError('');
+    e?.preventDefault();
+
     try {
-      // Validate required fields
-      if (!formData.name || !formData.type || !formData.description || formData.quantities === undefined) {
-        setError('Please fill in all required fields');
+      if (!formData.name || !formData.type || !formData.description) {
+        toast.error("Please fill in all required fields");
         return;
       }
 
-      console.log('Sending medicine data:', formData);
-      const response = await axios.post('http://localhost:8080/medicine/create', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
+      const response = await axiosInstance.post(
+        "/medicine/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
-      });
-      console.log('Create medicine response:', response.data);
-      
+      );
+
       if (response.data) {
+        toast.success("Medicine created successfully!");
         setFormData({
-          name: '',
-          type: 'tablet',
-          description: '',
-          quantities: 0,
-          warning: ''
+          name: "",
+          type: "tablet",
+          description: "",
+          warning: "",
         });
         setShowCreateForm(false);
-        fetchMedicines();
+        await fetchMedicines();
       }
     } catch (err) {
-      console.error('Create medicine error:', err);
-      if (err.response) {
-        console.error('Error response:', err.response.data);
-        setError(err.response.data.message || 'Failed to create medicine. Please check the input and try again.');
-      } else if (err.request) {
-        console.error('No response received:', err.request);
-        setError('No response from server. Please check your connection.');
-      } else {
-        console.error('Error setting up request:', err.message);
-        setError('An error occurred while setting up the request.');
-      }
+      console.error("Create medicine error:", err);
+      toast.error(
+        err.response?.data?.message ||
+          "Failed to create medicine. Please try again."
+      );
     }
   };
 
   const handleUpdateMedicine = async (e) => {
-    e.preventDefault();
-    setError('');
+    e?.preventDefault();
+
     try {
-      // Validate required fields
-      if (!formData.name || !formData.type || !formData.description || formData.quantities === undefined) {
-        setError('Please fill in all required fields');
+      if (!formData.name || !formData.type || !formData.description) {
+        toast.error("Please fill in all required fields");
         return;
       }
 
-      const response = await axios.put(`http://localhost:8080/medicine/update/${editingMedicine._id}`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
+      const response = await axiosInstance.put(
+        `/medicine/update/${editingMedicine._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
-      });
-      
+      );
+
       if (response.data) {
+        toast.success("Medicine updated successfully!");
         setEditingMedicine(null);
         setFormData({
-          name: '',
-          type: 'tablet',
-          description: '',
-          quantities: 0,
-          warning: ''
+          name: "",
+          type: "tablet",
+          description: "",
+          warning: "",
         });
         setShowCreateForm(false);
-        fetchMedicines();
+        await fetchMedicines();
       }
     } catch (err) {
-      console.error('Update medicine error:', err);
-      if (err.response) {
-        setError(err.response.data.message || 'Failed to update medicine. Please try again.');
-      } else if (err.request) {
-        setError('No response from server. Please check your connection.');
-      } else {
-        setError('An error occurred while setting up the request.');
-      }
+      console.error("Update medicine error:", err);
+      toast.error(
+        err.response?.data?.message ||
+          "Failed to update medicine. Please try again."
+      );
     }
   };
 
   const handleDeleteMedicine = async (medicineId) => {
-    if (window.confirm('Are you sure you want to delete this medicine? This action cannot be undone.')) {
+    if (
+      window.confirm("Are you sure you want to delete this medicine?")
+    ) {
       try {
-        const response = await axios.put(`http://localhost:8080/medicine/shutDownMedicine/${medicineId}`, {}, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`
+        const response = await axiosInstance.put(
+          `/medicine/shutDownMedicine/${medicineId}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
           }
-        });
-        
+        );
+
         if (response.data) {
-          fetchMedicines();
+          toast.success("Medicine deleted successfully!");
+          await fetchMedicines();
         }
       } catch (err) {
-        console.error('Delete medicine error:', err);
-        if (err.response) {
-          setError(err.response.data.message || 'Failed to delete medicine. Please try again.');
-        } else if (err.request) {
-          setError('No response from server. Please check your connection.');
-        } else {
-          setError('An error occurred while setting up the request.');
-        }
+        console.error("Delete medicine error:", err);
+        toast.error(
+          err.response?.data?.message ||
+            "Failed to delete medicine. Please try again."
+        );
       }
     }
   };
 
+  const filteredMedicines = medicines.filter((medicine) => {
+    const matchesSearch =
+      medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      medicine.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === "all" || medicine.type === filterType;
+    return matchesSearch && matchesFilter;
+  });
+
+  const getTypeIcon = (type) => {
+    const typeObj = medicineTypes.find((t) => t.value === type);
+    return typeObj ? typeObj.icon : "💊";
+  };
+
+  const showWarning = (warning) => {
+    setCurrentWarning(warning);
+    setShowWarningModal(true);
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <div className="text-gray-700 text-lg">Loading...</div>
+      <div className="flex min-h-screen bg-gray-50 pt-24">
+        <Sidebar activePath={location.pathname} />
+        <div className="flex-1 p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="text-gray-700 text-lg">Loading medicines...</div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar activePath={window.location.pathname} />
-      <div className="flex-1 p-6 md:p-10">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="py-8 text-center border-b border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-800">Medicine Management</h1>
-          </div>
+    <div className="flex min-h-screen bg-gray-50 pt-24">
+      <Sidebar activePath={location.pathname} />
+      <div className="flex-1 p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            <Pill className="h-8 w-8 text-blue-600" />
+            Quản lý thuốc
+          </h1>
+          <p className="text-gray-600">Quản lý danh sách thuốc trong hệ thống</p>
+        </div>
 
-          <div className="p-8">
-            <div className="mb-8 flex justify-end">
-              <button
-                onClick={() => setShowCreateForm(!showCreateForm)}
-                className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-              >
-                {showCreateForm ? 'Cancel' : 'Add New Medicine'}
-              </button>
+        {/* Action Bar */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm thuốc..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg"
+                />
+              </div>
+
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="pl-10 pr-8 py-3 border border-gray-200 rounded-lg bg-white"
+                >
+                  <option value="all">Tất cả loại</option>
+                  {medicineTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {showCreateForm && (
-              <div className="mb-8 p-6 border border-gray-200 rounded-lg shadow-sm">
-                <h2 className="text-xl font-semibold mb-6 text-gray-800">
-                  {editingMedicine ? 'Edit Medicine' : 'Add New Medicine'}
-                </h2>
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <span className="block sm:inline">{error}</span>
-                  </div>
-                )}
-                <form onSubmit={editingMedicine ? handleUpdateMedicine : handleCreateMedicine} className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select
-                      id="type"
-                      name="type"
-                      value={formData.type}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="tablet">Tablet</option>
-                      <option value="syrup">Syrup</option>
-                      <option value="capsule">Capsule</option>
-                      <option value="ointment">Ointment</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      rows="3"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="quantities" className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                    <input
-                      type="number"
-                      id="quantities"
-                      name="quantities"
-                      value={formData.quantities}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="warning" className="block text-sm font-medium text-gray-700 mb-1">Warning</label>
-                    <textarea
-                      id="warning"
-                      name="warning"
-                      value={formData.warning}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                      rows="2"
-                    />
-                  </div>
-                  <div className="flex justify-start gap-4">
-                    <button
-                      type="submit"
-                      className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-                    >
-                      {editingMedicine ? 'Update Medicine' : 'Add Medicine'}
-                    </button>
-                    {editingMedicine && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditingMedicine(null);
-                          setFormData({
-                            name: '',
-                            type: 'tablet',
-                            description: '',
-                            quantities: 0,
-                            warning: ''
-                          });
-                          setError('');
-                        }}
-                        className="bg-gray-500 text-white px-5 py-2 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
-            )}
+            <button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg"
+            >
+              <Plus className="h-5 w-5" />
+              {showCreateForm ? "Hủy" : "Thêm thuốc"}
+            </button>
+          </div>
+        </div>
 
-            <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+        {/* Form */}
+        {showCreateForm && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg">
+                <Plus className="h-5 w-5 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {editingMedicine ? "Chỉnh sửa thuốc" : "Thêm thuốc mới"}
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Tên thuốc *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg"
+                    placeholder="Nhập tên thuốc"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Loại *
+                  </label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white"
+                  >
+                    {medicineTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.icon} {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Mô tả *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg"
+                  rows="3"
+                  placeholder="Nhập mô tả thuốc"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Cảnh báo
+                </label>
+                <textarea
+                  name="warning"
+                  value={formData.warning}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg"
+                  rows="2"
+                  placeholder="Nhập cảnh báo (nếu có)"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={
+                    editingMedicine
+                      ? handleUpdateMedicine
+                      : handleCreateMedicine
+                  }
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg"
+                >
+                  {editingMedicine ? "Cập nhật thuốc" : "Thêm thuốc"}
+                </button>
+                {editingMedicine && (
+                  <button
+                    onClick={() => {
+                      setEditingMedicine(null);
+                      setFormData({
+                        name: "",
+                        type: "tablet",
+                        description: "",
+                        warning: "",
+                      });
+                    }}
+                    className="px-8 py-3 border border-gray-300 rounded-lg"
+                  >
+                    Hủy
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Medicines List */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {filteredMedicines.length === 0 ? (
+            <div className="p-12 text-center">
+              <p className="text-gray-500">Không tìm thấy thuốc nào.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Tên thuốc
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Loại
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Mô tả
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Cảnh báo
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                      Thao tác
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {medicines.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No medicines found.</td>
-                    </tr>
-                  ) : (
-                    medicines.map((medicine) => (
-                      <tr key={medicine._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{medicine.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">{medicine.type}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{medicine.quantities}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setEditingMedicine(medicine);
-                                setFormData({
-                                  name: medicine.name,
-                                  type: medicine.type,
-                                  description: medicine.description,
-                                  quantities: medicine.quantities,
-                                  warning: medicine.warning || ''
-                                });
-                                setShowCreateForm(true);
-                              }}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteMedicine(medicine._id)}
-                              className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200"
-                            >
-                              Delete
-                            </button>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredMedicines.map((medicine) => (
+                    <tr key={medicine._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">{getTypeIcon(medicine.type)}</div>
+                          <div>
+                            <div className="font-semibold text-gray-900">{medicine.name}</div>
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                          {medicine.type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <p className="text-sm text-gray-600 truncate" title={medicine.description}>
+                            {medicine.description}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {medicine.warning ? (
+                          <button
+                            onClick={() => showWarning(medicine.warning)}
+                            className="text-amber-700 text-sm hover:underline flex items-center gap-1"
+                          >
+                            <span>⚠</span>
+                            <span>Xem cảnh báo</span>
+                          </button>
+                        ) : (
+                          <span className="text-gray-400 text-sm">Không có</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMedicine(medicine);
+                              setFormData({
+                                name: medicine.name,
+                                type: medicine.type,
+                                description: medicine.description,
+                                warning: medicine.warning || "",
+                              });
+                              setShowCreateForm(true);
+                            }}
+                            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded text-sm hover:bg-blue-200 transition-colors"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Chỉnh sửa
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMedicine(medicine._id)}
+                            className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded text-sm hover:bg-red-200 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* Warning Modal */}
+      {showWarningModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-2xl">⚠️</div>
+              <h3 className="text-lg font-semibold text-gray-900">Cảnh báo</h3>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-700 whitespace-pre-wrap">{currentWarning}</p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowWarningModal(false)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,13 +1,11 @@
-import Banner from '../components/Banner'
-import Header from '../components/Header'
-import TopDoctors from '../components/Doctors/TopDoctors'
+import Header from '../components/layouts/Header'
+import TopDoctors from '../pages/doctors/TopDoctors'
 
 const Home = () => {
   return (
     <div>
       <Header />
       <TopDoctors />
-      <Banner/>
     </div>
   )
 }

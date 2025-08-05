@@ -87,6 +87,17 @@ export default function AuthForm({
               linkText={current.alternateLinkText}
               linkHref={current.alternateLink}
             />
+            {/* Forgot password link for login mode */}
+            {isLogin && (
+              <div className="text-center mt-2">
+                <a
+                  href="/auth/forgot-password"
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

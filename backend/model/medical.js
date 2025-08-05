@@ -6,7 +6,7 @@ const medicalRecordSchema = new Schema({
   // lịch khám
   appointmentId: { 
     type: Types.ObjectId,
-    ref: 'Appointment',
+    ref: 'appointments', // fix model name to match actual
     required: true,
   },
   patientId: {

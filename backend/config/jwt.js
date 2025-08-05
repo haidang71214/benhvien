@@ -18,7 +18,7 @@ const refreshTokenPublicKey = fs.readFileSync(path.join(__dirname, '../keys/refr
 export const createTokenAsyncKey = async (data) => {
   return jwt.sign({ payload: data }, accessTokenPrivateKey, {
     algorithm: 'RS256',
-    expiresIn: '1h'
+    expiresIn: '7d'
   });
 };
 

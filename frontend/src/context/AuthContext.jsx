@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { axiosInstance } from "../utils/axiosInstance";
+import toast from "react-hot-toast";
+import { ACCESS_TOKEN } from "../utils/enum";
 
 const AuthContext = createContext();
 
@@ -15,9 +17,20 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
+  const [dob, setDob] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (!savedUser || savedUser === "undefined") return null;
+      const parsed = JSON.parse(savedUser);
+      return parsed?.dob || null;
+    } catch {
+      return null;
+    }
+  });
+
   const [accessToken, setAccessToken] = useState(() => {
     try {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem(ACCESS_TOKEN);
       return token && token !== "undefined" ? token : null;
     } catch (error) {
       console.error("Lỗi parse token từ localStorage:", error);
@@ -38,20 +51,26 @@ export const AuthProvider = ({ children }) => {
   const login = (userData, token) => {
     console.log("Saving user data to localStorage:", userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("accessToken", token);
+    localStorage.setItem(ACCESS_TOKEN, token);
+    
     setUser(userData);
+    setDob(userData?.dob || null);
     setAccessToken(token);
+    toast.success("Đăng nhập thành công !!!");
   };
 
   const logout = async () => {
     try {
-      await axiosInstance.post("/api/v1/auth/logout");
+      await axiosInstance.post("/auth/logout");
+      toast.success("Đăng xuất thành công !!!");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
     } finally {
       localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem(ACCESS_TOKEN);
       setUser(null);
+      setDob(null);
       setAccessToken(null);
       window.location.href = "/";
     }
@@ -61,7 +80,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, login, logout, isAuthenticated, accessToken }}
+      value={{ user, setUser, dob, setDob, login, logout, isAuthenticated, accessToken }}
     >
       {children}
     </AuthContext.Provider>

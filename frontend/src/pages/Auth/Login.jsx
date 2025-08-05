@@ -1,7 +1,7 @@
 import { useState } from "react";
-import AuthForm  from "@/components//Auth/AuthForm";
-import { useAuth } from "@/context/AuthContext";
-import { axiosInstance } from "@/utils/axiosInstance";
+import AuthForm from "../../components/auth/AuthForm";
+import { useAuth } from "../../context/AuthContext";
+import { axiosInstance } from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 
@@ -10,6 +10,8 @@ export default function Login() {
     email: "",
     password: "",
   });
+  console.log(formData);
+  
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post("/auth/login", formData);
+      const response = await axiosInstance.post(`/auth/login`, formData);
       const data = response.data;
       console.log("Full API response:", response);
       console.log("Response data:", data);
@@ -35,31 +37,54 @@ export default function Login() {
       console.log("Data user object:", data.user);
       console.log("Data role:", data.role);
       
+<<<<<<< HEAD
       // Create user data object with the correct role from API
+=======
+      // Create user data object with the correct role and dob from API
+>>>>>>> master
       const userData = {
         id: data.user.id,
         userName: data.user.userName,
         email: data.user.email,
         avatarUrl: data.user.avatarUrl,
+<<<<<<< HEAD
         role: data.role || data.user.role // Try both possible locations for role
+=======
+        role: data.role || data.user.role, // Try both possible locations for role
+        dob: data.user.dob || null
+>>>>>>> master
       };
       
       console.log("Final user data being saved:", userData);
       login(userData, data.accessToken);
+<<<<<<< HEAD
       toast.success('Đăng nhập thành công !!!')
+=======
+      // toast.success('Đăng nhập thành công !!!')
+>>>>>>> master
       
       console.log("User role:", userData.role);
       if (userData.role === 'admin') {
         console.log("Redirecting to admin page");
+<<<<<<< HEAD
         navigate("/admin");
+=======
+        navigate("/admin/dashboard");
+>>>>>>> master
       } else {
         console.log("Redirecting to home page");
         navigate("/");
       }
     } catch (err) {
+<<<<<<< HEAD
       console.error("Login error:", err);
       toast.error(err.response.data.message || 'Đăng nhập thất bại !!!');
     }
+=======
+  console.error("Login error:", err.response?.data || err.message);
+  toast.error(err.response?.data?.message || 'Email hoặc mật khẩu không đúng. Vui lòng thử lại!');
+}
+>>>>>>> master
 
     setLoading(false);
   };
