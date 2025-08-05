@@ -12,6 +12,7 @@ import chatRouter from './chat.route.js';
 import testAssignmentRouter from './testAssignment.route.js';
 import testRoutes from './test.route.js';
 import aiRoutes from './ai.route.js';
+import paymentRoute from './payment.route.js';
 
 
 const rootRouter = express.Router();
@@ -26,4 +27,5 @@ rootRouter.use('/medicine',medicineRouter);
 rootRouter.use('/doctor',doctorRouter);
 rootRouter.use('/notifications',notificationRouter);
 rootRouter.use('/ai',aiRoutes);
+rootRouter.use('/payment',paymentRoute);
 export default rootRouter; 
