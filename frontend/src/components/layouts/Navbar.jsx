@@ -8,7 +8,6 @@ import {
   NavbarItem,
   NavbarMenuToggle,
 } from "@heroui/navbar";
-import toast from "react-hot-toast";
 import NotificationBell from "../NotificationBell";
 
 const Navbar = () => {
@@ -41,33 +40,37 @@ const Navbar = () => {
               }`
             }
           >
-            Home
+            Trang chủ
           </NavLink>
         </NavbarItem>
-        <NavbarItem>
-          <NavLink
-            to="/doctors"
-            className={({ isActive }) =>
-              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-              }`
-            }
-          >
-            Doctors
-          </NavLink>
+        <NavbarItem className="relative group">
+          <div className="px-4 py-2 text-base font-semibold rounded-md cursor-pointer text-gray-700 hover:bg-gray-100 group-hover:text-blue-600 transition-colors">
+            Dịch vụ y tế
+          </div>
+          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px]">
+            <NavLink
+              to="/booking/doctors"
+              className={({ isActive }) =>
+                `block px-4 py-2 text-sm font-medium rounded-t-md hover:bg-gray-50 transition-colors ${
+                  isActive ? "text-blue-600" : "text-gray-700"
+                }`
+              }
+            >
+              Đặt theo bác sĩ
+            </NavLink>
+            <NavLink
+              to="/goi-video-voi-bac-si"
+              className={({ isActive }) =>
+                `block px-4 py-2 text-sm font-medium rounded-b-md hover:bg-gray-50 transition-colors ${
+                  isActive ? "text-blue-600" : "text-gray-700"
+                }`
+              }
+            >
+              Gọi video với bác sĩ
+            </NavLink>
+          </div>
         </NavbarItem>
-        <NavbarItem>
-          <NavLink
-            to="/contact"
-            className={({ isActive }) =>
-              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-              }`
-            }
-          >
-            Contact
-          </NavLink>
-        </NavbarItem>
+
         <NavbarItem>
           <NavLink
             to="/about"
@@ -77,7 +80,7 @@ const Navbar = () => {
               }`
             }
           >
-            About
+            Về chúng tôi
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -89,19 +92,7 @@ const Navbar = () => {
               }`
             }
           >
-            AI Suggest
-          </NavLink>
-        </NavbarItem>
-         <NavbarItem>
-          <NavLink
-            to="/chat"
-            className={({ isActive }) =>
-              `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-              }`
-            }
-          >
-            Chat
+            AI Gợi ý bệnh
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -115,12 +106,11 @@ const Navbar = () => {
                 }`
               }
             >
-              Admin Dashboard
+              Trang quản trị
             </NavLink>
           )}
         </NavbarItem>
         <NavbarItem>
-          {/* Receptionist-only link */}
           {user?.role === "receptionist" && (
             <NavLink
               to="/receptionist-appointments"
@@ -130,7 +120,22 @@ const Navbar = () => {
                 }`
               }
             >
-              Manage Appointments
+              Quản lý lịch khám{" "}
+            </NavLink>
+          )}
+        </NavbarItem>
+        <NavbarItem>
+          {/* Nurse-only link */}
+          {user?.role === "nurse" && (
+            <NavLink
+              to="/nurse-dashboard"
+              className={({ isActive }) =>
+                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
+                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
+                }`
+              }
+            >
+              Trang y tá
             </NavLink>
           )}
         </NavbarItem>
@@ -164,33 +169,33 @@ const Navbar = () => {
                       onClick={() => navigate("/account-settings")}
                       className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                     >
-                      Account Settings
+                      Cài đặt hồ sơ
                     </button>
                     <button
                       onClick={() => navigate("/my-appointments")}
                       className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                     >
-                      My Appointments
+                      Phiếu khám bệnh
                     </button>
                     {/* Only show for patients */}
                     {user?.role === "patient" && (
                       <button
-                        onClick={() => navigate("/account-settings/medical-records-history")}
+                        onClick={() =>
+                          navigate("/account-settings/medical-records-history")
+                        }
                         className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                       >
-                        Medical Records History
+                        Lịch sử hồ sơ y tế
                       </button>
                     )}
                     <hr className="my-2 border-gray-200" />
                     <button
                       onClick={() => {
                         logout();
-                        // Only show toast if logout() does not already show it
-                        // toast.success("Đăng xuất thành công!");
                       }}
                       className="flex items-center gap-3 w-full px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                     >
-                      Sign Out
+                      Đăng xuất
                     </button>
                   </div>
                 </div>
@@ -203,13 +208,13 @@ const Navbar = () => {
                   className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition-colors"
                   onClick={() => navigate("/auth/login")}
                 >
-                  Log In
+                  Đăng nhập{" "}
                 </button>
                 <button
                   className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-base font-medium transition-colors"
                   onClick={() => navigate("/auth/register")}
                 >
-                  Get Started
+                  Đăng ký
                 </button>
               </div>
             </NavbarItem>

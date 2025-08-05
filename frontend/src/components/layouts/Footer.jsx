@@ -1,43 +1,52 @@
 import { assets } from "../../assets/data/doctors";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
-    <div className="md:mx-10">
-      <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 text-sm">
-        {/* Left section */}
+    <footer className="bg-gray-50 text-gray-700 px-6 md:px-20 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
         <div>
-          <img className="mb-5 w-40" src={assets.logo} alt="" />
-          <p className="w-full md:w-2/3 text-gray-600 leading-6">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged
+          <img className="mb-5 w-40" src={assets.logo} alt="Logo" />
+          <p className="text-sm leading-6 text-gray-600">
+            We provide the best online medical services and professional doctors to assist you anytime. Trusted by thousands of patients around the world.
           </p>
         </div>
-        {/* Center section */}
+
         <div>
-          <p className="text-xl font-medium mb-5">Company</p>
-          <ul className="flex flex-col gap-2 text-gray-600">
-            <li>Home</li>
-            <li>About us</li>
-            <li>Contact us</li>
-            <li>Privacy policy</li>
-            <li>Terms and conditions</li>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Company</h3>
+          <ul className="space-y-2 text-sm">
+            {["Home", "About Us", "Contact Us", "Privacy Policy", "Terms & Conditions"].map((item) => (
+              <li
+                key={item}
+                className="hover:text-blue-600 transition-colors cursor-pointer"
+              >
+                {item}
+              </li>
+            ))}
           </ul>
         </div>
-        {/* Right section */}
+
         <div>
-          <p className="text-xl font-medium mb-5">Get in touch</p>
-          <ul className="flex flex-col gap-2 text-gray-600">
-            <li>+1 234 56 789</li>
-            <li>example@gmail.com</li>
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Get in Touch</h3>
+          <ul className="space-y-3 text-sm">
+            <li className="flex items-center gap-2">
+              <Phone size={16} /> +1 234 56 789
+            </li>
+            <li className="flex items-center gap-2">
+              <Mail size={16} /> example@gmail.com
+            </li>
+            <li className="flex items-center gap-2">
+              <MapPin size={16} /> 123 Main St, City, Country
+            </li>
           </ul>
         </div>
       </div>
-    </div>
+
+      <div className="mt-10 border-t pt-6 text-xs text-gray-500 text-center">
+        &copy; {new Date().getFullYear()} YourCompany. All rights reserved.
+      </div>
+    </footer>
   );
 };
 

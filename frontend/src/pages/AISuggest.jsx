@@ -17,7 +17,7 @@ export default function AISuggest() {
     setLoading(true);
     setResults([]);
     try {
-      const res = await axiosInstance.post("/api/v1/ai/diagnose", { description });
+      const res = await axiosInstance.post("/ai/diagnose", { description });
       setResults(res.data);
     } catch (err) {
       toast.error("Không thể gợi ý AI.");
@@ -30,11 +30,6 @@ export default function AISuggest() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Debug info */}
-      <div className="fixed top-4 left-4 bg-black text-white p-2 rounded text-xs z-50">
-        Loading: {loading ? 'true' : 'false'} | Results: {results.length} | User: {user ? 'logged in' : 'not logged in'}
-      </div>
-      
       <div className="max-w-4xl mx-auto pt-32 px-6 pb-12">
         {/* Header Section */}
         <div className="text-center mb-12">

@@ -11,6 +11,7 @@ export const checkAdmin = async (userId) => {
     if (user.role === "admin") {
       return true;
     }
+    return false
   } catch (error) {
     console.error("Lỗi khi kiểm tra quyền admin:", error.message);
     return false;
@@ -185,15 +186,7 @@ const deleteUser = async (req, res) => {
 
 // admin
 const getAlluser = async (req, res) => {
-  const userId = req.user.id;
   try {
-    const isAdmin = await checkAdmin(userId);
-    if (!isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Bạn không có quyền thực hiện thao tác này." });
-    }
-
     const user = await users.find();
     res.status(200).json({ user });
   } catch (error) {

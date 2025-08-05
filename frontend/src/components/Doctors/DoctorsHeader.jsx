@@ -1,42 +1,43 @@
+import { Stethoscope, CircleDot } from "lucide-react";
+
 const DoctorsHeader = ({
   selectedSpecialty,
   loading,
   error,
   filteredDoctors,
-  startIndex,
-  doctorsPerPage,
 }) => {
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 mb-8">
+    <div className="from-white via-slate-50 to-white shadow-lg rounded-2xl border border-slate-200 p-6 mb-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-            {selectedSpecialty
-              ? `${selectedSpecialty} Specialists`
-              : "All Medical Professionals"}
-          </h2>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-gray-700">
+            <Stethoscope className="w-6 h-6 text-indigo-600" />
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+              {selectedSpecialty
+                ? `Chuyên khoa: ${selectedSpecialty}`
+                : "Danh sách bác sĩ"}
+            </h2>
+          </div>
+
           {!loading && !error && (
-            <p className="text-gray-600 mt-1 flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <div className="text-gray-600 flex items-center gap-2 text-sm">
+              <CircleDot className="w-3 h-3 text-green-500 animate-pulse" />
               {filteredDoctors.length > 0
-                ? `${startIndex + 1}-${Math.min(
-                    startIndex + doctorsPerPage,
-                    filteredDoctors.length
-                  )} of ${filteredDoctors.length} doctors available`
-                : "No doctors found"}
-            </p>
+                ? `${filteredDoctors.length} bác sĩ đang khả dụng`
+                : "Không tìm thấy bác sĩ nào"}
+            </div>
           )}
         </div>
 
         {!loading && !error && filteredDoctors.length > 0 && (
-          <div className="flex items-center gap-4 text-sm text-gray-600">
+          <div className="flex items-center gap-4 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Available Today</span>
+              <span>Có lịch hôm nay</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>Verified</span>
+              <span>Đã xác thực</span>
             </div>
           </div>
         )}

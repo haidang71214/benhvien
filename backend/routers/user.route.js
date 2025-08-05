@@ -14,11 +14,16 @@ import {
   banUser,
 } from "../controllers/admin.controller.js";
 
-import { getMyMedicalRecords } from "../controllers/user.controller.js";
+import { acceptRejectFormToChangeRole, detailform, getAllForm, getMyMedicalRecords } from "../controllers/user.controller.js";
 import { uploadCloud } from "../config/uploadCloud.js";
 
 const userRouter = express.Router();
 // Patient: get their own medical records
+//  form
+userRouter.post("/acceptOrReject/:formId",middlewareTokenAsyncKey,acceptRejectFormToChangeRole)
+userRouter.get("/getDetailForm/:id",detailform)
+userRouter.get("/getAllForm",getAllForm);
+// 
 userRouter.get(
   "/medical-records",
   middlewareTokenAsyncKey,
@@ -32,9 +37,9 @@ userRouter.post(
   updateUser
 ); // update user with admin role
 userRouter.delete("/deleteUser/:id", middlewareTokenAsyncKey, deleteUser); // delete admin
-userRouter.get("/getAllUser", middlewareTokenAsyncKey, getAlluser); // get all
-// cần check admin
-userRouter.get("/getAllUsers", middlewareTokenAsyncKey, getAllUsers); // get all users
+userRouter.get("/getAllUser", getAlluser); // get all
+// cần check admin  
+userRouter.get("/getAllUsers", getAllUsers); // get all users
 userRouter.get("/getAllDoctors", getAllDoctors);
 userRouter.get("/getDetailUser/:id", middlewareTokenAsyncKey, getDetailUser); // get detail user by id
 userRouter.get("/getDetailMySelf", middlewareTokenAsyncKey, detailSelf); // get my information

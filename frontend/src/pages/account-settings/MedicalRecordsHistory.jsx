@@ -22,10 +22,11 @@ export default function MedicalRecordsHistory() {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get("/api/v1/user/medical-records");
+      const res = await axiosInstance.get("/user/medical-records");
       setRecords(res.data.data || []);
     } catch (err) {
       setRecords([]);
+      console.error("Failed to fetch medical records:", err);
     } finally {
       setLoading(false);
     }

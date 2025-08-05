@@ -7,10 +7,10 @@ const LoadingState = () => {
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
         </div>
         <p className="text-gray-600 mt-6 text-lg font-medium">
-          Loading amazing doctors...
+          Đang tải danh sách bác sĩ...
         </p>
         <p className="text-gray-500 text-sm mt-2">
-          Please wait while we find the best specialists for you
+          Vui lòng chờ trong khi chúng tôi tìm những chuyên gia phù hợp nhất cho bạn
         </p>
       </div>
     </div>

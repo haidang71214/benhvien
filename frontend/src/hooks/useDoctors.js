@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { axiosInstance } from "../utils/axiosInstance.ts";
-import { transformDoctorData } from "../utils/transformDoctorData";
+import { axiosInstance } from "../utils/axiosInstance";
 
 export const useDoctors = () => {
   const { speciality: urlSpeciality } = useParams();
@@ -11,8 +10,6 @@ export const useDoctors = () => {
     urlSpeciality || ""
   );
   const [doctors, setDoctors] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const doctorsPerPage = 10;
 
   const fetchDoctors = useCallback(async () => {
     setLoading(true);
@@ -20,10 +17,8 @@ export const useDoctors = () => {
 
     try {
       const { data } = await axiosInstance.get("/admin/getAllDoctors");
-      const mongoDoctors = (data.data || []).map((doc) =>
-        transformDoctorData(doc, "mongodb")
-      );
-      setDoctors(mongoDoctors);
+      console.log("Doctors fetched:", data); // kiểm tra data
+      setDoctors(data.data || []);
     } catch (err) {
       console.error("Error fetching doctors:", err);
       setError("Unable to load doctors list");
@@ -36,10 +31,6 @@ export const useDoctors = () => {
   useEffect(() => {
     fetchDoctors();
   }, [fetchDoctors]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedSpecialty]);
 
   useEffect(() => {
     setSelectedSpecialty(urlSpeciality || "");
@@ -57,33 +48,13 @@ export const useDoctors = () => {
       })
     : doctors;
 
-  const totalPage = Math.ceil(filteredDoctors.length / doctorsPerPage);
-  const startIndex = (currentPage - 1) * doctorsPerPage;
-  const paginatedDoctors = filteredDoctors.slice(
-    startIndex,
-    startIndex + doctorsPerPage
-  );
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPage) {
-      setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   return {
     loading,
     error,
     selectedSpecialty,
     setSelectedSpecialty,
     doctors,
-    currentPage,
-    doctorsPerPage,
     filteredDoctors,
-    totalPage,
-    startIndex,
-    paginatedDoctors,
     fetchDoctors,
-    handlePageChange,
   };
 };

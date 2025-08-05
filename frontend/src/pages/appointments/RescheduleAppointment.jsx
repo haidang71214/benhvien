@@ -5,15 +5,6 @@ import { toast } from "react-hot-toast";
 import { Info, CalendarDays, Clock, UserCheck } from "lucide-react";
 import { assets } from "../../assets/data/doctors";
 
-const daysOfWeeks = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat",
-];
 
 const RescheduleAppointment = () => {
   const { appointmentId } = useParams();

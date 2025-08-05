@@ -6,7 +6,6 @@ import DoctorsHero from "../../components/Doctors/DoctorsHero";
 import SpecialtySidebar from "../../components/Doctors/SpecialtySidebar";
 import DoctorsHeader from "../../components/Doctors/DoctorsHeader";
 import DoctorsGrid from "../../components/doctors/DoctorsGrid";
-import DoctorsPagination from "../../components/Doctors/DoctorsPagination";
 
 const Doctors = () => {
   const { user } = useAuth();
@@ -17,29 +16,28 @@ const Doctors = () => {
     error,
     selectedSpecialty,
     setSelectedSpecialty,
-    currentPage,
     doctorsPerPage,
     filteredDoctors,
-    totalPage,
     startIndex,
-    paginatedDoctors,
     fetchDoctors,
-    handlePageChange,
   } = useDoctors();
 
   const handleSpecialtyClick = (value) => {
     const newSpecialty = selectedSpecialty === value ? "" : value;
     setSelectedSpecialty(newSpecialty);
     if (newSpecialty) {
-      navigate(`/doctors/${newSpecialty}`);
+      navigate(`/booking/doctors/${newSpecialty}`);
     } else {
-      navigate("/doctors");
+      navigate("/booking/doctors");
     }
   };
 
   const handleDoctorClick = (doctor) => {
     if (!user?.id) {
       toast.error("Please login to book an appointment!");
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 2000);
       return;
     }
     navigate(`/appointment/${doctor._id}/${user.id}`);
@@ -51,7 +49,7 @@ const Doctors = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen from-slate-50 via-blue-50 to-indigo-50">
       <DoctorsHero />
       <div className="max-w-7xl mx-auto px-4 pb-16">
         <div className="flex flex-col xl:flex-row gap-8">
@@ -72,23 +70,15 @@ const Doctors = () => {
 
             <div className="flex-1">
               <DoctorsGrid
+                doctors={filteredDoctors}
                 loading={loading}
                 error={error}
-                paginatedDoctors={paginatedDoctors}
                 selectedSpecialty={selectedSpecialty}
                 onDoctorClick={handleDoctorClick}
                 onRetry={handleRetry}
                 onSpecialtyClick={handleSpecialtyClick}
               />
-            </div>
-
-            {totalPage > 1 && !loading && !error && (
-              <DoctorsPagination
-                currentPage={currentPage}
-                totalPage={totalPage}
-                onPageChange={handlePageChange}
-              />
-            )}
+            </div>             
           </div>
         </div>
       </div>

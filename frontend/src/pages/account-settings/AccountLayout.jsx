@@ -1,24 +1,19 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { User, Lock, Shield, Settings } from "lucide-react";
+import { User, Lock, Settings } from "lucide-react";
 
 const AccountLayout = () => {
   const navItems = [
     {
-      to: "/account-settings",
+      to: "/cai-dat-tai-khoan",
       icon: User,
-      label: "Account",
+      label: "Hồ sơ bệnh nhân",
       end: true
     },
     {
-      to: "/account-settings/change-password", 
+      to: "/cai-dat-tai-khoan/doi-mat-khau", 
       icon: Lock,
-      label: "Password"
+      label: "Đổi mật khẩu"
     },
-    {
-      to: "/account-settings/security",
-      icon: Shield, 
-      label: "Security"
-    }
   ];
 
   return (
@@ -30,8 +25,8 @@ const AccountLayout = () => {
               <Settings className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">Account Settings</h2>
-              <p className="text-sm text-slate-500">Manage your preferences</p>
+              <h2 className="text-xl font-bold text-slate-800">Cài đặt tài khoản</h2>
+              <p className="text-sm text-slate-500">Quản lý tùy chọn của bạn</p>
             </div>
           </div>
 

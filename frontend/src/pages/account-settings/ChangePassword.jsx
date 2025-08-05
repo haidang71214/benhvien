@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 const PasswordInput = ({
   label,
@@ -37,7 +36,6 @@ const PasswordInput = ({
 );
 
 const ChangePassword = () => {
-  const { accessToken } = useAuth();
   const [form, setForm] = useState({
     oldPassword: "",
     newPassword: "",
@@ -69,13 +67,9 @@ const ChangePassword = () => {
 
     try {
       setLoading(true);
-      await axios.post(
-        "http://localhost:8080/api/v1/auth/updateMyself",
+      await axiosInstance.post(
+        "/auth/updateMyself",
         { oldPassword, newPassword },
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          withCredentials: true,
-        }
       );
       toast.success("Đổi mật khẩu thành công!");
       setForm({ oldPassword: "", newPassword: "", confirmNewPassword: "" });

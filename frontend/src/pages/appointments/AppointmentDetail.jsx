@@ -31,6 +31,14 @@ const AppointmentDetail = () => {
   const [editMode, setEditMode] = useState(false);
   const [prescriptionId, setPrescriptionId] = useState(null);
 
+  // Nurse/test assignment state
+  const [assignedTests, setAssignedTests] = useState([]);
+  const [nurses, setNurses] = useState([]);
+  const [selectedTestId, setSelectedTestId] = useState("");
+  const [selectedNurse, setSelectedNurse] = useState("");
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [availableTests, setAvailableTests] = useState([]);
+
   // Restrict access: Only doctor can edit, patient can view
   useEffect(() => {
     if (!user) return;
@@ -53,10 +61,27 @@ const AppointmentDetail = () => {
   // Fetch medicines for dropdown (doctor only)
   useEffect(() => {
     axiosInstance
-      .get("/api/v1/medicines/getAll")
+      .get("/medicines/getAll")
       .then((res) => setMedicines(res.data.data || []))
       .catch(() => setMedicines([]));
   }, []);
+
+  // Fetch nurses for assignment (doctor only)
+  useEffect(() => {
+    if (user?.role === "doctor") {
+      axiosInstance
+        .get("/user/getAllUsers")
+        .then((res) => {
+          setNurses((res.data.data || []).filter(u => u.role === "nurse"));
+        })
+        .catch(() => setNurses([]));
+      // Fetch available tests
+      axiosInstance
+        .get("/test/getAll")
+        .then((res) => setAvailableTests(res.data.data || []))
+        .catch(() => setAvailableTests([]));
+    }
+  }, [user]);
 
   // Fetch medical record for this appointment (edit mode)
   useEffect(() => {
@@ -64,7 +89,7 @@ const AppointmentDetail = () => {
     axiosInstance
       .get(`/doctor/getMedicalRecordByAppointment/${appointmentId}`)
       .then((res) => {
-        if (res.data.data) {
+        if (res.data && res.data.data) {
           setEditMode(true);
           setMedicalRecordId(res.data.data._id);
           setSymptoms(res.data.data.symptoms || "");
@@ -75,6 +100,7 @@ const AppointmentDetail = () => {
             .get(`/doctor/getPrescriptionByMedicalRecord/${res.data.data._id}`)
             .then((presRes) => {
               if (
+                presRes.data &&
                 presRes.data.data &&
                 presRes.data.data.medicines &&
                 presRes.data.data.medicines.length > 0
@@ -92,8 +118,52 @@ const AppointmentDetail = () => {
                 );
               }
             });
+        } else {
+          // No medical record found, set editMode to false and clear fields
+          setEditMode(false);
+          setMedicalRecordId(null);
+          setSymptoms("");
+          setDiagnosis("");
+          setConclusion("");
+          setPrescriptions([
+            {
+              medicineId: "",
+              dosage: "",
+              duration: "",
+              instructions: [
+                { mealTime: "", mealRelation: "", custom: "" },
+              ],
+            },
+          ]);
         }
+      })
+      .catch(() => {
+        // If 404 or error, treat as no medical record
+        setEditMode(false);
+        setMedicalRecordId(null);
+        setSymptoms("");
+        setDiagnosis("");
+        setConclusion("");
+        setPrescriptions([
+          {
+            medicineId: "",
+            dosage: "",
+            duration: "",
+            instructions: [
+              { mealTime: "", mealRelation: "", custom: "" },
+            ],
+          },
+        ]);
       });
+  }, [appointmentId]);
+
+  // Fetch assigned tests for this appointment
+  useEffect(() => {
+    if (!appointmentId) return;
+    axiosInstance
+      .get(`/test-assignment/results/${appointmentId}`)
+      .then((res) => setAssignedTests(res.data.data || []))
+      .catch(() => setAssignedTests([]));
   }, [appointmentId]);
 
   // Add prescription row
@@ -272,7 +342,37 @@ const AppointmentDetail = () => {
         navigate("/my-appointments");
       }, 2000);
     } catch (err) {
-      toast.error("Error saving medical record or prescriptions");
+      toast.error(`Error saving medical record or prescriptions ${err}`);
+    }
+  };
+
+  // Handle test assignment
+  const handleAssignTest = async (e) => {
+    e.preventDefault();
+    if (!selectedTestId || !selectedNurse) {
+      toast.error("Test type and nurse are required");
+      return;
+    }
+    setAssignLoading(true);
+    try {
+      await axiosInstance.post("/test-assignment/assign", {
+        appointmentId,
+        patientId: appointment.patientId._id,
+        doctorId: appointment.doctorId._id,
+        nurseId: selectedNurse,
+        testId: selectedTestId,
+      });
+      toast.success("Test assigned!");
+      setSelectedTestId("");
+      setSelectedNurse("");
+      // Refresh assigned tests
+      axiosInstance
+        .get(`/test-assignment/results/${appointmentId}`)
+        .then((res) => setAssignedTests(res.data.data || []));
+    } catch {
+      toast.error("Failed to assign test");
+    } finally {
+      setAssignLoading(false);
     }
   };
 
@@ -315,6 +415,185 @@ const AppointmentDetail = () => {
           <span className="text-gray-700">{appointment.initialSymptom}</span>
         </div>
       </div>
+
+      {/* Doctor: Assign tests to nurse and show assigned/completed tests */}
+      {user.role === "doctor" && (
+        <div className="mb-8 bg-white rounded-xl shadow p-6">
+          <h3 className="text-lg font-bold text-blue-700 mb-4">Assign Test to Nurse</h3>
+          <form className="flex flex-col md:flex-row gap-4 items-center" onSubmit={handleAssignTest}>
+            <select
+              value={selectedTestId}
+              onChange={e => setSelectedTestId(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1 min-w-[120px]"
+              required
+            >
+              <option value="">Select test type</option>
+              {availableTests.map(test => (
+                <option key={test._id} value={test._id}>
+                  {test.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedNurse}
+              onChange={e => setSelectedNurse(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1 min-w-[120px]"
+              required
+            >
+              <option value="">Select nurse</option>
+              {nurses.map(n => (
+                <option key={n._id} value={n._id}>{n.userName}</option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow"
+              disabled={assignLoading}
+            >
+              {assignLoading ? "Assigning..." : "Assign Test"}
+            </button>
+          </form>
+          {/* Show assigned/completed tests */}
+          <div className="mt-6">
+            <h4 className="font-semibold mb-2">Assigned/Completed Tests</h4>
+            {assignedTests.length === 0 ? (
+              <div className="text-gray-500 italic">No tests assigned yet.</div>
+            ) : (
+              <ul className="space-y-2">
+                {assignedTests.map(test => (
+                  <li key={test._id} className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex flex-col gap-2">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                      <span className="font-medium text-blue-700">{test.testId?.name}</span>
+                      <span className="text-gray-700">Nurse: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
+                      <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">{test.status}</span>
+                    </div>
+                    {test.result && (
+                      <div className="mt-2">
+                        <span className="font-semibold text-green-700">Result:</span>
+                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') ? (
+                          <div className="mt-1">
+                            {test.result.imageUrl && (
+                              <img src={test.result.imageUrl} alt="Scan/X-ray" className="max-w-xs rounded shadow" />
+                            )}
+                            {test.result.notes && (
+                              <div className="text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="mt-1 grid grid-cols-2 gap-2">
+                            {typeof test.result === 'object' ? (
+                              Object.entries(test.result).map(([key, value]) => (
+                                key !== 'imageUrl' && key !== 'notes' ? (
+                                  <div key={key} className="text-gray-700">
+                                    <b>{key}:</b> {value}
+                                  </div>
+                                ) : null
+                              ))
+                            ) : (
+                              <div className="text-gray-700">{test.result}</div>
+                            )}
+                            {test.result.notes && (
+                              <div className="col-span-2 text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Patient view: show assigned/completed tests with payment info and pay for all tests, and display results like doctor view */}
+      {user.role === "patient" && (
+        <div className="mb-8 bg-white rounded-xl shadow p-6">
+          <h4 className="font-semibold mb-2">Assigned/Completed Tests</h4>
+          {assignedTests.length === 0 ? (
+            <div className="text-gray-500 italic">No tests assigned yet.</div>
+          ) : (
+            <>
+              {/* Calculate total unpaid price */}
+              {(() => {
+                const unpaidTests = assignedTests.filter(test => test.paymentStatus === 'unpaid');
+                const totalUnpaid = unpaidTests.reduce((sum, test) => sum + (test.testId?.price || 0), 0);
+                return unpaidTests.length > 0 ? (
+                  <div className="mb-4 flex flex-col md:flex-row md:items-center gap-2">
+                    <span className="font-semibold text-yellow-700">Total unpaid tests: {unpaidTests.length}</span>
+                    <span className="font-semibold text-yellow-700">Total: {totalUnpaid.toLocaleString()}₫</span>
+                    <button
+                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded shadow"
+                      onClick={async () => {
+                        try {
+                          // Send all unpaid test IDs to backend for payment link
+                          const res = await axiosInstance.post(`/test-assignment/pay-multi`, {
+                            testIds: unpaidTests.map(test => test._id),
+                          });
+                          if (res.data && res.data.url) {
+                            window.location.href = res.data.url;
+                          } else {
+                            toast.error('Không thể tạo link thanh toán');
+                          }
+                        } catch {
+                          toast.error('Không thể tạo link thanh toán');
+                        }
+                      }}
+                    >
+                      Pay for All Tests
+                    </button>
+                  </div>
+                ) : null;
+              })()}
+              <ul className="space-y-2">
+                {assignedTests.map(test => (
+                  <li key={test._id} className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex flex-col gap-2">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                      <span className="font-medium text-blue-700">{test.testId?.name}</span>
+                      <span className="text-gray-700">Nurse: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
+                      <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">{test.status}</span>
+                      <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">Price: {test.testId?.price?.toLocaleString()}₫</span>
+                      <span className={`text-xs px-2 py-1 rounded ${test.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{test.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</span>
+                    </div>
+                    {test.result && (
+                      <div className="mt-2">
+                        <span className="font-semibold text-green-700">Result:</span>
+                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') ? (
+                          <div className="mt-1">
+                            {test.result.imageUrl && (
+                              <img src={test.result.imageUrl} alt="Scan/X-ray" className="max-w-xs rounded shadow" />
+                            )}
+                            {test.result.notes && (
+                              <div className="text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="mt-1 grid grid-cols-2 gap-2">
+                            {typeof test.result === 'object' ? (
+                              Object.entries(test.result).map(([key, value]) => (
+                                key !== 'imageUrl' && key !== 'notes' ? (
+                                  <div key={key} className="text-gray-700">
+                                    <b>{key}:</b> {value}
+                                  </div>
+                                ) : null
+                              ))
+                            ) : (
+                              <div className="text-gray-700">{test.result}</div>
+                            )}
+                            {test.result.notes && (
+                              <div className="col-span-2 text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
       {user.role === "doctor" ? (
         <form
           onSubmit={handleSubmit}

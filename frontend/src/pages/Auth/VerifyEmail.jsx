@@ -8,9 +8,10 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { LoaderCircle } from "lucide-react";
+import { BASE_URL } from "../../utils/axiosInstance";
 
-const VERIFY_EMAIL_API = "http://localhost:8080/api/v1/auth/verifyEmail";
-const RESEND_OTP_API = "http://localhost:8080/api/v1/auth/resendOTP";
+const VERIFY_EMAIL_API = `${BASE_URL}/auth/verifyEmail`;
+const RESEND_OTP_API = `${BASE_URL}/auth/resendOTP`;
 const OTP_LENGTH = 6;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -6,19 +6,19 @@ const EmptyState = ({ selectedSpecialty, onSpecialtyClick }) => {
           <span className="text-4xl">👨‍⚕️</span>
         </div>
         <h3 className="text-2xl font-bold text-gray-800 mb-2">
-          No Doctors Found
+          Không tìm thấy bác sĩ
         </h3>
         <p className="text-gray-600 text-lg mb-6">
           {selectedSpecialty
-            ? `We couldn't find any ${selectedSpecialty} specialists at the moment`
-            : "No doctors are currently available"}
+            ? `Chúng tôi hiện không tìm thấy bác sĩ chuyên khoa ${selectedSpecialty}`
+            : "Hiện tại chưa có bác sĩ nào khả dụng"}
         </p>
         {selectedSpecialty && (
           <button
             onClick={() => onSpecialtyClick(selectedSpecialty)}
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            View All Doctors
+            Xem tất cả bác sĩ
           </button>
         )}
       </div>

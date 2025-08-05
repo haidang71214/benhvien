@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/ui/Sidebar";
 import { axiosInstance } from "../utils/axiosInstance";
@@ -31,15 +30,15 @@ const AdminUser = () => {
     userBlocked: false,
   });
 
-  // ES6 useMemo để filter users dựa trên search term
   const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) return users;
-    
+
     const lowerSearchTerm = searchTerm.toLowerCase().trim();
-    return users.filter(user => 
-      user.userName?.toLowerCase().includes(lowerSearchTerm) ||
-      user.email?.toLowerCase().includes(lowerSearchTerm) ||
-      user.role?.toLowerCase().includes(lowerSearchTerm)
+    return users.filter(
+      (user) =>
+        user.userName?.toLowerCase().includes(lowerSearchTerm) ||
+        user.email?.toLowerCase().includes(lowerSearchTerm) ||
+        user.role?.toLowerCase().includes(lowerSearchTerm)
     );
   }, [users, searchTerm]);
 
@@ -65,14 +64,11 @@ const AdminUser = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/admin/getAllUser",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await axiosInstance.get("/admin/getAllUser", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       setUsers(response.data.user);
       setLoading(false);
     } catch (err) {
@@ -82,12 +78,10 @@ const AdminUser = () => {
     }
   };
 
-  // ES6 Arrow function cho search handler
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // ES6 Arrow function để clear search
   const clearSearch = () => {
     setSearchTerm("");
   };
@@ -104,10 +98,7 @@ const AdminUser = () => {
     e.preventDefault();
     setError("");
     try {
-      await axios.post("http://localhost:8080/admin/createUser", formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      await axiosInstance.post("/admin/createUser", formData, {
       });
       toast.success("Tạo người dùng thành công!");
       setFormData({
@@ -148,14 +139,11 @@ const AdminUser = () => {
 
   const handleDeleteUser = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8080/admin/deleteUser/${confirmModal.userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      await axiosInstance.delete(`/admin/deleteUser/${confirmModal.userId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       toast.success("Xóa người dùng thành công!");
       fetchUsers();
       closeConfirmModal();
@@ -210,10 +198,8 @@ const AdminUser = () => {
           </div>
 
           <div className="p-8">
-            {/* Search Bar and Create User Button */}
             <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
-              {/* Search Bar */}
-              <div className="relative flex-1 max-w-md">
+              <div className="relative flex-1 max-w-md w-full">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
                     className="h-5 w-5 text-gray-400"
@@ -257,18 +243,26 @@ const AdminUser = () => {
                   </button>
                 )}
               </div>
-              
-            <CreateUserForm
-              showCreateForm={showCreateForm}
-              setShowCreateForm={setShowCreateForm}
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleCreateUser={handleCreateUser}
-              error={error}
-            />
+
+              <button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+              >
+                {showCreateForm ? "Đóng form" : "Tạo người dùng mới"}
+              </button>
             </div>
 
-            {/* Search Results Info */}
+            {showCreateForm && (
+              <CreateUserForm
+                showCreateForm={showCreateForm}
+                setShowCreateForm={setShowCreateForm}
+                formData={formData}
+                handleInputChange={handleInputChange}
+                handleCreateUser={handleCreateUser}
+                error={error}
+              />
+            )}
+
             {searchTerm && (
               <div className="mb-4 text-sm text-gray-600">
                 Tìm thấy {filteredUsers.length} kết quả cho "{searchTerm}"
@@ -280,7 +274,6 @@ const AdminUser = () => {
               </div>
             )}
 
-
             {error && !showCreateForm && (
               <div
                 className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6"
@@ -290,8 +283,8 @@ const AdminUser = () => {
               </div>
             )}
 
-            <UsersTable 
-              users={filteredUsers} 
+            <UsersTable
+              users={filteredUsers}
               openConfirmModal={openConfirmModal}
               searchTerm={searchTerm}
             />

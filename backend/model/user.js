@@ -1,34 +1,35 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-export const ROLE_ENUM = ["patient", "admin", "doctor", "receptionist"];
+export const ROLE_ENUM = ["patient", "admin", "doctor", "nurse"];
 export const STATUS_ENUM = ["InUse", "UnderMaintenance", "Broken", "Removed"];
+
 export const DOCTOR_HEHE = [
-  "General physician",
-  "Gynecologist",
-  "Dermatologist",
-  "Pediatricians",
-  "Neurologist",
-  "Gastroenterologist",
+  "general_practitioner",
+  "gynecologist",
+  "dermatologist",
+  "pediatrician",
+  "neurologist",
+  "gastroenterologist",
 ];
-export const ROOM_ENUM = [
-  "booked",
-  "checkedIn",
-  "inProgress",
-  "completed",
-  "cancelled",
-];
+
 const userSchema = new Schema(
   {
     userName: {
       type: String,
-      required: [true, "Name cannot be null"],
+      required: [false],
       trim: true,
       unique: true,
     },
     password: {
       type: String,
       required: true,
+    },
+    address:{
+      type:String
+    },
+    province:{
+      type:String
     },
     email: {
       type: String,
@@ -101,23 +102,74 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    ratings: {
+      type: Number,
+      default: 4.5, // hoặc 0 nếu bạn muốn bắt đầu từ không có đánh giá
+      min: 0,
+      max: 5,
+    },
     fees: {
       type: Number,
       default: 50,
     },
     block: {
       type: Boolean,
-      default: false, 
+      default: false,
     },
     availableSchedule: {
       type: Map,
       of: [String],
       default: () => ({
-        Monday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
-        Tuesday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
-        Wednesday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
-        Thursday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
-        Friday: ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+        Monday: [
+          "09:00",
+          "10:00",
+          "11:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ],
+        Tuesday: [
+          "09:00",
+          "10:00",
+          "11:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ],
+        Wednesday: [
+          "09:00",
+          "10:00",
+          "11:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ],
+        Thursday: [
+          "09:00",
+          "10:00",
+          "11:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ],
+        Friday: [
+          "09:00",
+          "10:00",
+          "11:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+        ],
       }),
     },
   },

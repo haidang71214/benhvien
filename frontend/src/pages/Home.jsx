@@ -1,4 +1,3 @@
-import Banner from '../components/layouts/Banner'
 import Header from '../components/layouts/Header'
 import TopDoctors from '../pages/doctors/TopDoctors'
 
@@ -7,7 +6,6 @@ const Home = () => {
     <div>
       <Header />
       <TopDoctors />
-      <Banner/>
     </div>
   )
 }

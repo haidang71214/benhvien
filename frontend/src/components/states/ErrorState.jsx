@@ -6,14 +6,14 @@ const ErrorState = ({ error, onRetry }) => {
           <span className="text-3xl">⚠️</span>
         </div>
         <h3 className="text-xl font-bold text-gray-800 mb-2">
-          Oops! Something went wrong
+          Ôi! Đã xảy ra lỗi
         </h3>
         <p className="text-red-500 mb-6 text-lg">{error}</p>
         <button
           onClick={onRetry}
           className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
         >
-          Try Again
+          Thử lại
         </button>
       </div>
     </div>

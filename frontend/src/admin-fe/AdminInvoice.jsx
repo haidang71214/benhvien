@@ -10,7 +10,7 @@ const AdminInvoice = () => {
   useEffect(() => {
     setLoading(true);
     axiosInstance
-      .get("/api/v1/payment/getAll")
+      .get("/payment/getAll")
       .then((res) => setPayments(res.data.data || []))
       .catch((err) => setError(err.response?.data?.message || "Error fetching payments"))
       .finally(() => setLoading(false));

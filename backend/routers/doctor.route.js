@@ -16,12 +16,22 @@ import {
   updateMedicalRecord,
   getMedicalRecordByAppointment,
   getPrescriptionByMedicalRecord,
-  updatePrescription
+  updatePrescription,
+  userCreateRequest,
 } from "../controllers/doctor.controller.js";
 import { middlewareTokenAsyncKey } from "../config/jwt.js";
+import { uploadCloud } from "../config/uploadCloud.js";
 
 const doctorRouter = express.Router();
 // ai search cũng được
+//  mình sẽ làm 1 cái form ở đây, tức là thay đổi tạm thời,
+// nào admin change role của thằng user thì gửi response về thằng user đó 
+doctorRouter.post(
+  "/requestRoleToDoctor",
+  middlewareTokenAsyncKey,
+  uploadCloud.single("img"),
+  userCreateRequest
+);
 doctorRouter.get("/searchPatients", searchPatients);
 // tạo lịch khám cho tương lai -> truyền thằng userId vô đây
 doctorRouter.post(

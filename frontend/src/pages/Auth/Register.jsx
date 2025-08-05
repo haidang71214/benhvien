@@ -16,7 +16,6 @@ export default function Register() {
   });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const { login } = useAuth();
 
   const handleChange = (e) => {
@@ -24,22 +23,45 @@ export default function Register() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+
+    if (!formData.email || !formData.password || !formData.confirmPassword || !formData.userName || !formData.dob) {
+      toast.error("Vui lòng điền đầy đủ thông tin.", { position: "top-right" });
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Email không hợp lệ.", { position: "top-right" });
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast.error("Mật khẩu phải có ít nhất 6 ký tự.", { position: "top-right" });
+      setLoading(false);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      toast.error("Mật khẩu xác nhận không khớp.", { position: "top-right" });
+      setLoading(false);
+      return;
+    }
+
+    if (new Date(formData.dob) > new Date()) {
+      toast.error("Ngày sinh không hợp lệ.", { position: "top-right" });
       setLoading(false);
       return;
     }
 
     try {
-      const response = await axiosInstance.post("/api/v1/auth/register", {
+      const response = await axiosInstance.post("/auth/register", {
         email: formData.email,
         password: formData.password,
         userName: formData.userName,
@@ -54,8 +76,9 @@ export default function Register() {
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        "Something went wrong. Please try again.";
-      setError(message);
+        err.response?.data?.errors?.[0]?.msg ||
+        "Có lỗi xảy ra. Vui lòng thử lại sau.";
+      toast.error(message, { position: "top-right" });
     }
 
     setLoading(false);
@@ -70,7 +93,6 @@ export default function Register() {
           onChange={handleChange}
           onSubmit={handleSubmit}
           loading={loading}
-          error={error}
         />
       </div>
     </div>

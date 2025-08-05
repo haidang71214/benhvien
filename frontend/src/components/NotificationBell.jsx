@@ -11,23 +11,24 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    // Optionally, poll for new notifications every minute
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      const res = await axiosInstance.get("/api/v1/notifications");
+      const res = await axiosInstance.get("/notifications");
       setNotifications(res.data.notifications || []);
       setUnreadCount((res.data.notifications || []).filter(n => !n.read).length);
     } catch (err) {
+      console.log(err);
+      
       setNotifications([]);
     }
   };
 
   const markAsRead = async (id) => {
-    await axiosInstance.put(`/api/v1/notifications/${id}/read`);
+    await axiosInstance.put(`/notifications/${id}/read`);
     fetchNotifications();
   };
 

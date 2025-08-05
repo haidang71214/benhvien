@@ -1,73 +1,104 @@
-import { Link } from "react-router-dom";
+  import {
+    ChevronRight,
+    Users,
+    MapPin,
+    Award,
+    Stethoscope,
+  } from "lucide-react";
 
-const DoctorCard = ({ doctor }) => {
-  const name = doctor.userName || doctor.name || "Unknown";
-  const speciality = Array.isArray(doctor.specialty)
-    ? doctor.specialty.join(", ")
-    : doctor.specialty || doctor.speciality || "General";
-  const image = doctor.avatarUrl || doctor.image || "/default-doctor-avatar.png";
-  const experience = doctor.experience || "N/A";
-  const ratings = doctor.ratings || 0;
-
-  const renderStars = (rating) => (
-    <div className="flex items-center gap-1">
-      {[...Array(5)].map((_, i) => (
-        <svg
-          key={i}
-          className="w-4 h-4 text-yellow-400"
-          fill={i < Math.floor(rating) ? "currentColor" : "none"}
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+  const DoctorCard = ({
+    doctor,
+    hoveredCard,
+    setHoveredCard,
+    handleDoctorClick,
+    renderStars,
+    getAvailabilityColor,
+  }) => {
+    return (
+      <div
+        key={doctor._id}
+        className={`group bg-white rounded-3xl shadow-lg border overflow-hidden cursor-pointer transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
+          hoveredCard === doctor._id ? "ring-4 ring-blue-200" : ""
+        }`}
+        onClick={() => handleDoctorClick(doctor._id)}
+        onMouseEnter={() => setHoveredCard(doctor._id)}
+        onMouseLeave={() => setHoveredCard(null)}
+      >
+        <div className="relative overflow-hidden">
+          <img
+            src={doctor.avatarUrl || "/images/default-doctor.jpg"}
+            alt={doctor.userName}
+            className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
           />
-        </svg>
-      ))}
-      <span className="text-sm text-gray-600">
-        ({doctor.totalReviews || 0} reviews)
-      </span>
-    </div>
-  );
-
-  return (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
-      <div className="relative">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-48 object-cover"
-          onError={(e) => (e.target.src = "/default-doctor-avatar.png")}
-        />
-        <span
-          className={`absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded-full ${
-            doctor.source === "mongodb"
-              ? "bg-green-100 text-green-800"
-              : "bg-blue-100 text-blue-800"
-          }`}
-        >
-          {doctor.source === "mongodb" ? "Live" : "System"}
-        </span>
-      </div>
-      <div className="p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-gray-800">{name}</h3>
-          {doctor.isVerified && (
-            <img src="/verified-icon.png" alt="Verified" className="w-5 h-5" />
-          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
+          <div
+            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold border ${getAvailabilityColor(
+              doctor.availability
+            )}`}
+          >
+            {doctor.availability || "Chưa rõ"}
+          </div>
+          <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-xs font-semibold text-gray-700">
+            {doctor.experience || "Chưa rõ kinh nghiệm"}
+          </div>
         </div>
-        <p className="text-gray-600 text-sm mt-1">{speciality}</p>
-        <p className="text-gray-500 text-sm">{experience} experience</p>
-        {renderStars(ratings)}
-        <Link className="mt-4 block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-          Book Appointment
-        </Link>
-      </div>
-    </div>
-  );
-};
 
-export default DoctorCard;
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {renderStars(doctor.ratings)}
+              <span className="text-sm font-bold text-amber-600">
+                {doctor.ratings || "0.0"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full">
+              <Users className="w-3 h-3 text-orange-500" />
+              <span className="text-xs font-semibold text-orange-600">
+                {doctor.consultations?.toLocaleString() || 0}
+              </span>
+            </div>
+          </div>
+
+          <h3 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-blue-600 transition">
+            {doctor.userName}
+          </h3>
+
+          <div className="space-y-2 mb-4 text-sm text-gray-600">
+            <p className="flex items-center gap-2">
+              <Stethoscope className="w-3 h-3 text-blue-500" />
+              {doctor.speciality?.join(", ") || "Chuyên khoa chưa cập nhật"}
+            </p>
+            <p className="flex items-center gap-2">
+              <MapPin className="w-3 h-3 text-green-500" />
+              {doctor.hospital || "Cơ sở chưa rõ"}
+            </p>
+            <p className="flex items-center gap-2">
+              <Award className="w-3 h-3 text-purple-500" />
+              {doctor.degree || "Học vị chưa rõ"}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-500">Phí tư vấn:</span>
+            <span className="text-lg font-bold text-green-600">
+              {doctor.fees ? `${doctor.fees.toLocaleString()}đ` : "Miễn phí"}
+            </span>
+          </div>
+
+          <button
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-4 rounded-xl transition-all transform hover:scale-105 shadow-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDoctorClick(doctor._id);
+            }}
+          >
+            <span className="flex items-center justify-center gap-2">
+              Đặt lịch ngay <ChevronRight className="w-4 h-4" />
+            </span>
+          </button>
+        </div>
+      </div>
+    )
+  };
+
+  export default DoctorCard;
