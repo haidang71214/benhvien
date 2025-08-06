@@ -82,7 +82,6 @@ const Navbar = () => {
             }
           >
             Về chúng tôi
-            Về chúng tôi
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -94,7 +93,7 @@ const Navbar = () => {
               }`
             }
           >
-            AI Gợi ý bệnh
+            AI Gợi ý Bác sĩ
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -126,22 +125,7 @@ const Navbar = () => {
             </NavLink>
           )}
         </NavbarItem>
-        <NavbarItem>
-          {/* Nurse-only link */}
-          {user?.role === "nurse" && (
-            <NavLink
-              to="/nurse-dashboard"
-              className={({ isActive }) =>
-                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-                }`
-              }
-            >
-              Trang y tá
-              Quản lý lịch khám{" "}
-            </NavLink>
-          )}
-        </NavbarItem>
+        
         <NavbarItem>
           {/* Nurse-only link */}
           {user?.role === "nurse" && (

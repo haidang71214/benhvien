@@ -9,14 +9,12 @@ const DOCTOR_HEHE = [
 ];
 // 
 const DOCTOR_SPECIALTIES = [
-  "Bác sĩ mắt",
+  "Bác sĩ đa khoa",
+  "Bác sĩ phụ khoa",
+  "Bác sĩ da liễu",
   "Bác sĩ nhi khoa",
-  "Bác sĩ tổng quát",
-  "Bác sĩ tim mạch",
-  "Bác sĩ mắt",
-  "Bác sĩ nhi khoa",
-  "Bác sĩ tổng quát",
-  "Bác sĩ tim mạch",
+  "Bác sĩ thần kinh",
+  "Bác sĩ chuyên khoa tiêu hóa",
 ];
 
 const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
