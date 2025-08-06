@@ -41,7 +41,6 @@ const Navbar = () => {
             }
           >
             Trang chủ
-            Trang chủ
           </NavLink>
         </NavbarItem>
         <NavbarItem className="relative group">
