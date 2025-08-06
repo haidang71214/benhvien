@@ -9,14 +9,12 @@ const DOCTOR_HEHE = [
 ];
 // 
 const DOCTOR_SPECIALTIES = [
-  "Bác sĩ mắt",
+  "Bác sĩ đa khoa",
+  "Bác sĩ phụ khoa",
+  "Bác sĩ da liễu",
   "Bác sĩ nhi khoa",
-  "Bác sĩ tổng quát",
-  "Bác sĩ tim mạch",
-  "Bác sĩ mắt",
-  "Bác sĩ nhi khoa",
-  "Bác sĩ tổng quát",
-  "Bác sĩ tim mạch",
+  "Bác sĩ thần kinh",
+  "Bác sĩ chuyên khoa tiêu hóa",
 ];
 
 const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
@@ -41,7 +39,6 @@ const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium">Tất cả chuyên khoa</span>
                 <span className="font-medium">Tất cả chuyên khoa</span>
                 {!selectedSpecialty && (
                   <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Active</span>

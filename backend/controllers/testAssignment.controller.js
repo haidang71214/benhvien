@@ -88,7 +88,7 @@ testAssignmentController.assignTest = async (req, res) => {
     // Create notification for nurse
     await Notification.create({
       userId: nurseId,
-      type: 'appointment',
+      type: 'test_assignment',
       message: `You have been assigned a new test: ${testDef.name}`,
       appointmentId,
     });

@@ -72,8 +72,13 @@ export default function NotificationBell() {
                   markAsRead(n._id);
                   if (n.type === 'chat') {
                     navigate('/chat');
+                    return;
+                  } else if (n.type === 'test_assignment') {
+                    navigate('/nurse-dashboard');
+                    return;
                   } else if (n.appointmentId) {
                     navigate(`/my-appointments`);
+                    return;
                   }
                 }}
               >

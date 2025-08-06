@@ -49,26 +49,26 @@ useEffect(() => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Đang tải...</div>;
 
   return (
     <div className="max-w-4xl mx-auto pt-24 px-4">
       <h2 className="text-3xl font-bold mb-8 text-blue-700 flex items-center gap-3">
         <span role="img" aria-label="nurse" className="text-blue-400 text-4xl">🩺</span>
-        Nurse Dashboard
+        Bảng điều khiển điều dưỡng
       </h2>
       <div className="mb-10 bg-white rounded-2xl shadow-lg p-8 border border-blue-100">
         <h3 className="text-xl font-bold text-blue-700 mb-6 flex items-center gap-2">
           <span role="img" aria-label="test" className="text-blue-400 text-2xl">🧪</span>
-          Assigned Tests
+          Danh sách xét nghiệm được giao
         </h3>
         {assignedTests.length === 0 ? (
           <div className="text-gray-500 italic text-center py-12">
             <span className="text-4xl block mb-4">🧑‍⚕️</span>
-            No tests assigned.<br />
-            <span className="text-xs text-gray-400">Nurse ID: {user?.id || 'unknown'}</span>
+            Không có xét nghiệm nào được giao.<br />
+            <span className="text-xs text-gray-400">Mã điều dưỡng: {user?.id || 'không rõ'}</span>
             <br />
-            <span className="text-xs text-gray-400">If you expect tests, check backend for TestAssignment documents with nurseId matching above and status 'assigned'.</span>
+            <span className="text-xs text-gray-400">Nếu bạn mong đợi có xét nghiệm, hãy kiểm tra backend với TestAssignment có nurseId trùng và trạng thái 'assigned'.</span>
           </div>
         ) : (
           <ul className="space-y-6">
@@ -80,15 +80,15 @@ useEffect(() => {
                     <span className="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-semibold">{test.status}</span>
                   </div>
                   <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-                    <span>Patient: <b>{test.patientId?.userName}</b></span>
-                    <span>Doctor: <b>{test.doctorId?.userName}</b></span>
+                    <span>Bệnh nhân: <b>{test.patientId?.userName}</b></span>
+                    <span>Bác sĩ: <b>{test.doctorId?.userName}</b></span>
                   </div>
                 </div>
                 <div className="flex flex-col gap-3 mt-2">
-                  {/* CT scan and X-ray: file upload and notes */}
+                  {/* CT scan và X-quang: tải ảnh và ghi chú */}
                   {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') && (
                     <div className="flex flex-col gap-2">
-                      <label className="font-semibold text-xs text-blue-700">Upload Image</label>
+                      <label className="font-semibold text-xs text-blue-700">Tải ảnh lên</label>
                       <input
                         type="file"
                         accept="image/*"
@@ -104,10 +104,10 @@ useEffect(() => {
                         }}
                         className="border border-gray-300 rounded px-2 py-1 min-w-[200px] bg-white"
                       />
-                      <label className="font-semibold text-xs text-blue-700">Notes</label>
+                      <label className="font-semibold text-xs text-blue-700">Ghi chú</label>
                       <input
                         type="text"
-                        placeholder="Notes"
+                        placeholder="Nhập ghi chú"
                         value={resultInputs[test._id]?.notes || ""}
                         onChange={e => setResultInputs(prev => ({
                           ...prev,
@@ -141,12 +141,12 @@ useEffect(() => {
                         }}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow mt-2"
                       >
-                        <span role="img" aria-label="submit">📤</span> Submit Result
+                        <span role="img" aria-label="submit">📤</span> Gửi kết quả
                       </button>
                     </div>
                   )}
-                  {/* Blood test: multiple fields */}
-                  {test.testId?.name === 'Blood Test' && (
+                  {/* Xét nghiệm máu: nhiều trường */}
+                  {(test.testId?.name === 'Blood Test' || test.testId?.name === 'Xét nghiệm máu') && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <div>
                         <label className="font-semibold text-xs text-blue-700">Hemoglobin</label>
@@ -165,7 +165,7 @@ useEffect(() => {
                         />
                       </div>
                       <div>
-                        <label className="font-semibold text-xs text-blue-700">WBC</label>
+                        <label className="font-semibold text-xs text-blue-700">Bạch cầu (WBC)</label>
                         <input
                           type="number"
                           placeholder="WBC"
@@ -181,10 +181,10 @@ useEffect(() => {
                         />
                       </div>
                       <div>
-                        <label className="font-semibold text-xs text-blue-700">Platelets</label>
+                        <label className="font-semibold text-xs text-blue-700">Tiểu cầu</label>
                         <input
                           type="number"
-                          placeholder="Platelets"
+                          placeholder="Tiểu cầu"
                           value={resultInputs[test._id]?.platelets || ""}
                           onChange={e => setResultInputs(prev => ({
                             ...prev,
@@ -208,12 +208,12 @@ useEffect(() => {
                           }}
                           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow w-full"
                         >
-                          <span role="img" aria-label="submit">📤</span> Submit Result
+                          <span role="img" aria-label="submit">📤</span> Gửi kết quả
                         </button>
                       </div>
                     </div>
                   )}
-                  {/* Urine test: multiple fields */}
+                  {/* Xét nghiệm nước tiểu: nhiều trường */}
                   {test.testId?.name === 'Urine Test' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
@@ -260,18 +260,18 @@ useEffect(() => {
                           }}
                           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow w-full"
                         >
-                          <span role="img" aria-label="submit">📤</span> Submit Result
+                          <span role="img" aria-label="submit">📤</span> Gửi kết quả
                         </button>
                       </div>
                     </div>
                   )}
-                  {/* Other: generic text input */}
-                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Urine Test' && (
+                  {/* Khác: nhập kết quả dạng text */}
+                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Xét nghiệm máu' && test.testId?.name !== 'Urine Test' && (
                     <div className="flex flex-col gap-2">
-                      <label className="font-semibold text-xs text-blue-700">Result</label>
+                      <label className="font-semibold text-xs text-blue-700">Kết quả</label>
                       <input
                         type="text"
-                        placeholder="Enter test result"
+                        placeholder="Nhập kết quả xét nghiệm"
                         value={resultInputs[test._id] || ""}
                         onChange={e => handleResultChange(test._id, e.target.value)}
                         className="border border-gray-300 rounded px-2 py-1 min-w-[200px] bg-white"
@@ -280,7 +280,7 @@ useEffect(() => {
                         onClick={() => handleSubmitResult(test._id)}
                         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow mt-2"
                       >
-                        <span role="img" aria-label="submit">📤</span> Submit Result
+                        <span role="img" aria-label="submit">📤</span> Gửi kết quả
                       </button>
                     </div>
                   )}

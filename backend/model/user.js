@@ -11,6 +11,13 @@ export const DOCTOR_HEHE = [
   "pediatrician",
   "neurologist",
   "gastroenterologist",
+  // Vietnamese names
+  "Bác sĩ đa khoa",
+  "Bác sĩ phụ khoa",
+  "Bác sĩ da liễu",
+  "Bác sĩ nhi khoa",
+  "Bác sĩ thần kinh",
+  "Bác sĩ chuyên khoa tiêu hóa",
 ];
 
 const userSchema = new Schema(

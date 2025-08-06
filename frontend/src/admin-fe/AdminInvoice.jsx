@@ -44,7 +44,7 @@ const AdminInvoice = () => {
                       <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Mã hóa đơn</th>
                       <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Bệnh nhân</th>
                       <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Số tiền</th>
-                      <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Trạng thái</th>
+                      <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Phương thức</th>
                       <th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Ngày thanh toán</th>
                     </tr>
                   </thead>
@@ -60,9 +60,9 @@ const AdminInvoice = () => {
                       return (
                         <tr key={payment._id} className="hover:bg-gray-50 transition-colors">
                           <td className="py-3 px-4 border-b text-gray-700">{idx + 1}</td>
-                          <td className="py-3 px-4 border-b text-gray-700">{payment._id}</td>
+                          <td className="py-3 px-4 border-b text-gray-700">{String(payment._id).slice(-6)}</td>
                           <td className="py-3 px-4 border-b text-gray-700">{patientName}</td>
-                          <td className="py-3 px-4 border-b text-gray-700 font-semibold">{(payment.amount * 1000).toLocaleString()}₫</td>
+                          <td className="py-3 px-4 border-b text-gray-700 font-semibold">{(payment.amount).toLocaleString()}₫</td>
                           <td className="py-3 px-4 border-b">
                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${payment.status === 'success' ? 'bg-green-100 text-green-700' : payment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>{payment.status || payment.payMethod || '-'}</span>
                           </td>
