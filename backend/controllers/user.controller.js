@@ -99,9 +99,45 @@ const getAllForm = async(req,res) =>{
     
   }
 }
+// Get current doctor profile
+const getDoctorProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await users.findById(userId).select(
+      "speciality degree experience about availableSchedule role"
+    );
+    if (!user || user.role !== "doctor") {
+      return res.status(403).json({ message: "Bạn không có quyền truy cập." });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('DEBUG getDoctorProfile error:', err);
+    res.status(500).json({ message: "Lỗi server khi lấy thông tin bác sĩ" });
+  }
+};
+
+// Update doctor profile
+const updateDoctorProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const updateFields = {};
+    ["speciality", "degree", "experience", "about", "availableSchedule"].forEach((field) => {
+      if (req.body[field] !== undefined) updateFields[field] = req.body[field];
+    });
+    const user = await users.findByIdAndUpdate(userId, updateFields, { new: true });
+    if (!user || user.role !== "doctor") {
+      return res.status(403).json({ message: "Bạn không có quyền cập nhật." });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server khi cập nhật thông tin bác sĩ" });
+  }
+};
 export{
   getAllForm,
   getMyMedicalRecords,
   detailform,
-  acceptRejectFormToChangeRole
+  acceptRejectFormToChangeRole,
+  getDoctorProfile,
+  updateDoctorProfile
 }

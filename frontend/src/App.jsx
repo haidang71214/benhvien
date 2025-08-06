@@ -31,6 +31,7 @@ import AISuggest from "./pages/AISuggest";
 import PaymentCancel from "./pages/PaymentCancel";
 import NurseDashboard from "./pages/nurse/NurseDashboard";
 import AllNotifications from "./pages/AllNotifications";
+import DoctorProfileEdit from "./pages/account-settings/DoctorProfileEdit";
 
 const App = () => {
   return (
@@ -80,6 +81,7 @@ const App = () => {
           <Route index element={<AccountInfo />} />
           <Route path="change-password" element={<ChangePassword />} />
           <Route path="medical-records-history" element={<MedicalRecordsHistory />} />
+          <Route path="doctor-profile" element={<DoctorProfileEdit />} />
         </Route>
 
         <Route path="/notifications" element={<AllNotifications />} />

@@ -4,15 +4,20 @@ import { User, Lock, Settings } from "lucide-react";
 const AccountLayout = () => {
   const navItems = [
     {
-      to: "/cai-dat-tai-khoan",
+      to: "/account-settings",
       icon: User,
-      label: "Hồ sơ bệnh nhân",
+      label: "Hồ sơ",
       end: true
     },
     {
-      to: "/cai-dat-tai-khoan/doi-mat-khau", 
+      to: "/account-settings/change-password",
       icon: Lock,
       label: "Đổi mật khẩu"
+    },
+    {
+      to: "/account-settings/doctor-profile",
+      icon: Settings,
+      label: "Chỉnh sửa bác sĩ"
     },
   ];
 

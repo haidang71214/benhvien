@@ -10,6 +10,7 @@ import testAssignmentRouter from './testAssignment.route.js';
 import testRoutes from './test.route.js';
 import aiRoutes from './ai.route.js';
 import paymentRoute from './payment.route.js';
+import doctorProfileRouter from './doctorProfile.route.js';
 
 
 const rootRouter = express.Router();
@@ -27,4 +28,5 @@ rootRouter.use('/user',userRouter);
 rootRouter.use('/notifications',notificationRouter);
 rootRouter.use('/ai',aiRoutes);
 rootRouter.use('/payment',paymentRoute);
-export default rootRouter; 
+rootRouter.use('/doctor-profile', doctorProfileRouter);
+export default rootRouter;
