@@ -42,7 +42,6 @@ const SpecialtySidebar = ({ selectedSpecialty, onSpecialtyClick }) => {
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium">Tất cả chuyên khoa</span>
-                <span className="font-medium">Tất cả chuyên khoa</span>
                 {!selectedSpecialty && (
                   <span className="text-xs bg-white/20 px-2 py-1 rounded-full">Active</span>
                 )}
