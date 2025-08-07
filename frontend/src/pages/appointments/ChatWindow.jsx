@@ -4,7 +4,6 @@ export const ChatWindow = ({ socket, conversationId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
-// 👇 Auto scroll khi messages thay đổi (kể cả khi mới load lần đầu)
 useEffect(() => {
   scrollToBottom();
 }, [messages,newMessage]);

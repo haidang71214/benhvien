@@ -14,8 +14,6 @@ export default function SliderChatUser({ onClose, onSelectConversation }) {
       console.log(user);
       
       try {
- 
-        
         const fetchedUserId = user.id;
         setUserId(fetchedUserId);
         console.log('User ID from localStorage:', fetchedUserId);

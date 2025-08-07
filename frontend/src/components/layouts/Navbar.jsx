@@ -12,7 +12,7 @@ import NotificationBell from "../NotificationBell";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { SocketContext } from "../../context/socketProvider";
-import { ChatWindow } from "../../pages/appointments/Appointment";
+import { ChatWindow } from "../../pages/appointments/ChatWindow";
 import SliderChatUser from "../../context/SliderChatUse";
 
 const Navbar = () => {
