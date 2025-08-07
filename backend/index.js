@@ -3,7 +3,6 @@ const { json, urlencoded } = express;
 import dotenv from "dotenv";
 import logger from "morgan";
 import { createServer } from "http";
-
 import mongoose from "mongoose";
 import cors from "cors";
 import normalizePort from "./routers/utils/normalizePort.js";
@@ -62,7 +61,6 @@ app.use(
   })
 );
 
-
 /**
  * Init mongoose.
  * process.env.MONGODB_URL ||
@@ -86,7 +84,6 @@ app.set("port", port);
 app.use(logger("dev"));
 app.use(json());
 app.use(urlencoded({ extended: false }));
-
 
 app.use(
   cors({
@@ -124,8 +121,6 @@ app.use((err, _req, res, _next) => {
  */
 const server = createServer(app);
 
-
-
 /**
  * Setup Socket.IO
  */
@@ -134,9 +129,6 @@ setupSocketIo(server);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-// Setup Socket.IO
-setupSocketIo(server);
 
 server.listen(port);
 server.on("error", onError(port));

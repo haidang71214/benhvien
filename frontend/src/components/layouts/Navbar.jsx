@@ -1,4 +1,4 @@
-import { assets } from "@/assets/data/doctors";
+import { assets } from "../../assets/data/doctors";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -116,7 +116,6 @@ const Navbar = () => {
               }`
             }
           >
-            AI Gợi ý Bác sĩ
             AI Gợi ý Bác sĩ
           </NavLink>
         </NavbarItem>

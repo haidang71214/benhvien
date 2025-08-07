@@ -17,11 +17,11 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <SocketProvider>
-      <ChatProvider>
-          <AppContextProvider>
-            <App />
-          </AppContextProvider>
-          </ChatProvider>
+            <ChatProvider>
+              <AppContextProvider>
+                <App />
+              </AppContextProvider>
+            </ChatProvider>
           </SocketProvider>
         </ThemeProvider>
       </BrowserRouter>
