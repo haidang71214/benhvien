@@ -49,7 +49,10 @@ export const AuthProvider = ({ children }) => {
   }, [accessToken]);
 
   const login = (userData, token) => {
+    console.log("Saving user data to localStorage:", userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    console.log(userData);
+    
     localStorage.setItem(ACCESS_TOKEN, token);
     
     setUser(userData);

@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { axiosInstance } from "../utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import Sidebar from "../components/ui/Sidebar";
 
 const AdminMedicine = () => {
   const { user, accessToken } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,6 +29,8 @@ const AdminMedicine = () => {
     warning: "",
   });
   const [editingMedicine, setEditingMedicine] = useState(null);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [currentWarning, setCurrentWarning] = useState("");
 
   const medicineTypes = [
     { value: "tablet", label: "Tablet", icon: "💊" },
@@ -201,37 +205,40 @@ const AdminMedicine = () => {
     return typeObj ? typeObj.icon : "💊";
   };
 
+  const showWarning = (warning) => {
+    setCurrentWarning(warning);
+    setShowWarningModal(true);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <div className="text-gray-700 text-lg">Loading medicines...</div>
+      <div className="flex min-h-screen bg-gray-50 pt-24">
+        <Sidebar activePath={location.pathname} />
+        <div className="flex-1 p-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="text-gray-700 text-lg">Loading medicines...</div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header */}
-      <div className="bg-white shadow-lg border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
-                <Pill className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Medicine Management
-              </h1>
-            </div>
-            <div className="text-sm text-gray-500">Admin Dashboard</div>
-          </div>
+    <div className="flex min-h-screen bg-gray-50 pt-24">
+      <Sidebar activePath={location.pathname} />
+      <div className="flex-1 p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
+            <Pill className="h-8 w-8 text-blue-600" />
+            Quản lý thuốc
+          </h1>
+          <p className="text-gray-600">Quản lý danh sách thuốc trong hệ thống</p>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Action Bar */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -240,7 +247,7 @@ const AdminMedicine = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
-                  placeholder="Search medicines..."
+                  placeholder="Tìm kiếm thuốc..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg"
@@ -254,7 +261,7 @@ const AdminMedicine = () => {
                   onChange={(e) => setFilterType(e.target.value)}
                   className="pl-10 pr-8 py-3 border border-gray-200 rounded-lg bg-white"
                 >
-                  <option value="all">All Types</option>
+                  <option value="all">Tất cả loại</option>
                   {medicineTypes.map((type) => (
                     <option key={type.value} value={type.value}>
                       {type.label}
@@ -269,7 +276,7 @@ const AdminMedicine = () => {
               className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg"
             >
               <Plus className="h-5 w-5" />
-              {showCreateForm ? "Cancel" : "Add Medicine"}
+              {showCreateForm ? "Hủy" : "Thêm thuốc"}
             </button>
           </div>
         </div>
@@ -282,7 +289,7 @@ const AdminMedicine = () => {
                 <Plus className="h-5 w-5 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800">
-                {editingMedicine ? "Edit Medicine" : "Add New Medicine"}
+                {editingMedicine ? "Chỉnh sửa thuốc" : "Thêm thuốc mới"}
               </h2>
             </div>
 
@@ -290,7 +297,7 @@ const AdminMedicine = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Medicine Name *
+                    Tên thuốc *
                   </label>
                   <input
                     type="text"
@@ -298,13 +305,13 @@ const AdminMedicine = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg"
-                    placeholder="Enter medicine name"
+                    placeholder="Nhập tên thuốc"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Type *
+                    Loại *
                   </label>
                   <select
                     name="type"
@@ -323,7 +330,7 @@ const AdminMedicine = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Description *
+                  Mô tả *
                 </label>
                 <textarea
                   name="description"
@@ -331,13 +338,13 @@ const AdminMedicine = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg"
                   rows="3"
-                  placeholder="Enter medicine description"
+                  placeholder="Nhập mô tả thuốc"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Warning
+                  Cảnh báo
                 </label>
                 <textarea
                   name="warning"
@@ -345,7 +352,7 @@ const AdminMedicine = () => {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg"
                   rows="2"
-                  placeholder="Enter any warnings"
+                  placeholder="Nhập cảnh báo (nếu có)"
                 />
               </div>
 
@@ -358,7 +365,7 @@ const AdminMedicine = () => {
                   }
                   className="bg-blue-600 text-white px-8 py-3 rounded-lg"
                 >
-                  {editingMedicine ? "Update Medicine" : "Add Medicine"}
+                  {editingMedicine ? "Cập nhật thuốc" : "Thêm thuốc"}
                 </button>
                 {editingMedicine && (
                   <button
@@ -373,7 +380,7 @@ const AdminMedicine = () => {
                     }}
                     className="px-8 py-3 border border-gray-300 rounded-lg"
                   >
-                    Cancel
+                    Hủy
                   </button>
                 )}
               </div>
@@ -382,72 +389,127 @@ const AdminMedicine = () => {
         )}
 
         {/* Medicines List */}
-        <div className="grid gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {filteredMedicines.length === 0 ? (
-            <div className="bg-white rounded-xl p-12 text-center">
-              <p className="text-gray-500">No medicines found.</p>
+            <div className="p-12 text-center">
+              <p className="text-gray-500">Không tìm thấy thuốc nào.</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMedicines.map((medicine) => (
-                <div
-                  key={medicine._id}
-                  className="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">{getTypeIcon(medicine.type)}</div>
-                      <div>
-                        <h3 className="text-lg font-bold">{medicine.name}</h3>
-                        <span className="text-sm text-gray-500 capitalize">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Tên thuốc
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Loại
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Mô tả
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                      Cảnh báo
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredMedicines.map((medicine) => (
+                    <tr key={medicine._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-2xl">{getTypeIcon(medicine.type)}</div>
+                          <div>
+                            <div className="font-semibold text-gray-900">{medicine.name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
                           {medicine.type}
                         </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-2">
-                    {medicine.description}
-                  </p>
-
-                  {medicine.warning && (
-                    <button
-                      onClick={() => toast.warning(medicine.warning)}
-                      className="text-amber-700 text-sm hover:underline"
-                    >
-                      ⚠ View Warning
-                    </button>
-                  )}
-
-                  <div className="flex gap-2 pt-4">
-                    <button
-                      onClick={() => {
-                        setEditingMedicine(medicine);
-                        setFormData({
-                          name: medicine.name,
-                          type: medicine.type,
-                          description: medicine.description,
-                          warning: medicine.warning || "",
-                        });
-                        setShowCreateForm(true);
-                      }}
-                      className="bg-blue-100 text-blue-700 px-4 py-2 rounded"
-                    >
-                      <Edit className="h-4 w-4 inline" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteMedicine(medicine._id)}
-                      className="bg-red-100 text-red-700 px-4 py-2 rounded"
-                    >
-                      <Trash2 className="h-4 w-4 inline" /> Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <p className="text-sm text-gray-600 truncate" title={medicine.description}>
+                            {medicine.description}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {medicine.warning ? (
+                          <button
+                            onClick={() => showWarning(medicine.warning)}
+                            className="text-amber-700 text-sm hover:underline flex items-center gap-1"
+                          >
+                            <span>⚠</span>
+                            <span>Xem cảnh báo</span>
+                          </button>
+                        ) : (
+                          <span className="text-gray-400 text-sm">Không có</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingMedicine(medicine);
+                              setFormData({
+                                name: medicine.name,
+                                type: medicine.type,
+                                description: medicine.description,
+                                warning: medicine.warning || "",
+                              });
+                              setShowCreateForm(true);
+                            }}
+                            className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded text-sm hover:bg-blue-200 transition-colors"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Chỉnh sửa
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMedicine(medicine._id)}
+                            className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1.5 rounded text-sm hover:bg-red-200 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
       </div>
+
+      {/* Warning Modal */}
+      {showWarningModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-2xl">⚠️</div>
+              <h3 className="text-lg font-semibold text-gray-900">Cảnh báo</h3>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-700 whitespace-pre-wrap">{currentWarning}</p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowWarningModal(false)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

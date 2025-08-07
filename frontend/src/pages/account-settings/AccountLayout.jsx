@@ -1,19 +1,31 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { User, Lock, Settings } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const AccountLayout = () => {
+  const { user } = useAuth();
+  const role = user?.role;
   const navItems = [
     {
-      to: "/cai-dat-tai-khoan",
+      to: "/account-settings",
       icon: User,
-      label: "Hồ sơ bệnh nhân",
-      end: true
+      label: "Hồ sơ",
+      end: true,
     },
     {
-      to: "/cai-dat-tai-khoan/doi-mat-khau", 
+      to: "/account-settings/change-password",
       icon: Lock,
-      label: "Đổi mật khẩu"
+      label: "Đổi mật khẩu",
     },
+    ...(role === "doctor"
+      ? [
+          {
+            to: "/account-settings/doctor-profile",
+            icon: Settings,
+            label: "Chỉnh sửa bác sĩ",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -25,7 +37,9 @@ const AccountLayout = () => {
               <Settings className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">Cài đặt tài khoản</h2>
+              <h2 className="text-xl font-bold text-slate-800">
+                Cài đặt tài khoản
+              </h2>
               <p className="text-sm text-slate-500">Quản lý tùy chọn của bạn</p>
             </div>
           </div>
@@ -40,19 +54,21 @@ const AccountLayout = () => {
                   end={item.end}
                   className={({ isActive }) =>
                     `group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                      isActive 
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]" 
+                      isActive
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]"
                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-800 hover:shadow-md hover:scale-[1.01]"
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <div className={`p-2 rounded-lg transition-colors ${
-                        isActive 
-                          ? "bg-white/20" 
-                          : "bg-slate-100 group-hover:bg-slate-200"
-                      }`}>
+                      <div
+                        className={`p-2 rounded-lg transition-colors ${
+                          isActive
+                            ? "bg-white/20"
+                            : "bg-slate-100 group-hover:bg-slate-200"
+                        }`}
+                      >
                         <IconComponent className="w-4 h-4" />
                       </div>
                       <span className="font-medium">{item.label}</span>

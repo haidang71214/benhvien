@@ -47,7 +47,7 @@ const AdminTestManager = () => {
         <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
           <div className="py-8 text-center border-b border-gray-200">
             <h1 className="text-3xl font-bold text-blue-700 flex items-center gap-2">
-              <FaPlus className="text-blue-400" /> Test Type Manager
+              <FaPlus className="text-blue-400" /> Quản lý các loại xét nghiệm
             </h1>
           </div>
           <div className="p-8">
@@ -55,7 +55,7 @@ const AdminTestManager = () => {
               <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 items-center bg-blue-50 rounded-lg p-4 shadow w-full max-w-xl">
                 <input
                   type="text"
-                  placeholder="Test Name"
+                  placeholder="Tên xét nghiệm"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   className="border border-blue-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -64,7 +64,7 @@ const AdminTestManager = () => {
                 <input
                   type="number"
                   min={0}
-                  placeholder="Price"
+                  placeholder="Giá tiền"
                   value={form.price}
                   onChange={e => setForm({ ...form, price: Number(e.target.value) })}
                   className="border border-blue-300 rounded px-3 py-2 w-32 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -72,24 +72,24 @@ const AdminTestManager = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Description"
+                  placeholder="Mô tả"
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })}
                   className="border border-blue-300 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded px-4 py-2 font-semibold flex items-center gap-2 shadow">
-                  {editId ? <FaCheck /> : <FaPlus />} {editId ? 'Update' : 'Add'}
+                  {editId ? <FaCheck /> : <FaPlus />} {editId ? 'Cập nhật' : 'Thêm'}
                 </button>
                 {editId && (
                   <button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded px-4 py-2 flex items-center gap-2" onClick={() => { setEditId(null); setForm({ name: '', description: '', price: 0 }); }}>
-                    <FaTimes /> Cancel
+                    <FaTimes /> Hủy
                   </button>
                 )}
               </form>
             </div>
             <ul className="divide-y">
               {tests.length === 0 ? (
-                <li className="py-4 text-center text-gray-400 italic">No test types found.</li>
+                <li className="py-4 text-center text-gray-400 italic">Không tìm thấy loại xét nghiệm nào.</li>
               ) : (
                 tests.map(test => (
                   <li key={test._id} className="py-3 flex justify-between items-center hover:bg-blue-50 rounded-lg px-2 transition">
@@ -99,11 +99,11 @@ const AdminTestManager = () => {
                       {test.description && <span className="ml-2 text-gray-500">{test.description}</span>}
                     </div>
                     <div className="flex gap-2">
-                      <button className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition flex items-center gap-1" onClick={() => handleEdit(test)} title="Edit">
-                        <FaEdit /> <span className="hidden sm:inline">Edit</span>
+                      <button className="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition flex items-center gap-1" onClick={() => handleEdit(test)} title="Chỉnh sửa">
+                        <FaEdit /> <span className="hidden sm:inline">Sửa</span>
                       </button>
-                      <button className="text-red-600 hover:text-red-800 px-2 py-1 rounded transition flex items-center gap-1" onClick={() => handleDelete(test._id)} title="Delete">
-                        <FaTrash /> <span className="hidden sm:inline">Delete</span>
+                      <button className="text-red-600 hover:text-red-800 px-2 py-1 rounded transition flex items-center gap-1" onClick={() => handleDelete(test._id)} title="Xóa">
+                        <FaTrash /> <span className="hidden sm:inline">Xóa</span>
                       </button>
                     </div>
                   </li>

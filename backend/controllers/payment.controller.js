@@ -44,13 +44,13 @@ export const createPaymentLink = async (req, res) => {
 
     const paymentBody = {
       orderCode,
-      amount: Number(amount) * 1000,
+      amount: Number(amount),
       description: `Phí đặt lịch #${orderCode}`.slice(0, 25), // max 25 chars
       items: [
         {
           name: "Phí đặt lịch khám",
           quantity: 1,
-          price: Number(amount) * 1000,
+          price: Number(amount),
         },
       ],
       returnUrl: `${process.env.FRONTEND_URL || "http://localhost:5173"}/payment-success?orderCode=${orderCode}`,

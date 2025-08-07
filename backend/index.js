@@ -3,7 +3,7 @@ const { json, urlencoded } = express;
 import dotenv from "dotenv";
 import logger from "morgan";
 import { createServer } from "http";
-import setupSocket from "./config/socket.js";
+
 import mongoose from "mongoose";
 import cors from "cors";
 import normalizePort from "./routers/utils/normalizePort.js";
@@ -11,6 +11,9 @@ import { onError, onListening } from "./routers/utils/appEvents.js";
 import rootRouter from "./routers/root.route.js";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+
+import { setupSocketIo } from "./config/socket-io.js";
+
 dotenv.config();
 
 let __max = 0; // Biến max length cho log
@@ -50,7 +53,6 @@ const app = express();
 app.use(cookieParser());
 
 //session
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your-secret-key",
@@ -122,12 +124,14 @@ app.use((err, _req, res, _next) => {
  */
 const server = createServer(app);
 
+
+
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 // Setup Socket.IO
-setupSocket(server);
+setupSocketIo(server);
 
 server.listen(port);
 server.on("error", onError(port));

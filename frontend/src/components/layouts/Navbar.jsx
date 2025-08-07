@@ -9,10 +9,47 @@ import {
   NavbarMenuToggle,
 } from "@heroui/navbar";
 import NotificationBell from "../NotificationBell";
+import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { SocketContext } from "../../context/socketProvider";
+import { ChatWindow } from "../../pages/appointments/Appointment";
+import SliderChatUser from "../../context/SliderChatUse";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
+  const { socket } = useContext(SocketContext);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    socket.emit("register", user.id);
+
+    const handleNewMessage = (message) => {
+      if (!isChatOpen && message.conversationId !== selectedConversationId) {
+        setSelectedConversationId(message.conversationId);
+        setIsChatOpen(true);
+      }
+    };
+
+    socket.on("newMessage", handleNewMessage);
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+      toast.error("Lỗi socket: " + error.message);
+    });
+
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+      socket.off("error");
+    };
+  }, [socket, user, selectedConversationId, isChatOpen]);
+
+  const handleCloseChat = () => {
+    setIsChatOpen(false);
+    setSelectedConversationId(null);
+  };
 
   return (
     <HeroNavbar
@@ -41,35 +78,21 @@ const Navbar = () => {
             }
           >
             Trang chủ
-            Trang chủ
           </NavLink>
         </NavbarItem>
-        <NavbarItem className="relative group">
-          <div className="px-4 py-2 text-base font-semibold rounded-md cursor-pointer text-gray-700 hover:bg-gray-100 group-hover:text-blue-600 transition-colors">
-            Dịch vụ y tế
-          </div>
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 min-w-[200px]">
-            <NavLink
-              to="/booking/doctors"
-              className={({ isActive }) =>
-                `block px-4 py-2 text-sm font-medium rounded-t-md hover:bg-gray-50 transition-colors ${
-                  isActive ? "text-blue-600" : "text-gray-700"
-                }`
-              }
-            >
-              Đặt theo bác sĩ
-            </NavLink>
-            <NavLink
-              to="/goi-video-voi-bac-si"
-              className={({ isActive }) =>
-                `block px-4 py-2 text-sm font-medium rounded-b-md hover:bg-gray-50 transition-colors ${
-                  isActive ? "text-blue-600" : "text-gray-700"
-                }`
-              }
-            >
-              Gọi video với bác sĩ
-            </NavLink>
-          </div>
+        <NavbarItem>
+          <NavLink
+            to="/booking/doctors"
+            className={({ isActive }) =>
+              `px-4 py-2 text-base font-semibold rounded-md transition-colors ${
+                isActive
+                  ? "text-blue-600 bg-gray-100"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-gray-100"
+              }`
+            }
+          >
+            Đặt theo bác sĩ
+          </NavLink>
         </NavbarItem>
 
         <NavbarItem>
@@ -82,7 +105,6 @@ const Navbar = () => {
             }
           >
             Về chúng tôi
-            Về chúng tôi
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -94,7 +116,7 @@ const Navbar = () => {
               }`
             }
           >
-            AI Gợi ý bệnh
+            AI Gợi ý Bác sĩ
           </NavLink>
         </NavbarItem>
         <NavbarItem>
@@ -108,7 +130,6 @@ const Navbar = () => {
                 }`
               }
             >
-              Trang quản trị
               Trang quản trị
             </NavLink>
           )}
@@ -127,22 +148,7 @@ const Navbar = () => {
             </NavLink>
           )}
         </NavbarItem>
-        <NavbarItem>
-          {/* Nurse-only link */}
-          {user?.role === "nurse" && (
-            <NavLink
-              to="/nurse-dashboard"
-              className={({ isActive }) =>
-                `px-4 py-2 text-base font-semibold rounded-md hover:bg-gray-100 transition-colors ${
-                  isActive ? "text-blue-600 bg-gray-100" : "text-gray-700"
-                }`
-              }
-            >
-              Trang y tá
-              Quản lý lịch khám{" "}
-            </NavLink>
-          )}
-        </NavbarItem>
+
         <NavbarItem>
           {/* Nurse-only link */}
           {user?.role === "nurse" && (
@@ -196,6 +202,12 @@ const Navbar = () => {
                     >
                       Phiếu khám bệnh
                     </button>
+                    <button
+                      onClick={() => setIsChatOpen(true)}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                      Các cuộc trò chuyện
+                    </button>
                     {/* Only show for patients */}
                     {user?.role === "patient" && (
                       <button
@@ -204,7 +216,6 @@ const Navbar = () => {
                         }
                         className="flex items-center gap-3 w-full px-4 py-2 text-gray-800 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
                       >
-                        Lịch sử hồ sơ y tế
                         Lịch sử hồ sơ y tế
                       </button>
                     )}
@@ -241,9 +252,26 @@ const Navbar = () => {
           )}
         </div>
       </NavbarContent>
+      {isChatOpen && (
+        <>
+          <SliderChatUser
+            onClose={handleCloseChat}
+            onSelectConversation={(conversationId) =>
+              setSelectedConversationId(conversationId)
+            }
+          />
+          {selectedConversationId && (
+            <ChatWindow
+              socket={socket}
+              conversationId={selectedConversationId}
+              userId={user?.id}
+              onClose={handleCloseChat}
+            />
+          )}
+        </>
+      )}
     </HeroNavbar>
   );
 };
 
 export default Navbar;
-
