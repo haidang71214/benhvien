@@ -5,8 +5,8 @@ import testAssignmentController from '../controllers/testAssignment.controller.j
 const testAssignmentRouter = express.Router();
 
 import { uploadCloud } from '../config/uploadCloud.js';
-// Nurse submits test result (support image upload to cloud)
-testAssignmentRouter.put('/result/:testId', uploadCloud.single('image'), testAssignmentController.submitTestResult);
+// Nurse submits test result (support multiple image upload to cloud)
+testAssignmentRouter.put('/result/:testId', uploadCloud.array('image'), testAssignmentController.submitTestResult);
 
 // Doctor assigns test to nurse (with price)
 testAssignmentRouter.post('/assign', testAssignmentController.assignTest);

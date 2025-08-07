@@ -15,17 +15,23 @@ const GENAIHEHE = async (req, res) => {
       return res.status(500).json({ error: "Không xử lý được AI" });
     }
 
-    const results = [];
-
+    const seenSpecialties = new Set();
+    let result = null;
     for (const diag of diagnoses) {
       if (!diag.enumspecialty) {
         console.warn("❗️AI không trả về enumspecialty hợp lệ:", diag);
         continue;
       }
+      const specialtyKey = diag.enumspecialty.trim();
+      if (seenSpecialties.has(specialtyKey)) {
+        continue;
+      }
+      seenSpecialties.add(specialtyKey);
+      // Find doctors by both Vietnamese and English specialty
       const doctors = await users
         .find({
           role: "doctor",
-          speciality: diag.enumspecialty,
+          speciality: { $in: [diag.enumspecialty, diag.specialty] },
         })
         .select("-password -refreshToken -resetToken -resetTokenExpires");
       // Add appointment link for each doctor, userId will be filled by frontend
@@ -34,23 +40,24 @@ const GENAIHEHE = async (req, res) => {
         appointmentLink: `/appointment/${doc._id}/USER_ID` // Replace USER_ID in frontend
       }));
       console.log("📌 Tìm với specialty:", diag.enumspecialty);
-      results.push({
+      result = {
         reason: diag.reason,
         diagnosis: diag.diagnosis,
         specialty: diag.specialty,
-        enumspecialty: diag.enumspecialty.trim(),
+        enumspecialty: specialtyKey,
         doctors: doctorsWithLinks,
-      });
+      };
+      break; // Only return the first unique specialty
     }
 
-    console.log("🎯 Trả về kết quả:", results);
-    if (results.length === 0) {
+    if (!result) {
       console.warn(
         "⚠️ Không tìm thấy bác sĩ nào phù hợp với tất cả chẩn đoán."
       );
+      return res.json([]);
     }
-
-    res.json(results);
+    console.log("🎯 Trả về kết quả:", result);
+    res.json([result]);
   } catch (err) {
     console.error("🔥 Lỗi khi chẩn đoán:", err);
     res.status(500).json({ error: err.message || "Lỗi máy chủ" });
