@@ -127,6 +127,11 @@ const server = createServer(app);
 
 
 /**
+ * Setup Socket.IO
+ */
+setupSocketIo(server);
+
+/**
  * Listen on provided port, on all network interfaces.
  */
 

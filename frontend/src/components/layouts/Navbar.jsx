@@ -117,6 +117,7 @@ const Navbar = () => {
             }
           >
             AI Gợi ý Bác sĩ
+            AI Gợi ý Bác sĩ
           </NavLink>
         </NavbarItem>
         <NavbarItem>
