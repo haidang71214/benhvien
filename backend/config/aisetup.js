@@ -23,20 +23,23 @@ Yêu cầu:
   {
     "reason": "giải thích",
     "diagnosis": "tên bệnh",
-    "specialty": "Tên chuyên khoa tiếng Việt",
-    "enumspecialty": "Tên chuyên khoa tiếng Anh đúng theo danh sách này"
+    "specialty": "Tên chuyên khoa tiếng Việt (bắt buộc)",
+    "enumspecialty": "Tên chuyên khoa tiếng Anh (bắt buộc, đúng theo danh sách dưới)"
   }
 ]
 
-Chỉ được sử dụng enumspecialty sau:
+Lưu ý:
+- specialty phải là tiếng Việt, enumspecialty phải là tiếng Anh, cả hai đều phải đúng theo bảng mapping dưới đây.
+- Luôn trả về cả hai trường này cho mỗi kết quả.
 
+Mapping specialty (Vietnamese) <-> enumspecialty (English) hợp lệ:
 {
   "General physician": "Bác sĩ đa khoa",
-  "Gynecologist": "Phụ khoa",
-  "Dermatologist": "Da liễu",
-  "Pediatricians": "Nhi khoa",
-  "Neurologist": "Thần kinh",
-  "Gastroenterologist": "Tiêu hóa"
+  "Gynecologist": "Bác sĩ phụ khoa",
+  "Dermatologist": "Bác sĩ da liễu",
+  "Pediatricians": "Bác sĩ nhi khoa",
+  "Neurologist": "Bác sĩ thần kinh",
+  "Gastroenterologist": "Bác sĩ chuyên khoa tiêu hóa"
 }
 `;
 

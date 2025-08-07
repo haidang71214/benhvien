@@ -1,10 +1,12 @@
-  import {
-    ChevronRight,
-    Users,
-    MapPin,
-    Award,
-    Stethoscope,
-  } from "lucide-react";
+
+import React, { useRef, useEffect, useState } from "react";
+import {
+  ChevronRight,
+  Users,
+  MapPin,
+  Award,
+  Stethoscope,
+} from "lucide-react";
 
   const DoctorCard = ({
     doctor,
@@ -14,6 +16,16 @@
     renderStars,
     getAvailabilityColor,
   }) => {
+    const specialityRef = useRef(null);
+    const [isOverflowed, setIsOverflowed] = useState(false);
+
+    useEffect(() => {
+      const el = specialityRef.current;
+      if (el) {
+        setIsOverflowed(el.scrollWidth > el.clientWidth);
+      }
+    }, [doctor.speciality]);
+
     return (
       <div
         key={doctor._id}
@@ -31,13 +43,13 @@
             className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition" />
-          <div
+          {/* <div
             className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold border ${getAvailabilityColor(
               doctor.availability
             )}`}
           >
             {doctor.availability || "Chưa rõ"}
-          </div>
+          </div> */}
           <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-xs font-semibold text-gray-700">
             {doctor.experience || "Chưa rõ kinh nghiệm"}
           </div>
@@ -64,9 +76,34 @@
           </h3>
 
           <div className="space-y-2 mb-4 text-sm text-gray-600">
-            <p className="flex items-center gap-2">
+            <p
+              className="flex items-center gap-2"
+              style={{ maxHeight: '24px', position: 'relative' }}
+            >
               <Stethoscope className="w-3 h-3 text-blue-500" />
-              {doctor.speciality?.join(", ") || "Chuyên khoa chưa cập nhật"}
+              <span
+                ref={specialityRef}
+                className="block w-full pr-6"
+                style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'block',
+                  position: 'relative',
+                }}
+                title={doctor.speciality?.join(", ") || "Chuyên khoa chưa cập nhật"}
+              >
+                {doctor.speciality?.join(", ") || "Chuyên khoa chưa cập nhật"}
+              </span>
+              {isOverflowed && (
+                <span
+                  className="absolute right-2 text-gray-400 bg-white"
+                  style={{ pointerEvents: 'none', top: '50%', transform: 'translateY(-50%)', background: 'inherit', paddingLeft: '2px' }}
+                  aria-hidden="true"
+                >
+                  ...
+                </span>
+              )}
             </p>
             <p className="flex items-center gap-2">
               <MapPin className="w-3 h-3 text-green-500" />

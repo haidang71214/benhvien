@@ -22,10 +22,11 @@ const GENAIHEHE = async (req, res) => {
         console.warn("❗️AI không trả về enumspecialty hợp lệ:", diag);
         continue;
       }
+      // Find doctors by both Vietnamese and English specialty
       const doctors = await users
         .find({
           role: "doctor",
-          speciality: diag.enumspecialty,
+          speciality: { $in: [diag.enumspecialty, diag.specialty] },
         })
         .select("-password -refreshToken -resetToken -resetTokenExpires");
       // Add appointment link for each doctor, userId will be filled by frontend

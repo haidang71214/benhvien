@@ -135,9 +135,6 @@ setupSocketIo(server);
  * Listen on provided port, on all network interfaces.
  */
 
-// Setup Socket.IO
-setupSocketIo(server);
-
 server.listen(port);
 server.on("error", onError(port));
 server.on("listening", onListening(server));
