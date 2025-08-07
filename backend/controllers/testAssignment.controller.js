@@ -220,9 +220,11 @@ testAssignmentController.submitTestResult = async (req, res) => {
   try {
     const { testId } = req.params;
     let result = {};
-    // If image uploaded, add imageUrl to result
-    if (req.file && req.file.path) {
-      // For cloudinary, use secure_url or path
+    // If images uploaded, add imageUrls array to result
+    if (req.files && req.files.length > 0) {
+      result.imageUrls = req.files.map(f => f.path || f.secure_url || f.url);
+    } else if (req.file && req.file.path) {
+      // fallback for single file (should not happen with .array, but for safety)
       result.imageUrl = req.file.path || req.file.secure_url || req.file.url;
     }
     // Merge other fields from body (notes, etc)

@@ -85,20 +85,21 @@ useEffect(() => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-3 mt-2">
-                  {/* CT scan và X-quang: tải ảnh và ghi chú */}
-                  {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') && (
+                  {/* CT scan, X-quang, Siêu âm bụng: tải ảnh và ghi chú */}
+                  {(test.testId?.name === 'Chụp CT' || test.testId?.name === 'X-ray' || test.testId?.name === 'X-quang' || test.testId?.name === 'Siêu âm bụng') && (
                     <div className="flex flex-col gap-2">
                       <label className="font-semibold text-xs text-blue-700">Tải ảnh lên</label>
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         onChange={e => {
-                          const file = e.target.files[0];
+                          const files = Array.from(e.target.files);
                           setResultInputs(prev => ({
                             ...prev,
                             [test._id]: {
                               ...(prev[test._id] || {}),
-                              image: file
+                              images: files
                             }
                           }));
                         }}
@@ -121,12 +122,16 @@ useEffect(() => {
                       <button
                         onClick={async () => {
                           const input = resultInputs[test._id];
-                          if (!input?.image && !input?.notes) {
+                          if ((!input?.images || input.images.length === 0) && !input?.notes) {
                             toast.error("Vui lòng nhập ảnh hoặc ghi chú");
                             return;
                           }
                           const formData = new FormData();
-                          if (input.image) formData.append('image', input.image);
+                          if (input.images && input.images.length > 0) {
+                            input.images.forEach((img) => {
+                              formData.append('image', img);
+                            });
+                          }
                           if (input.notes) formData.append('notes', input.notes);
                           try {
                             await axiosInstance.put(`/test-assignment/result/${test._id}`, formData, {
@@ -266,7 +271,7 @@ useEffect(() => {
                     </div>
                   )}
                   {/* Khác: nhập kết quả dạng text */}
-                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Xét nghiệm máu' && test.testId?.name !== 'Urine Test' && (
+                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'Chụp CT' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'X-quang' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Xét nghiệm máu' && test.testId?.name !== 'Urine Test' && test.testId?.name !== 'Siêu âm bụng' && (
                     <div className="flex flex-col gap-2">
                       <label className="font-semibold text-xs text-blue-700">Kết quả</label>
                       <input

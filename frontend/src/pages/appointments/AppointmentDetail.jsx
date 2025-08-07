@@ -386,32 +386,32 @@ const AppointmentDetail = () => {
         onClick={() => navigate(-1)}
         className="mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition"
       >
-        <ArrowLeft className="w-5 h-5" /> Back
+        <ArrowLeft className="w-5 h-5" /> Quay lại
       </button>
       <h2 className="text-2xl font-bold mb-6 text-blue-700">
-        Appointment Detail
+        Chi tiết lịch hẹn
       </h2>
       <div className="mb-8 bg-white rounded-xl shadow p-6">
         <div className="mb-2">
-          <b>Doctor:</b>{" "}
+          <b>Bác sĩ:</b>{" "}
           <span className="text-gray-700">
             {appointment.doctorId?.userName}
           </span>
         </div>
         <div className="mb-2">
-          <b>Patient:</b>{" "}
+          <b>Bệnh nhân:</b>{" "}
           <span className="text-gray-700">
             {appointment.patientId?.userName}
           </span>
         </div>
         <div className="mb-2">
-          <b>Time:</b>{" "}
+          <b>Thời gian:</b>{" "}
           <span className="text-gray-700">
             {new Date(appointment.appointmentTime).toLocaleString()}
           </span>
         </div>
         <div>
-          <b>Initial Symptom:</b>{" "}
+          <b>Triệu chứng ban đầu:</b>{" "}
           <span className="text-gray-700">{appointment.initialSymptom}</span>
         </div>
       </div>
@@ -419,7 +419,7 @@ const AppointmentDetail = () => {
       {/* Doctor: Assign tests to nurse and show assigned/completed tests */}
       {user.role === "doctor" && (
         <div className="mb-8 bg-white rounded-xl shadow p-6">
-          <h3 className="text-lg font-bold text-blue-700 mb-4">Assign Test to Nurse</h3>
+          <h3 className="text-lg font-bold text-blue-700 mb-4">Phân công xét nghiệm cho y tá</h3>
           <form className="flex flex-col md:flex-row gap-4 items-center" onSubmit={handleAssignTest}>
             <select
               value={selectedTestId}
@@ -427,7 +427,7 @@ const AppointmentDetail = () => {
               className="border border-gray-300 rounded px-2 py-1 min-w-[120px]"
               required
             >
-              <option value="">Select test type</option>
+              <option value="">Chọn loại xét nghiệm</option>
               {availableTests.map(test => (
                 <option key={test._id} value={test._id}>
                   {test.name}
@@ -440,7 +440,7 @@ const AppointmentDetail = () => {
               className="border border-gray-300 rounded px-2 py-1 min-w-[120px]"
               required
             >
-              <option value="">Select nurse</option>
+              <option value="">Chọn y tá</option>
               {nurses.map(n => (
                 <option key={n._id} value={n._id}>{n.userName}</option>
               ))}
@@ -450,14 +450,14 @@ const AppointmentDetail = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow"
               disabled={assignLoading}
             >
-              {assignLoading ? "Assigning..." : "Assign Test"}
+              {assignLoading ? "Đang phân công..." : "Phân công xét nghiệm"}
             </button>
           </form>
           {/* Show assigned/completed tests */}
           <div className="mt-6">
-            <h4 className="font-semibold mb-2">Assigned/Completed Tests</h4>
+            <h4 className="font-semibold mb-2">Xét nghiệm đã phân công/hoàn thành</h4>
             {assignedTests.length === 0 ? (
-              <div className="text-gray-500 italic">No tests assigned yet.</div>
+              <div className="text-gray-500 italic">Chưa có xét nghiệm nào được phân công.</div>
             ) : (
               <ul className="space-y-2">
                 {assignedTests.map(test => (
@@ -470,13 +470,17 @@ const AppointmentDetail = () => {
                     {test.result && (
                       <div className="mt-2">
                         <span className="font-semibold text-green-700">Result:</span>
-                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') ? (
-                          <div className="mt-1">
-                            {test.result.imageUrl && (
+                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'Chụp CT' || test.testId?.name === 'X-ray' || test.testId?.name === 'X-quang' || test.testId?.name === 'Siêu âm bụng') ? (
+                          <div className="mt-1 flex flex-wrap gap-2">
+                            {Array.isArray(test.result.imageUrls) && test.result.imageUrls.length > 0 ? (
+                              test.result.imageUrls.map((url, idx) => (
+                                <img key={idx} src={url} alt={`Scan/X-ray ${idx + 1}`} className="max-w-xs rounded shadow" />
+                              ))
+                            ) : test.result.imageUrl ? (
                               <img src={test.result.imageUrl} alt="Scan/X-ray" className="max-w-xs rounded shadow" />
-                            )}
+                            ) : null}
                             {test.result.notes && (
-                              <div className="text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                              <div className="w-full text-gray-700 mt-1">Notes: {test.result.notes}</div>
                             )}
                           </div>
                         ) : (
@@ -509,9 +513,9 @@ const AppointmentDetail = () => {
       {/* Patient view: show assigned/completed tests with payment info and pay for all tests, and display results like doctor view */}
       {user.role === "patient" && (
         <div className="mb-8 bg-white rounded-xl shadow p-6">
-          <h4 className="font-semibold mb-2">Assigned/Completed Tests</h4>
+          <h4 className="font-semibold mb-2">Xét nghiệm đã phân công/hoàn thành</h4>
           {assignedTests.length === 0 ? (
-            <div className="text-gray-500 italic">No tests assigned yet.</div>
+            <div className="text-gray-500 italic">Chưa có xét nghiệm nào được phân công.</div>
           ) : (
             <>
               {/* Calculate total unpaid price */}
@@ -520,8 +524,8 @@ const AppointmentDetail = () => {
                 const totalUnpaid = unpaidTests.reduce((sum, test) => sum + (test.testId?.price || 0), 0);
                 return unpaidTests.length > 0 ? (
                   <div className="mb-4 flex flex-col md:flex-row md:items-center gap-2">
-                    <span className="font-semibold text-yellow-700">Total unpaid tests: {unpaidTests.length}</span>
-                    <span className="font-semibold text-yellow-700">Total: {totalUnpaid.toLocaleString()}₫</span>
+                    <span className="font-semibold text-yellow-700">Số lượng xét nghiệm chưa thanh toán: {unpaidTests.length}</span>
+                    <span className="font-semibold text-yellow-700">Tổng: {totalUnpaid.toLocaleString()}₫</span>
                     <button
                       className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-4 py-2 rounded shadow"
                       onClick={async () => {
@@ -540,7 +544,7 @@ const AppointmentDetail = () => {
                         }
                       }}
                     >
-                      Pay for All Tests
+                      Thanh toán tất cả xét nghiệm
                     </button>
                   </div>
                 ) : null;
@@ -550,28 +554,32 @@ const AppointmentDetail = () => {
                   <li key={test._id} className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex flex-col gap-2">
                     <div className="flex flex-col md:flex-row md:items-center gap-2">
                       <span className="font-medium text-blue-700">{test.testId?.name}</span>
-                      <span className="text-gray-700">Nurse: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
+                      <span className="text-gray-700">Y tá: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
                       <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">{test.status}</span>
-                      <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">Price: {test.testId?.price?.toLocaleString()}₫</span>
-                      <span className={`text-xs px-2 py-1 rounded ${test.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{test.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</span>
+                      <span className="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">Giá: {test.testId?.price?.toLocaleString()}₫</span>
+                      <span className={`text-xs px-2 py-1 rounded ${test.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{test.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
                     </div>
                     {test.result && (
                       <div className="mt-2">
-                        <span className="font-semibold text-green-700">Result:</span>
-                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'X-ray') ? (
-                          <div className="mt-1">
-                            {test.result.imageUrl && (
-                              <img src={test.result.imageUrl} alt="Scan/X-ray" className="max-w-xs rounded shadow" />
-                            )}
+                        <span className="font-semibold text-green-700">Kết quả:</span>
+                        {(test.testId?.name === 'CT Scan' || test.testId?.name === 'Chụp CT' || test.testId?.name === 'X-ray' || test.testId?.name === 'X-quang' || test.testId?.name === 'Siêu âm bụng') ? (
+                          <div className="mt-1 flex flex-wrap gap-2">
+                            {Array.isArray(test.result.imageUrls) && test.result.imageUrls.length > 0 ? (
+                              test.result.imageUrls.map((url, idx) => (
+                                <img key={idx} src={url} alt={`Ảnh xét nghiệm ${idx + 1}`} className="max-w-xs rounded shadow" />
+                              ))
+                            ) : test.result.imageUrl ? (
+                              <img src={test.result.imageUrl} alt="Ảnh xét nghiệm" className="max-w-xs rounded shadow" />
+                            ) : null}
                             {test.result.notes && (
-                              <div className="text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                              <div className="w-full text-gray-700 mt-1">Ghi chú: {test.result.notes}</div>
                             )}
                           </div>
                         ) : (
                           <div className="mt-1 grid grid-cols-2 gap-2">
                             {typeof test.result === 'object' ? (
                               Object.entries(test.result).map(([key, value]) => (
-                                key !== 'imageUrl' && key !== 'notes' ? (
+                                key !== 'imageUrl' && key !== 'imageUrls' && key !== 'notes' ? (
                                   <div key={key} className="text-gray-700">
                                     <b>{key}:</b> {value}
                                   </div>
@@ -581,7 +589,7 @@ const AppointmentDetail = () => {
                               <div className="text-gray-700">{test.result}</div>
                             )}
                             {test.result.notes && (
-                              <div className="col-span-2 text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                              <div className="col-span-2 text-gray-700 mt-1">Ghi chú: {test.result.notes}</div>
                             )}
                           </div>
                         )}
@@ -600,7 +608,7 @@ const AppointmentDetail = () => {
           className="space-y-6 bg-white rounded-xl shadow p-8"
         >
           <div>
-            <label className="block font-semibold mb-1">Symptoms</label>
+            <label className="block font-semibold mb-1">Triệu chứng</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={symptoms}
@@ -609,7 +617,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1">Diagnosis</label>
+            <label className="block font-semibold mb-1">Chẩn đoán</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={diagnosis}
@@ -618,7 +626,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1">Conclusion</label>
+            <label className="block font-semibold mb-1">Kết luận</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-vertical min-h-[300px]"
               value={conclusion}
@@ -626,7 +634,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-2">Prescriptions</label>
+            <label className="block font-semibold mb-2">Đơn thuốc</label>
           <div className="space-y-3">
             {prescriptions.map((pres, idx) => (
               <div
@@ -635,7 +643,7 @@ const AppointmentDetail = () => {
               >
                 <div className="flex flex-wrap gap-2 items-center">
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Medicine</label>
+                    <label className="text-xs font-medium mb-1">Thuốc</label>
                     <select
                       value={pres.medicineId}
                       onChange={(e) =>
@@ -644,7 +652,7 @@ const AppointmentDetail = () => {
                       className="border border-gray-300 rounded px-2 py-1 min-w-[120px] focus:outline-none focus:ring-2 focus:ring-blue-400"
                       required
                     >
-                      <option value="">Select medicine</option>
+                      <option value="">Chọn thuốc</option>
                       {medicines.map((med) => (
                         <option key={med._id} value={med._id}>
                           {med.name}
@@ -653,7 +661,7 @@ const AppointmentDetail = () => {
                     </select>
                   </div>
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Dosage</label>
+                    <label className="text-xs font-medium mb-1">Liều lượng</label>
                     {getMedicineType(pres.medicineId) === "ointment" ? (
                       <select
                         value={pres.dosage}
@@ -661,11 +669,11 @@ const AppointmentDetail = () => {
                         className="border border-gray-300 rounded px-2 py-1 min-w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                         required
                       >
-                        <option value="">Select amount</option>
-                        <option value="apply thin layer">Apply thin layer</option>
-                        <option value="pea-sized amount">Pea-sized amount</option>
-                        <option value="cover affected area">Cover affected area</option>
-                        <option value="as directed">As directed</option>
+                        <option value="">Chọn lượng</option>
+                        <option value="apply thin layer">Bôi một lớp mỏng</option>
+                        <option value="pea-sized amount">Lượng bằng hạt đậu</option>
+                        <option value="cover affected area">Phủ vùng bị ảnh hưởng</option>
+                        <option value="as directed">Theo chỉ dẫn</option>
                       </select>
                     ) : (
                       <input
@@ -681,9 +689,9 @@ const AppointmentDetail = () => {
                   </div>
                   {/* Frequency removed */}
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Duration</label>
+                    <label className="text-xs font-medium mb-1">Thời gian dùng</label>
                     <input
-                      placeholder="Duration"
+                      placeholder="Thời gian dùng"
                       value={pres.duration}
                       onChange={(e) =>
                         updatePrescription(idx, "duration", e.target.value)
@@ -697,7 +705,7 @@ const AppointmentDetail = () => {
                       type="button"
                       onClick={() => removePrescription(idx)}
                       className="text-red-600 px-2 text-lg hover:bg-red-50 rounded transition mt-5"
-                      title="Remove"
+                      title="Xóa"
                     >
                       &times;
                     </button>
@@ -705,7 +713,7 @@ const AppointmentDetail = () => {
                 </div>
                 {/* Instruction sets for this medicine */}
                 <div className="ml-2 mt-2">
-                  <label className="text-xs font-semibold">Instructions</label>
+                  <label className="text-xs font-semibold">Hướng dẫn sử dụng</label>
                   {pres.instructions.map((instr, instrIdx) => (
                     <div key={instrIdx} className="flex flex-wrap gap-2 items-center mt-1">
                       {getMedicineType(pres.medicineId) !== "ointment" && (
@@ -715,25 +723,25 @@ const AppointmentDetail = () => {
                             onChange={(e) => updateInstruction(idx, instrIdx, "mealTime", e.target.value)}
                             className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
                           >
-                            <option value="">Meal Time</option>
-                            <option value="Breakfast">Breakfast</option>
-                            <option value="Lunch">Lunch</option>
-                            <option value="Dinner">Dinner</option>
+                            <option value="">Thời điểm ăn</option>
+                            <option value="Breakfast">Sáng</option>
+                            <option value="Lunch">Trưa</option>
+                            <option value="Dinner">Tối</option>
                           </select>
                           <select
                             value={instr.mealRelation}
                             onChange={(e) => updateInstruction(idx, instrIdx, "mealRelation", e.target.value)}
                             className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
                           >
-                            <option value="">Meal Relation</option>
-                            <option value="Before Meal">Before Meal</option>
-                            <option value="After Meal">After Meal</option>
+                            <option value="">Liên quan bữa ăn</option>
+                            <option value="Before Meal">Trước ăn</option>
+                            <option value="After Meal">Sau ăn</option>
                           </select>
                         </>
                       )}
                       <input
                         type="text"
-                        placeholder="Custom instruction"
+                        placeholder="Hướng dẫn thêm"
                         value={instr.custom}
                         onChange={(e) => updateInstruction(idx, instrIdx, "custom", e.target.value)}
                         className="border border-gray-300 rounded px-2 py-1 min-w-[120px] focus:outline-none"
@@ -743,7 +751,7 @@ const AppointmentDetail = () => {
                           type="button"
                           onClick={() => removeInstruction(idx, instrIdx)}
                           className="text-red-600 px-2 text-lg hover:bg-red-50 rounded transition"
-                          title="Remove instruction"
+                          title="Xóa hướng dẫn"
                         >
                           &times;
                         </button>
@@ -755,7 +763,7 @@ const AppointmentDetail = () => {
                     onClick={() => addInstruction(idx)}
                     className="mt-1 text-blue-600 hover:text-blue-800 text-xs font-medium"
                   >
-                    + Add Instruction
+                    + Thêm hướng dẫn
                   </button>
                 </div>
               </div>
@@ -766,21 +774,21 @@ const AppointmentDetail = () => {
             onClick={addPrescription}
             className="mt-3 text-blue-600 hover:text-blue-800 font-medium transition"
           >
-            + Add Prescription
+            + Thêm thuốc
           </button>
           </div>
           <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow transition"
           >
-            {editMode ? "Update Medical Record" : "Save Medical Record"}
+            {editMode ? "Cập nhật hồ sơ bệnh án" : "Lưu hồ sơ bệnh án"}
           </button>
         </form>
       ) : (
         // Patient view: read-only
         <div className="space-y-6 bg-white rounded-xl shadow p-8">
           <div>
-            <label className="block font-semibold mb-1">Symptoms</label>
+            <label className="block font-semibold mb-1">Triệu chứng</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={symptoms}
@@ -788,7 +796,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1">Diagnosis</label>
+            <label className="block font-semibold mb-1">Chẩn đoán</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={diagnosis}
@@ -796,7 +804,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-1">Conclusion</label>
+            <label className="block font-semibold mb-1">Kết luận</label>
             <textarea
               className="border border-gray-300 rounded px-3 py-2 w-full bg-gray-100 resize-vertical min-h-[120px]"
               value={conclusion}
@@ -804,7 +812,7 @@ const AppointmentDetail = () => {
             />
           </div>
           <div>
-            <label className="block font-semibold mb-2">Prescriptions</label>
+            <label className="block font-semibold mb-2">Đơn thuốc</label>
           <div className="space-y-3">
             {prescriptions.map((pres, idx) => (
               <div
@@ -813,7 +821,7 @@ const AppointmentDetail = () => {
               >
                 <div className="flex flex-wrap gap-2 items-center">
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Medicine</label>
+                    <label className="text-xs font-medium mb-1">Thuốc</label>
                     <input
                       value={
                         medicines.find((m) => m._id === pres.medicineId)?.name || ""
@@ -823,7 +831,7 @@ const AppointmentDetail = () => {
                     />
                   </div>
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Dosage</label>
+                    <label className="text-xs font-medium mb-1">Liều lượng</label>
                     <input
                       value={pres.dosage}
                       className="border border-gray-300 rounded px-2 py-1 w-24 bg-gray-100"
@@ -832,7 +840,7 @@ const AppointmentDetail = () => {
                   </div>
                   {/* Frequency removed */}
                   <div className="flex flex-col">
-                    <label className="text-xs font-medium mb-1">Duration</label>
+                    <label className="text-xs font-medium mb-1">Thời gian dùng</label>
                     <input
                       value={pres.duration}
                       className="border border-gray-300 rounded px-2 py-1 w-24 bg-gray-100"
@@ -842,11 +850,11 @@ const AppointmentDetail = () => {
                 </div>
                 {/* Show all instructions for this medicine */}
                 <div className="ml-2 mt-2">
-                  <label className="text-xs font-semibold mb-1">Instructions</label>
+                  <label className="text-xs font-semibold mb-1">Hướng dẫn sử dụng</label>
                   <div className="grid grid-cols-1 gap-2">
                     {(!pres.instructions || pres.instructions.length === 0 ||
                       pres.instructions.every(instr => !instr.mealTime && !instr.mealRelation && !instr.custom)) ? (
-                      <div className="text-gray-400 italic">No instructions provided</div>
+                      <div className="text-gray-400 italic">Không có hướng dẫn</div>
                     ) : (
                       (pres.instructions && pres.instructions.length > 0
                         ? pres.instructions
@@ -863,7 +871,7 @@ const AppointmentDetail = () => {
                             <span role="img" aria-label="pill" className="text-blue-400 text-lg">💊</span>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 w-full">
                               <div className="flex gap-2 items-center flex-wrap">
-                                {main.length > 0 ? main : <span className="text-gray-400 italic">No meal info</span>}
+                                {main.length > 0 ? main : <span className="text-gray-400 italic">Không có thông tin bữa ăn</span>}
                               </div>
                               {hasCustom && (
                                 <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-medium whitespace-pre-line">

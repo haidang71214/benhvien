@@ -354,7 +354,7 @@ const Appointment = () => {
                 <b>Bác sĩ:</b> {docInfo?.name}
               </div>
               <div>
-                <b>Chuyên khoa:</b> {docInfo?.speciality}
+                <b>Chuyên khoa:</b> {Array.isArray(docInfo?.speciality) ? docInfo.speciality.join(', ') : docInfo?.speciality}
               </div>
               <div>
                 <b>Ngày khám:</b> {selectedDate && selectedDate.toLocaleDateString('vi-VN')}
@@ -367,8 +367,7 @@ const Appointment = () => {
                 {initialSymptom || <span className="italic text-gray-400">(Chưa nhập)</span>}
               </div>
               <div>
-                <b>Phí khám:</b> {currencySymbol}
-                {docInfo?.fees}
+                <b>Phí khám:</b> {docInfo?.fees ? `${docInfo.fees.toLocaleString()}đ` : 'Miễn phí'}
               </div>
               <button
                 onClick={handleChatAction}
@@ -415,7 +414,7 @@ const Appointment = () => {
               {docInfo.name}
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              {docInfo.degree} • {docInfo.speciality}
+              {docInfo.degree} • {Array.isArray(docInfo.speciality) ? docInfo.speciality.join(', ') : docInfo.speciality}
             </p>
             <div className="mt-2 text-sm font-medium bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full inline-block">
               {docInfo.experience} kinh nghiệm
@@ -446,8 +445,7 @@ const Appointment = () => {
               {conversationId ? 'Tiếp tục chat' : 'Bắt đầu chat'}
             </button>
             <p className="text-green-600 font-bold mt-4 text-lg flex items-center gap-2">
-              <span className="text-2xl">💰</span> Phí khám: {currencySymbol}
-              {docInfo.fees}
+              <span className="text-2xl">💰</span> Phí khám: {docInfo.fees ? `${docInfo.fees.toLocaleString()}đ` : 'Miễn phí'}
             </p>
           </div>
         </div>

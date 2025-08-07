@@ -8,13 +8,11 @@ const AccountLayout = () => {
   const navItems = [
     {
       to: "/account-settings",
-      to: "/account-settings",
       icon: User,
       label: "Hồ sơ",
       end: true,
     },
     {
-      to: "/account-settings/change-password",
       to: "/account-settings/change-password",
       icon: Lock,
       label: "Đổi mật khẩu",
