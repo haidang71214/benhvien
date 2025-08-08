@@ -13,7 +13,8 @@ const payos = new PayOS(
 export const createPaymentLink = async (req, res) => {
   try {
     const { amount, appointmentTime, doctorId, initialSymptom, patientId } = req.body;
-
+    console.log(amount, appointmentTime, doctorId, initialSymptom, patientId);
+    
     if (!amount || !appointmentTime || !doctorId || !patientId) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -66,7 +67,8 @@ export const createPaymentLink = async (req, res) => {
     // Save orderCode to tempBooking for lookup later
     tempBooking.orderCode = orderCode;
     await tempBooking.save();
-
+    console.log("aaaaaaaaaaaaa",paymentLink.checkoutUrl);
+    
     res.json({ url: paymentLink.checkoutUrl });
   } catch (err) {
     console.error(err);

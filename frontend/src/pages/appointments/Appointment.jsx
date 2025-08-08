@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useChat } from "../../context/ChatContext";
 import { toast } from "react-hot-toast";
 import { io } from "socket.io-client";
-import { SOCKET_URL } from "../../utils/axiosInstance";
+import { axiosInstance, SOCKET_URL } from "../../utils/axiosInstance";
 import { isValidDate } from "../../utils/dateUtils";
 
 // Custom Hooks
@@ -30,23 +30,31 @@ const Appointment = () => {
   const navigate = useNavigate();
   const socket = useMemo(() => io(`${SOCKET_URL}`), []);
   const { user } = useAuth();
+  console.log(user);
+
   const { openChat, isChatOpen, currentConversationId, closeChat } = useChat();
-  
+
   // State
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");
   const [initialSymptom, setInitialSymptom] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+
   // Custom hooks
   const { doctor: docInfo } = useDoctorDetail(docId);
   const appointments = useAppointments(docId);
   const [conversationId, setConversationId] = useConversation(user?.id, docId);
-  const { availableTimes, bookedTimes } = useSchedule(selectedDate, appointments, docInfo, docId);
+  const { availableTimes, bookedTimes } = useSchedule(
+    selectedDate,
+    appointments,
+    docInfo,
+    docId
+  );
 
   // Handlers
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (!isValidDate(selectedDate) || !selectedTime) {
       toast.error("Vui lòng chọn ngày và giờ khám");
       return;
@@ -59,20 +67,20 @@ const Appointment = () => {
     setShowConfirm(true);
   };
 
-  const handleConfirmBooking = async () => {
+  const handleConfirmBooking = async (e) => {
+    e.preventDefault();
     if (!isValidDate(selectedDate) || !selectedTime) {
       toast.error("Vui lòng chọn ngày và giờ khám");
       return;
     }
-    
+
     try {
       setIsLoading(true);
       setShowConfirm(false);
-      
+
       const [hour, minute] = selectedTime.split(":");
       const appointmentDate = new Date(selectedDate);
       appointmentDate.setHours(parseInt(hour), parseInt(minute), 0, 0);
-      
       const paymentData = await appointmentService.createPaymentLink({
         appointmentTime: appointmentDate.toISOString(),
         doctorId: docId,
@@ -80,7 +88,6 @@ const Appointment = () => {
         amount: docInfo.fees,
         patientId: user.id,
       });
-
       window.location.href = paymentData.url;
     } catch (error) {
       console.error(error);
@@ -92,12 +99,12 @@ const Appointment = () => {
 
   const handleChatAction = () => {
     chatService.handleChatAction(
-      user, 
-      docId, 
-      socket, 
-      conversationId, 
-      setConversationId, 
-      initialSymptom, 
+      user,
+      docId,
+      socket,
+      conversationId,
+      setConversationId,
+      initialSymptom,
       openChat
     );
   };
