@@ -59,6 +59,7 @@ useEffect(() => {
     <div
       style={{
         position: 'fixed',
+        top:"200px",
         bottom: '20px',
         right: '320px',
         width: '400px',

@@ -256,9 +256,10 @@ const Navbar = () => {
         <>
           <SliderChatUser
             onClose={handleCloseChat}
-            onSelectConversation={(conversationId) =>
-              setSelectedConversationId(conversationId)
-            }
+            onSelectConversation={(conversationId) => {
+              setSelectedConversationId(conversationId);
+              setIsChatOpen(true);
+            }}
           />
           {selectedConversationId && (
             <ChatWindow
