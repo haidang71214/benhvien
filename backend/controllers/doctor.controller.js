@@ -4,8 +4,12 @@ import MedicalRecords from "../model/medical.js";
 import medicines from "../model/medicines.js";
 import Prescription from "../model/prescription.js";
 import { users } from "../model/user.js";
-import { checkAdmin, checkDoctor, checkReceptionist } from "./admin.controller.js";
-import doctorRequest from "../model/doctorRequestSchema.js"
+import {
+  checkAdmin,
+  checkDoctor,
+  checkReceptionist,
+} from "./admin.controller.js";
+import doctorRequest from "../model/doctorRequestSchema.js";
 // tạo lịch khám, tạo đơn thuốc, kiểm tra thuốc trong kho
 // tạo hồ sơ bệnh án, cập nhật hồ so bệnh án, xem hồ sơ bệnh án
 // cập nhật cái trạng thái của thằng dụng cụ y tế, hỏng hay loại bỏ, hay đang vệ sinh
@@ -24,18 +28,18 @@ const getAppointment = async (req, res) => {
 
 const getAppointmentsByUserId = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const data = await appointments.find({
-      $or: [
-        { patientId: userId },
-        { doctorId: userId }
-      ]
-    })
-    .populate("doctorId", "userName avatarUrl")
-    .populate("patientId", "userName avatarUrl")
-    ;
+    const userId = new mongoose.Types.ObjectId(req.params.id);
+    console.log("Backend received userId:", userId); // 👈 Thêm dòng này
+    const data = await appointments
+      .find({
+        $or: [{ patientId: userId }, { doctorId: userId }],
+      })
+      .populate("doctorId", "userName avatarUrl")
+      .populate("patientId", "userName avatarUrl");
+    console.log("Backend query result:", data); // 👈 Thêm dòng này để xem kết quả
     return res.status(200).json({ data });
   } catch (error) {
+    console.error("Server error:", error); // 👈 Xử lý và log lỗi
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -97,17 +101,22 @@ const createAppointment = async (req, res) => {
     const appointmentDate = new Date(appointmentTime);
     const now = new Date();
     if (appointmentDate < now) {
-      return res.status(400).json({ message: "Không thể đặt lịch cho ngày đã qua." });
+      return res
+        .status(400)
+        .json({ message: "Không thể đặt lịch cho ngày đã qua." });
     }
 
     // 2. Check for existing appointment with same doctor and time
     const exists = await appointments.findOne({
       doctorId,
-      appointmentTime: appointmentDate
+      appointmentTime: appointmentDate,
     });
 
     if (exists) {
-      return res.status(400).json({ message: "Bác sĩ đã có lịch hẹn vào thời gian này. Vui lòng chọn thời gian khác." });
+      return res.status(400).json({
+        message:
+          "Bác sĩ đã có lịch hẹn vào thời gian này. Vui lòng chọn thời gian khác.",
+      });
     }
 
     // If not exists and date is valid, create new appointment
@@ -116,10 +125,12 @@ const createAppointment = async (req, res) => {
       patientId,
       appointmentTime: appointmentDate,
       reason: req.body.reason || "",
-      initialSymptom
+      initialSymptom,
     });
 
-    return res.status(201).json({ message: "Đặt lịch thành công", data: newAppointment });
+    return res
+      .status(201)
+      .json({ message: "Đặt lịch thành công", data: newAppointment });
   } catch (error) {
     console.error("Error creating appointment:", error);
     return res.status(500).json({ message: "Lỗi server" });
@@ -149,17 +160,21 @@ const updateAppointment = async (req, res) => {
     const conflict = await appointments.findOne({
       doctorId: appointment.doctorId,
       appointmentTime: new Date(newTime),
-      _id: { $ne: id }
+      _id: { $ne: id },
     });
     if (conflict) {
-      return res.status(400).json({ message: "Bác sĩ đã có lịch vào thời gian này." });
+      return res
+        .status(400)
+        .json({ message: "Bác sĩ đã có lịch vào thời gian này." });
     }
 
     // Update appointment time
     appointment.appointmentTime = new Date(newTime);
     await appointment.save();
 
-    return res.status(200).json({ message: "Đổi lịch thành công", data: appointment });
+    return res
+      .status(200)
+      .json({ message: "Đổi lịch thành công", data: appointment });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Lỗi server" });
@@ -305,11 +320,18 @@ const createNowAppoinment = async (req, res) => {
   } catch (error) {
     throw new Error(error);
   }
-}; 
+};
 
 const createMedicalRecord = async (req, res) => {
   try {
-    const { appointmentId, patientId, doctorId, symptoms, diagnosis, conclusion } = req.body;
+    const {
+      appointmentId,
+      patientId,
+      doctorId,
+      symptoms,
+      diagnosis,
+      conclusion,
+    } = req.body;
     const newMedicalRecord = await MedicalRecords.create({
       appointmentId,
       patientId,
@@ -335,7 +357,9 @@ const createPrescription = async (req, res) => {
     // Build medicines array for prescription
     const prescriptionMedicines = [];
     for (const med of medicinesArr) {
-      const medicine = await medicines.findById(new mongoose.Types.ObjectId(med.medicineId));
+      const medicine = await medicines.findById(
+        new mongoose.Types.ObjectId(med.medicineId)
+      );
       if (!medicine) {
         return res.status(404).json({ message: `Medicine not found` });
       }
@@ -412,7 +436,8 @@ const updatePrescription = async (req, res) => {
       { medicalRecordId, medicines },
       { new: true }
     );
-    if (!updated) return res.status(404).json({ message: "Prescription not found" });
+    if (!updated)
+      return res.status(404).json({ message: "Prescription not found" });
     res.status(200).json({ createPrescription: updated });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -454,11 +479,22 @@ const getAndFilterDoctor = async (req, res) => {
     });
   }
 };
- const userCreateRequest = async (req, res) => {
+const userCreateRequest = async (req, res) => {
   try {
-    const { speciality, licenseNumber, bio, degree, experience, about, fees,province,warn,distric } = req.body;
+    const {
+      speciality,
+      licenseNumber,
+      bio,
+      degree,
+      experience,
+      about,
+      fees,
+      province,
+      warn,
+      distric,
+    } = req.body;
     console.log(req.speciality);
-    
+
     const existing = await doctorRequest.findOne({ userId: req.user.id });
     if (existing) {
       return res.status(400).json({ message: "Bạn đã gửi yêu cầu trước đó" });
@@ -476,14 +512,16 @@ const getAndFilterDoctor = async (req, res) => {
       fees,
       imgHanhNghe: imageUrl,
       province,
-      address:`${province}` + `${distric}` + `${warn}`
+      address: `${province}` + `${distric}` + `${warn}`,
     });
 
-    res.status(201).json({ message: "Gửi yêu cầu thành công", data: newRequest });
+    res
+      .status(201)
+      .json({ message: "Gửi yêu cầu thành công", data: newRequest });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
-} 
+};
 export {
   userCreateRequest,
   getAppointment,

@@ -78,7 +78,7 @@ const Doctors = () => {
                 onRetry={handleRetry}
                 onSpecialtyClick={handleSpecialtyClick}
               />
-            </div>             
+            </div>
           </div>
         </div>
       </div>

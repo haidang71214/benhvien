@@ -17,7 +17,6 @@ export const useDoctors = () => {
 
     try {
       const { data } = await axiosInstance.get("/admin/getAllDoctors");
-      console.log("Doctors fetched:", data); // kiểm tra data
       setDoctors(data.data || []);
     } catch (err) {
       console.error("Error fetching doctors:", err);

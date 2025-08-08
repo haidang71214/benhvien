@@ -179,7 +179,8 @@ const BookingModal = ({
               Hủy bỏ
             </button>
             <button
-              onClick={onConfirm}
+              type="button"
+              onClick={(e) => onConfirm(e)} // truyền sự kiện rõ ràng xuống
               disabled={isLoading}
               className="flex-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none disabled:shadow-lg flex items-center justify-center gap-2"
             >

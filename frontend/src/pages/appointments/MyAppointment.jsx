@@ -8,7 +8,7 @@ import {
 } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
-import { enUS } from "date-fns/locale"; // nếu cần chuyển sang vi hoặc thêm tiếng Việt có thể dùng viLocale
+import { enUS } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
 
@@ -28,12 +28,25 @@ const MyAppointment = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user?.id) return;
+    console.log("Current User:", user); // 👈 kiểm tra full object
+
+    if (!user || !user.id) {
+      console.warn("No user ID found, skipping fetch");
+      return;
+    }
+    console.log("Fetching appointments for user ID:", user.id); // 👉 Thêm dòng này
     setLoading(true);
+
     axiosInstance
       .get(`/doctor/getAppointmentsByUserId/${user.id}`)
-      .then((res) => setAppointments(res.data.data || []))
-      .catch(() => setAppointments([]))
+      .then((res) => {
+        console.log("Appointments fetched:", res.data.data);
+        setAppointments(res.data.data || []);
+      })
+      .catch((err) => {
+        console.error("Error fetching appointments", err);
+        setAppointments([]);
+      })
       .finally(() => setLoading(false));
   }, [user]);
 
@@ -99,6 +112,8 @@ const MyAppointment = () => {
       </div>
     );
 
+  console.log("Appointments data:", appointments);
+
   const events = appointments.map((appt) => ({
     id: appt._id,
     title: `${appt.doctorId?.userName || "Không rõ"}${
@@ -108,6 +123,8 @@ const MyAppointment = () => {
     end: new Date(new Date(appt.appointmentTime).getTime() + 30 * 60 * 1000),
     resource: appt,
   }));
+
+  console.log("Events to show:", events);
 
   return (
     <div className="max-w-4xl mx-auto pt-24 px-4">

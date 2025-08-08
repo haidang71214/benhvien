@@ -1,7 +1,7 @@
 import { axiosInstance } from "../utils/axiosInstance";
 
 export const appointmentService = {
-  createPaymentLink: async (appointmentData) => {
+  createPaymentLink: async (appointmentData) => {    
     const response = await axiosInstance.post(
       "/payment/create-payment-link",
       appointmentData
