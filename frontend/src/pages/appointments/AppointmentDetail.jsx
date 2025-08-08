@@ -464,12 +464,12 @@ const AppointmentDetail = () => {
                   <li key={test._id} className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex flex-col gap-2">
                     <div className="flex flex-col md:flex-row md:items-center gap-2">
                       <span className="font-medium text-blue-700">{test.testId?.name}</span>
-                      <span className="text-gray-700">Nurse: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
+                      <span className="text-gray-700">Y tá: {typeof test.nurseId === 'object' ? test.nurseId.userName : test.nurseId}</span>
                       <span className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700">{test.status}</span>
                     </div>
                     {test.result && (
                       <div className="mt-2">
-                        <span className="font-semibold text-green-700">Result:</span>
+                        <span className="font-semibold text-green-700">Kết quả:</span>
                         {(test.testId?.name === 'CT Scan' || test.testId?.name === 'Chụp CT' || test.testId?.name === 'X-ray' || test.testId?.name === 'X-quang' || test.testId?.name === 'Siêu âm bụng') ? (
                           <div className="mt-1 flex flex-wrap gap-2">
                             {Array.isArray(test.result.imageUrls) && test.result.imageUrls.length > 0 ? (
@@ -480,14 +480,19 @@ const AppointmentDetail = () => {
                               <img src={test.result.imageUrl} alt="Scan/X-ray" className="max-w-xs rounded shadow" />
                             ) : null}
                             {test.result.notes && (
-                              <div className="w-full text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                              <div className="w-full text-gray-700 mt-1">Ghi chú: {test.result.notes}</div>
                             )}
                           </div>
                         ) : (
                           <div className="mt-1 grid grid-cols-2 gap-2">
-                            {typeof test.result === 'object' ? (
+                            {/* Custom display for Khám lâm sàng */}
+                            {test.testId?.name === 'Khám lâm sàng' && typeof test.result === 'object' ? (
+                              <div className="col-span-2 text-gray-700 font-semibold">
+                                Mạch: {test.result.mach || ''} lần/phút – Huyết áp: {test.result.huyetap1 || ''}/{test.result.huyetap2 || ''} mmHg – Nhiệt độ: {test.result.nhietdo || ''} °C
+                              </div>
+                            ) : typeof test.result === 'object' ? (
                               Object.entries(test.result).map(([key, value]) => (
-                                key !== 'imageUrl' && key !== 'notes' ? (
+                                key !== 'imageUrl' && key !== 'imageUrls' && key !== 'notes' ? (
                                   <div key={key} className="text-gray-700">
                                     <b>{key}:</b> {value}
                                   </div>
@@ -497,7 +502,7 @@ const AppointmentDetail = () => {
                               <div className="text-gray-700">{test.result}</div>
                             )}
                             {test.result.notes && (
-                              <div className="col-span-2 text-gray-700 mt-1">Notes: {test.result.notes}</div>
+                              <div className="col-span-2 text-gray-700 mt-1">Ghi chú: {test.result.notes}</div>
                             )}
                           </div>
                         )}
@@ -723,7 +728,7 @@ const AppointmentDetail = () => {
                             onChange={(e) => updateInstruction(idx, instrIdx, "mealTime", e.target.value)}
                             className="border border-gray-300 rounded px-2 py-1 min-w-[100px] focus:outline-none"
                           >
-                            <option value="">Thời điểm ăn</option>
+                            <option value="">Bữa ăn</option>
                             <option value="Breakfast">Sáng</option>
                             <option value="Lunch">Trưa</option>
                             <option value="Dinner">Tối</option>

@@ -68,7 +68,7 @@ useEffect(() => {
             Không có xét nghiệm nào được giao.<br />
             <span className="text-xs text-gray-400">Mã điều dưỡng: {user?.id || 'không rõ'}</span>
             <br />
-            <span className="text-xs text-gray-400">Nếu bạn mong đợi có xét nghiệm, hãy kiểm tra backend với TestAssignment có nurseId trùng và trạng thái 'assigned'.</span>
+            {/* <span className="text-xs text-gray-400">Nếu bạn mong đợi có xét nghiệm, hãy kiểm tra backend với TestAssignment có nurseId trùng và trạng thái 'assigned'.</span> */}
           </div>
         ) : (
           <ul className="space-y-6">
@@ -270,8 +270,95 @@ useEffect(() => {
                       </div>
                     </div>
                   )}
+                  {/* Khám lâm sàng: nhập Mạch, Huyết áp, Nhiệt độ */}
+                  {test.testId?.name === 'Khám lâm sàng' && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div>
+                        <label className="font-semibold text-xs text-blue-700">Mạch (lần/phút)</label>
+                        <input
+                          type="number"
+                          placeholder="Mạch"
+                          value={resultInputs[test._id]?.mach || ""}
+                          onChange={e => setResultInputs(prev => ({
+                            ...prev,
+                            [test._id]: {
+                              ...(prev[test._id] || {}),
+                              mach: e.target.value
+                            }
+                          }))}
+                          className="border border-gray-300 rounded px-2 py-1 w-full bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="font-semibold text-xs text-blue-700">Huyết áp (mmHg)</label>
+                        <div className="flex gap-1 items-center">
+                          <input
+                            type="number"
+                            placeholder="Tâm thu"
+                            value={resultInputs[test._id]?.huyetap1 || ""}
+                            onChange={e => setResultInputs(prev => ({
+                              ...prev,
+                              [test._id]: {
+                                ...(prev[test._id] || {}),
+                                huyetap1: e.target.value
+                              }
+                            }))}
+                            className="border border-gray-300 rounded px-2 py-1 w-1/2 bg-white"
+                          />
+                          <span className="mx-1">/</span>
+                          <input
+                            type="number"
+                            placeholder="Tâm trương"
+                            value={resultInputs[test._id]?.huyetap2 || ""}
+                            onChange={e => setResultInputs(prev => ({
+                              ...prev,
+                              [test._id]: {
+                                ...(prev[test._id] || {}),
+                                huyetap2: e.target.value
+                              }
+                            }))}
+                            className="border border-gray-300 rounded px-2 py-1 w-1/2 bg-white"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="font-semibold text-xs text-blue-700">Nhiệt độ (°C)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          placeholder="Nhiệt độ"
+                          value={resultInputs[test._id]?.nhietdo || ""}
+                          onChange={e => setResultInputs(prev => ({
+                            ...prev,
+                            [test._id]: {
+                              ...(prev[test._id] || {}),
+                              nhietdo: e.target.value
+                            }
+                          }))}
+                          className="border border-gray-300 rounded px-2 py-1 w-full bg-white"
+                        />
+                      </div>
+                      <div className="col-span-1 sm:col-span-3 mt-2">
+                        <button
+                          onClick={async () => {
+                            const input = resultInputs[test._id];
+                            if (!input?.mach && !input?.huyetap1 && !input?.huyetap2 && !input?.nhietdo) {
+                              toast.error("Vui lòng nhập đầy đủ thông tin khám lâm sàng");
+                              return;
+                            }
+                            // Format result string
+                            const result = `Mạch: ${input.mach || ''} lần/phút – Huyết áp: ${input.huyetap1 || ''}/${input.huyetap2 || ''} mmHg – Nhiệt độ: ${input.nhietdo || ''} °C`;
+                            await handleSubmitResult(test._id, result);
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow w-full"
+                        >
+                          <span role="img" aria-label="submit">📤</span> Gửi kết quả
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   {/* Khác: nhập kết quả dạng text */}
-                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'Chụp CT' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'X-quang' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Xét nghiệm máu' && test.testId?.name !== 'Urine Test' && test.testId?.name !== 'Siêu âm bụng' && (
+                  {test.testId?.name !== 'CT Scan' && test.testId?.name !== 'Chụp CT' && test.testId?.name !== 'X-ray' && test.testId?.name !== 'X-quang' && test.testId?.name !== 'Blood Test' && test.testId?.name !== 'Xét nghiệm máu' && test.testId?.name !== 'Urine Test' && test.testId?.name !== 'Siêu âm bụng' && test.testId?.name !== 'Khám lâm sàng' && (
                     <div className="flex flex-col gap-2">
                       <label className="font-semibold text-xs text-blue-700">Kết quả</label>
                       <input
