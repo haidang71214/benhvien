@@ -34,8 +34,8 @@ const Header = () => {
     return () => clearInterval(interval);
   }, []);
   return (
-    <div className="bg-slate-50 rounded-xl overflow-hidden">
-      <div className="flex flex-col lg:flex-row items-center px-6 md:px-12 lg:px-16">
+    <div className="bg-slate-50 w-full pt-6">
+      <div className="flex flex-col lg:flex-row items-center px-0 md:px-0 lg:px-0 w-full">
         <div className="flex-1 py-16 lg:py-20 space-y-8">
           <div className="inline-flex items-center bg-blue-50 border border-blue-100 rounded-full px-4 py-2 text-blue-700 text-sm font-medium">
             <Star className="w-4 h-4 mr-2 text-blue-500" />
@@ -119,7 +119,7 @@ const Header = () => {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              to="/doctors"
+              to="/booking/doctors"
               className="group flex items-center justify-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 hover:scale-105 transform transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Đặt khám ngay

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { axiosInstance } from "../../utils/axiosInstance";
+import {
+  Calendar as BigCalendar,
+  Views,
+  dateFnsLocalizer,
+} from "react-big-calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { format, parse, startOfWeek, getDay } from "date-fns";
+import { enUS } from "date-fns/locale"; // nếu cần chuyển sang vi hoặc thêm tiếng Việt có thể dùng viLocale
+import { useNavigate } from "react-router-dom";
+import { Calendar } from "lucide-react";
 
-import { Calendar as BigCalendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
-
-
-const locales = {
-  'en-US': enUS,
-};
+const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -36,83 +37,121 @@ const MyAppointment = () => {
       .finally(() => setLoading(false));
   }, [user]);
 
-  // Skeleton Loader Component
   const SkeletonLoader = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 animate-pulse">
       {[...Array(3)].map((_, i) => (
-        <div key={i} className="p-6 bg-white rounded-xl shadow animate-pulse">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-gray-200"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-            </div>
+        <div
+          key={i}
+          className="p-5 bg-white rounded-xl shadow flex gap-4 items-center"
+        >
+          <div className="w-12 h-12 bg-gray-200 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
           </div>
         </div>
       ))}
     </div>
   );
 
-  if (loading) return (
-    <div className="max-w-4xl mx-auto pt-24 px-4">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">My Appointments</h2>
-      <SkeletonLoader />
-    </div>
-  );
-
-  if (!appointments.length) return (
-    <div className="max-w-4xl mx-auto pt-24 px-4 text-center">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">My Appointments</h2>
-      <div className="p-6 bg-white rounded-xl shadow">
-        <p className="text-gray-600">No appointments found.</p>
+  if (loading)
+    return (
+      <div className="max-w-4xl mx-auto pt-24 px-4">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-blue-100 text-blue-600 rounded-xl">
+            <Calendar className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Lịch hẹn của tôi
+            </h2>
+            <p className="text-sm text-gray-500">
+              Xem tổng quan các cuộc hẹn sắp tới của bạn
+            </p>
+          </div>
+        </div>
+        <SkeletonLoader />
       </div>
-    </div>
-  );
+    );
 
+  if (!appointments.length)
+    return (
+      <div className="max-w-4xl mx-auto pt-24 px-4 text-center">
+        <div className="flex items-center gap-4 mb-8 justify-center">
+          <div className="p-3 bg-blue-100 text-blue-600 rounded-xl">
+            <Calendar className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Lịch hẹn của tôi
+            </h2>
+            <p className="text-sm text-gray-500">Bạn chưa có lịch hẹn nào</p>
+          </div>
+        </div>
+        <div className="p-8 bg-white rounded-xl shadow flex flex-col items-center space-y-4">
+          <Calendar className="w-12 h-12 text-gray-400" />
+          <p className="text-lg font-medium text-gray-700">
+            Chưa có lịch hẹn nào
+          </p>
+          <p className="text-sm text-gray-500">Hãy đặt lịch hẹn để bắt đầu!</p>
+        </div>
+      </div>
+    );
 
-  // Transform appointments to events for react-big-calendar
-  const events = appointments.map(appt => ({
+  const events = appointments.map((appt) => ({
     id: appt._id,
-    title: `${appt.doctorId?.userName || 'Unknown'}${appt.initialSymptom ? ' - ' + appt.initialSymptom : ''}`,
+    title: `${appt.doctorId?.userName || "Không rõ"}${
+      appt.initialSymptom ? " - " + appt.initialSymptom : ""
+    }`,
     start: new Date(appt.appointmentTime),
-    end: new Date(new Date(appt.appointmentTime).getTime() + 30 * 60 * 1000), // 30 min slot
+    end: new Date(new Date(appt.appointmentTime).getTime() + 30 * 60 * 1000),
     resource: appt,
   }));
 
   return (
     <div className="max-w-4xl mx-auto pt-24 px-4">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800">My Appointments</h2>
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-3 bg-blue-100 text-blue-600 rounded-xl">
+          <Calendar className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-bold text-gray-800">Lịch hẹn của tôi</h2>
+          <p className="text-sm text-gray-500">
+            Xem và quản lý các lịch hẹn đã đặt
+          </p>
+        </div>
+      </div>
       <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
         <BigCalendar
           localizer={localizer}
           events={events}
           defaultView={Views.WEEK}
-          views={['week', 'day']}
+          views={["week", "day"]}
           step={30}
           timeslots={2}
           startAccessor="start"
           endAccessor="end"
           style={{ height: 540 }}
-          onSelectEvent={event => navigate(`/appointment-detail/${event.id}`)}
+          onSelectEvent={(event) => navigate(`/appointment-detail/${event.id}`)}
           popup
           eventPropGetter={(event) => ({
             style: {
-              backgroundColor: '#2563eb',
-              color: 'white',
-              borderRadius: '8px',
-              border: 'none',
-              padding: '4px 8px',
-              fontWeight: 500,
-              boxShadow: '0 2px 8px 0 rgba(37,99,235,0.08)'
-            }
+              backgroundColor: "#1d4ed8",
+              color: "white",
+              borderRadius: "0.5rem",
+              padding: "6px 10px",
+              fontWeight: 600,
+              boxShadow: "0 4px 10px rgba(37,99,235,0.2)",
+              cursor: "pointer",
+            },
           })}
           components={{
             event: ({ event }) => (
               <div className="truncate">
                 <span className="font-semibold">{event.title}</span>
               </div>
-            )
+            ),
           }}
         />
       </div>

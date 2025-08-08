@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const testSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true }, // e.g. 'CT scan', 'Blood test'
+  name: { type: String, required: true, unique: true },
   description: { type: String },
   price: { type: Number, required: true },
   isActive: { type: Boolean, default: true },
@@ -9,5 +9,5 @@ const testSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const Test = mongoose.model('Test', testSchema);
+const Test = mongoose.model("Test", testSchema);
 export default Test;

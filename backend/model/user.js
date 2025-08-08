@@ -32,11 +32,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    address:{
-      type:String
+    address: {
+      type: String,
     },
-    province:{
-      type:String
+    province: {
+      type: String,
     },
     email: {
       type: String,
